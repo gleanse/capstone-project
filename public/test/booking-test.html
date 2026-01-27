@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Form Test - Herco Detailing Garage</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="booking-test.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-motorcycle"></i>
+      </div>
+      <h1>Herco Detailing Garage</h1>
+      <p class="subtitle">Book Your Motorcycle Detailing Service</p>
+      <span class="test-badge">TEST MODE</span>
+    </div>
+
+    <form id="bookingForm" novalidate>
+      <div class="form-group">
+        <label for="name">
+          <i class="fas fa-user"></i>
+          Full Name *
+        </label>
+        <input type="text" id="name" required minlength="2" maxlength="100" placeholder="Juan Dela Cruz"
+          pattern="[A-Za-z\s]+" title="Please enter a valid name (letters and spaces only)">
+        <span class="error-message" id="nameError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">
+          <i class="fas fa-envelope"></i>
+          Email Address *
+        </label>
+        <input type="email" id="email" required placeholder="juan@example.com"
+          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address">
+        <span class="error-message" id="emailError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">
+          <i class="fas fa-phone"></i>
+          Phone Number *
+        </label>
+        <input type="tel" id="phone" required placeholder="09171234567" maxlength="11">
+        <span class="error-message" id="phoneError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="service">
+          <i class="fas fa-spray-can"></i>
+          Select Service *
+        </label>
+        <select id="service" required>
+          <option value="">-- Choose a service --</option>
+          <option value="premium-detailing">Premium Detailing - ₱2,500</option>
+          <option value="ceramic-coating">Ceramic Coating - ₱8,000</option>
+          <option value="powder-coating">Powder Coating - ₱5,000</option>
+        </select>
+        <span class="error-message" id="serviceError"></span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="date">
+            <i class="fas fa-calendar"></i>
+            Booking Date *
+          </label>
+          <input type="date" id="date" required>
+          <span class="error-message" id="dateError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="time">
+            <i class="fas fa-clock"></i>
+            Booking Time *
+          </label>
+          <input type="time" id="time" required min="08:00" max="18:00">
+          <span class="error-message" id="timeError"></span>
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn">
+        <i class="fas fa-credit-card"></i>
+        Book & Pay Now
+      </button>
+    </form>
+
+    <div class="message" id="message"></div>
+
+    <div class="footer">
+      <p><i class="fas fa-shield-alt"></i> Secure payment powered by Xendit</p>
+    </div>
+  </div>
+
+  <script src="booking-test.js"></script>
+</body>
+</html>
