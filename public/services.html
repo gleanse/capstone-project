@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Services</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-black min-h-screen text-white">
+
+  <!-- Header -->
+  <header class="border-b border-white/10 px-6 py-4">
+    <h1 class="text-2xl font-bold tracking-widest uppercase">Herco Detailing Garage</h1>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-6 py-12">
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold mb-2">Our Services</h2>
+      <p class="text-white/50">Choose a service to get started</p>
+    </div>
+
+    <div id="services" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+  </main>
+
+  <script>
+    fetch('/api/services')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('services');
+        data.data.forEach(service => {
+          container.innerHTML += `
+            <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-red-500 transition-all duration-300 cursor-pointer group">
+              <div class="relative overflow-hidden">
+                <img src="${service.image_url}" alt="${service.name}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              </div>
+              <div class="p-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <i class="ph ph-wrench text-red-500 text-xl"></i>
+                  <h3 class="text-xl font-bold">${service.name}</h3>
+                </div>
+                <p class="text-white/50 text-sm mb-4">${service.description}</p>
+                <p class="text-red-500 font-semibold mb-4">Starting at ₱${service.price}</p>
+                <div class="border-t border-white/10 pt-4">
+                  <p class="text-xs text-white/30 uppercase tracking-widest mb-2">Variants</p>
+                  <div class="flex flex-col gap-2">
+                    ${service.variants.map(v => `
+                      <div class="flex justify-between items-center text-sm">
+                        <span class="text-white/70">${v.name}</span>
+                        <span class="text-white font-medium">₱${v.price}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                <button class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+                  <i class="ph ph-calendar"></i>
+                  Book Now
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      });
+  </script>
+
+</body>
+</html>

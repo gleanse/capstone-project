@@ -16,6 +16,7 @@ CREATE TABLE services (
   description TEXT,
   price DECIMAL(10,2) NOT NULL, -- base/starting price for display only
   duration_hours INT, -- estimated duration for reference only
+  image_url VARCHAR(500),
   is_active BOOLEAN DEFAULT true, -- soft delete
   created_at TIMESTAMP DEFAULT NOW()
 );
@@ -65,10 +66,13 @@ CREATE TABLE bookings (
   availability_id UUID REFERENCES availability(id),
   guest_name VARCHAR(255),
   guest_email VARCHAR(255),
+  guest_phone VARCHAR(20),
   reference_code VARCHAR(20) UNIQUE,
   queue_number INT NOT NULL,
   motorcycle_plate VARCHAR(100),
   motorcycle_description TEXT,
+  motorcycle_color VARCHAR(100),
+  motorcycle_model VARCHAR(100),
   is_walkin BOOLEAN DEFAULT false,
   payment_method VARCHAR(50) DEFAULT 'online', -- online, cash
   status VARCHAR(50) DEFAULT 'pending', -- pending, in_progress, done, picked_up
