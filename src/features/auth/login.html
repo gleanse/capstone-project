@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Herco Detailing Garage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <div class="auth-wrapper">
+    <div class="brand-panel">
+      <div class="brand-content">
+        <div class="brand-icon">
+          <i class="fas fa-motorcycle"></i>
+        </div>
+        <h1 class="brand-name">HERCO</h1>
+        <p class="brand-tagline">Detailing Garage</p>
+        <div class="brand-divider"></div>
+        <p class="brand-desc">Premium motorcycle detailing & coating services. Manage your business with precision.</p>
+        <div class="brand-stats">
+          <div class="stat">
+            <span class="stat-num">3</span>
+            <span class="stat-label">Services</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat">
+            <span class="stat-num">∞</span>
+            <span class="stat-label">Quality</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat">
+            <span class="stat-num">24/7</span>
+            <span class="stat-label">System</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-panel">
+      <div class="form-container">
+        <div class="form-header">
+          <span class="form-tag">ADMIN PORTAL</span>
+          <h2>Welcome back</h2>
+          <p>Sign in to manage your garage</p>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <div class="field-group">
+            <label for="email">
+              <i class="fas fa-envelope"></i>
+              Email Address
+            </label>
+            <div class="input-wrap">
+              <input type="email" id="email" name="email" placeholder="admin@herco.com" autocomplete="email">
+              <span class="input-status"></span>
+            </div>
+            <span class="field-error" id="emailError"></span>
+          </div>
+
+          <div class="field-group">
+            <label for="password">
+              <i class="fas fa-lock"></i>
+              Password
+            </label>
+            <div class="input-wrap">
+              <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password">
+              <button type="button" class="toggle-pw" id="togglePw" tabindex="-1">
+                <i class="fas fa-eye" id="pwIcon"></i>
+              </button>
+            </div>
+            <span class="field-error" id="passwordError"></span>
+          </div>
+
+          <div class="form-meta">
+            <label class="checkbox-wrap">
+              <input type="checkbox" id="remember">
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text"><i class="fas fa-sign-in-alt"></i> Sign In</span>
+            <span class="btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Signing in...</span>
+          </button>
+
+          <div class="form-message" id="formMessage"></div>
+        </form>
+
+        <div class="form-footer">
+          <p>Need an account? <a href="signup.html">Request access</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

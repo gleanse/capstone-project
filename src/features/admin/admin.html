@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Herco Detailing Garage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="fas fa-motorcycle"></i>
+      </div>
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-name">HERCO</span>
+        <span class="sidebar-brand-sub">Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <span class="nav-label">Overview</span>
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="bookings">
+          <i class="fas fa-calendar-check"></i>
+          <span>Bookings</span>
+          <span class="nav-badge" id="pendingBadge">0</span>
+        </a>
+        <a href="#" class="nav-item" data-page="walkins">
+          <i class="fas fa-walking"></i>
+          <span>Walk-ins</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-label">Manage</span>
+        <a href="#" class="nav-item" data-page="services">
+          <i class="fas fa-spray-can"></i>
+          <span>Services</span>
+        </a>
+        <a href="#" class="nav-item" data-page="availability">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Availability</span>
+        </a>
+        <a href="#" class="nav-item" data-page="staff">
+          <i class="fas fa-users"></i>
+          <span>Staff</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-label">Reports</span>
+        <a href="#" class="nav-item" data-page="payments">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Payments</span>
+        </a>
+        <a href="#" class="nav-item" data-page="audit">
+          <i class="fas fa-clipboard-list"></i>
+          <span>Audit Logs</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">A</div>
+        <div class="user-details">
+          <span class="user-name" id="userName">Admin</span>
+          <span class="user-role" id="userRole">Administrator</span>
+        </div>
+        <button class="logout-btn" id="logoutBtn" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrap">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="breadcrumb">
+          <span id="pageTitle">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbarDate"></div>
+        <button class="topbar-btn" title="Notifications">
+          <i class="fas fa-bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="content" id="mainContent">
+
+      <!-- ========== DASHBOARD PAGE ========== -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Good <span id="greetingTime">morning</span>, <span id="greetingName">Admin</span></h1>
+            <p class="page-sub">Here's what's happening at the garage today.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary" id="refreshDashboard">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card" style="--accent: #dc2626;">
+            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statBookingsToday">—</span>
+              <span class="stat-label">Bookings Today</span>
+            </div>
+            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Today</div>
+          </div>
+          <div class="stat-card" style="--accent: #f59e0b;">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statPending">—</span>
+              <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-trend"><i class="fas fa-minus"></i> Awaiting</div>
+          </div>
+          <div class="stat-card" style="--accent: #3b82f6;">
+            <div class="stat-icon"><i class="fas fa-tools"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statInProgress">—</span>
+              <span class="stat-label">In Progress</span>
+            </div>
+            <div class="stat-trend"><i class="fas fa-spinner"></i> Active</div>
+          </div>
+          <div class="stat-card" style="--accent: #10b981;">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statDone">—</span>
+              <span class="stat-label">Done / Pickup</span>
+            </div>
+            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Ready</div>
+          </div>
+        </div>
+
+        <!-- Today's Bookings Table -->
+        <div class="card mt-6">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-list"></i> Today's Bookings</h2>
+            <button class="btn-text" data-page="bookings"><i class="fas fa-external-link-alt"></i> View all</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="todayTable">
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Time</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="todayTableBody">
+                <tr class="empty-row">
+                  <td colspan="7">
+                    <div class="empty-state">
+                      <i class="fas fa-calendar-times"></i>
+                      <p>No bookings for today</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pickup Pending Notice -->
+        <div class="card mt-4" id="pickupCard" style="display:none;">
+          <div class="card-header">
+            <h2 class="card-title warning"><i class="fas fa-motorcycle"></i> Motorcycles Ready for Pickup</h2>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="pickupTable">
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Down Payment</th>
+                  <th>Remaining</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="pickupTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== BOOKINGS PAGE ========== -->
+      <div class="page" id="page-bookings">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Bookings</h1>
+            <p class="page-sub">Manage all customer bookings</p>
+          </div>
+          <div class="page-actions">
+            <div class="search-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" id="bookingSearch" placeholder="Search by ref, name, or email...">
+            </div>
+            <select class="filter-select" id="bookingStatusFilter">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+              <option value="picked_up">Picked Up</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table" id="bookingsTable">
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Date & Time</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookingsTableBody">
+                <tr class="empty-row">
+                  <td colspan="8">
+                    <div class="empty-state">
+                      <i class="fas fa-search"></i>
+                      <p>No bookings found</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SERVICES PAGE ========== -->
+      <div class="page" id="page-services">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Services</h1>
+            <p class="page-sub">Manage services and pricing variants</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn-primary" id="addServiceBtn">
+              <i class="fas fa-plus"></i> Add Service
+            </button>
+          </div>
+        </div>
+
+        <div class="services-grid" id="servicesGrid">
+          <div class="empty-state full-width">
+            <i class="fas fa-spray-can"></i>
+            <p>No services yet. Add your first service.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== AVAILABILITY PAGE ========== -->
+      <div class="page" id="page-availability">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Availability</h1>
+            <p class="page-sub">Set capacity and manage closed dates</p>
+          </div>
+        </div>
+
+        <div class="avail-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i class="fas fa-calendar-alt"></i> Date Capacity</h2>
+              <button class="btn-primary btn-sm" id="addCapacityBtn">
+                <i class="fas fa-plus"></i> Set Capacity
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Service</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="capacityTableBody">
+                  <tr class="empty-row">
+                    <td colspan="5">
+                      <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No capacity set yet</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i class="fas fa-ban"></i> Closed Dates</h2>
+              <button class="btn-danger btn-sm" id="addClosedBtn">
+                <i class="fas fa-plus"></i> Add Closure
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Day / Date</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="closedDatesBody">
+                  <tr class="empty-row">
+                    <td colspan="4">
+                      <div class="empty-state">
+                        <i class="fas fa-calendar-check"></i>
+                        <p>No closures set</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== STAFF PAGE ========== -->
+      <div class="page" id="page-staff">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Staff Accounts</h1>
+            <p class="page-sub">Manage admin and staff access</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn-primary" id="addStaffBtn">
+              <i class="fas fa-user-plus"></i> Add Staff
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="staffTableBody">
+                <tr class="empty-row">
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <i class="fas fa-users"></i>
+                      <p>No staff accounts found</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAYMENTS PAGE ========== -->
+      <div class="page" id="page-payments">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Payments</h1>
+            <p class="page-sub">Track all payment records and balances</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card" style="--accent: #10b981;">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statPaidTotal">₱0</span>
+              <span class="stat-label">Total Collected</span>
+            </div>
+          </div>
+          <div class="stat-card" style="--accent: #f59e0b;">
+            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statUnpaidTotal">₱0</span>
+              <span class="stat-label">Remaining Balance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-6">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Booking Ref</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Paid</th>
+                  <th>Balance</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTableBody">
+                <tr class="empty-row">
+                  <td colspan="8">
+                    <div class="empty-state">
+                      <i class="fas fa-receipt"></i>
+                      <p>No payment records</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== AUDIT PAGE ========== -->
+      <div class="page" id="page-audit">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Audit Logs</h1>
+            <p class="page-sub">Track all system actions and changes</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>By</th>
+                  <th>Table</th>
+                  <th>Details</th>
+                  <th>Date & Time</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr class="empty-row">
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <i class="fas fa-clipboard-list"></i>
+                      <p>No audit logs found</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== WALK-INS PAGE ========== -->
+      <div class="page" id="page-walkins">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Walk-in Booking</h1>
+            <p class="page-sub">Create walk-in bookings for customers at the garage</p>
+          </div>
+        </div>
+
+        <div class="walkin-layout">
+          <div class="card walkin-form-card">
+            <div class="card-header">
+              <h2 class="card-title"><i class="fas fa-user-plus"></i> New Walk-in</h2>
+            </div>
+            <form id="walkinForm" novalidate>
+              <div class="field-group">
+                <label><i class="fas fa-user"></i> Customer Name</label>
+                <div class="input-wrap">
+                  <input type="text" id="wi_name" placeholder="Juan Dela Cruz">
+                </div>
+                <span class="field-error" id="wi_nameError"></span>
+              </div>
+              <div class="field-group">
+                <label><i class="fas fa-envelope"></i> Email (optional)</label>
+                <div class="input-wrap">
+                  <input type="email" id="wi_email" placeholder="juan@example.com">
+                </div>
+              </div>
+              <div class="field-group">
+                <label><i class="fas fa-phone"></i> Phone</label>
+                <div class="input-wrap">
+                  <input type="tel" id="wi_phone" placeholder="09171234567" maxlength="11">
+                </div>
+                <span class="field-error" id="wi_phoneError"></span>
+              </div>
+              <div class="field-group">
+                <label><i class="fas fa-spray-can"></i> Service</label>
+                <div class="input-wrap select-wrap">
+                  <select id="wi_service">
+                    <option value="">-- Select service --</option>
+                  </select>
+                </div>
+                <span class="field-error" id="wi_serviceError"></span>
+              </div>
+              <div class="field-group">
+                <label><i class="fas fa-tags"></i> Variant / Size</label>
+                <div class="input-wrap select-wrap">
+                  <select id="wi_variant" disabled>
+                    <option value="">-- Select service first --</option>
+                  </select>
+                </div>
+                <span class="field-error" id="wi_variantError"></span>
+              </div>
+              <div class="field-group">
+                <label><i class="fas fa-motorcycle"></i> Plate Number</label>
+                <div class="input-wrap">
+                  <input type="text" id="wi_plate" placeholder="ABC 1234">
+                </div>
+              </div>
+              <div class="field-group">
+                <label><i class="fas fa-info-circle"></i> Motorcycle Description</label>
+                <div class="input-wrap">
+                  <input type="text" id="wi_desc" placeholder="e.g. Black Honda CBR 150">
+                </div>
+              </div>
+              <div class="walkin-summary" id="walkinSummary" style="display:none;">
+                <div class="summary-row">
+                  <span>Service:</span>
+                  <span id="summary_service">—</span>
+                </div>
+                <div class="summary-row">
+                  <span>Variant:</span>
+                  <span id="summary_variant">—</span>
+                </div>
+                <div class="summary-row total">
+                  <span>Amount:</span>
+                  <span id="summary_amount">₱0</span>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary full-width" id="walkinSubmit">
+                <i class="fas fa-check"></i> Confirm Walk-in Booking
+              </button>
+              <div class="form-message" id="walkinMessage"></div>
+            </form>
+          </div>
+
+          <div class="walkin-info">
+            <div class="card info-card">
+              <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-info-circle"></i> Walk-in Guidelines</h2>
+              </div>
+              <ul class="guideline-list">
+                <li><i class="fas fa-check-circle"></i> Check today's capacity before accepting</li>
+                <li><i class="fas fa-check-circle"></i> Payment is collected immediately in cash</li>
+                <li><i class="fas fa-check-circle"></i> Walk-in is marked confirmed right away — no lock timer</li>
+                <li><i class="fas fa-exclamation-circle warning"></i> Use your judgment on closing time vs service duration</li>
+                <li><i class="fas fa-exclamation-circle warning"></i> If no capacity, ask customer to book online in advance</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-calendar-day"></i> Today's Capacity</h2>
+              </div>
+              <div id="todayCapacityList">
+                <div class="empty-state">
+                  <i class="fas fa-calendar-alt"></i>
+                  <p>No capacity data</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- STATUS UPDATE MODAL -->
+  <div class="modal-overlay" id="statusModal" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Update Booking Status</h3>
+        <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <p>Select new status for this booking:</p>
+        <div class="status-options" id="statusOptions"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn-primary" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
