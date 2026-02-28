@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book a Service</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="border-b border-white/10 px-6 py-5 flex items-center gap-3 relative z-10 animate-slideDown">
+    <h1
+      class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
+      style="font-family:'Bebas Neue',sans-serif;">
+      Herco Detailing Garage
+    </h1>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-3xl mx-auto px-6 py-12 relative z-10">
+
+    <!-- Back to Services -->
+    <button id="btn-back-services"
+      class="cursor-pointer flex items-center gap-2 text-white/40 hover:text-white text-sm mb-8 transition-colors duration-200 group">
+      <i class="ph ph-arrow-left group-hover:-translate-x-1 transition-transform duration-200"></i>
+      Back to Services
+    </button>
+
+    <!-- Service Info Skeleton / Loaded -->
+    <div id="service-info" class="mb-10 animate-fadeUp">
+      <div id="service-skeleton" class="flex flex-col gap-3">
+        <div class="skeleton-line h-4 rounded-full" style="width:40%"></div>
+        <div class="skeleton-line h-8 rounded-full" style="width:60%"></div>
+      </div>
+      <div id="service-heading" class="hidden">
+        <p class="text-white/40 text-xs uppercase tracking-widest mb-1">Booking for</p>
+        <h2 id="service-name" class="text-5xl font-bold tracking-wide" style="font-family:'Bebas Neue',sans-serif;">
+        </h2>
+      </div>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="flex items-center gap-0 mb-10">
+      <!-- Step 1 -->
+      <div class="step-indicator flex items-center gap-2" data-step="1">
+        <div
+          class="step-dot w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300">
+          1</div>
+        <span class="step-label text-sm text-white font-medium transition-colors duration-300">Variant</span>
+      </div>
+      <div class="step-line flex-1 h-px bg-white/10 mx-3 transition-colors duration-300" id="line-1"></div>
+      <!-- Step 2 -->
+      <div class="step-indicator flex items-center gap-2" data-step="2">
+        <div
+          class="step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
+          2</div>
+        <span class="step-label text-sm text-white/40 transition-colors duration-300">Date</span>
+      </div>
+      <div class="step-line flex-1 h-px bg-white/10 mx-3 transition-colors duration-300" id="line-2"></div>
+      <!-- Step 3 -->
+      <div class="step-indicator flex items-center gap-2" data-step="3">
+        <div
+          class="step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
+          3</div>
+        <span class="step-label text-sm text-white/40 transition-colors duration-300">Details</span>
+      </div>
+      <div class="step-line flex-1 h-px bg-white/10 mx-3 transition-colors duration-300" id="line-3"></div>
+      <!-- Step 4 -->
+      <div class="step-indicator flex items-center gap-2" data-step="4">
+        <div
+          class="step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
+          4</div>
+        <span class="step-label text-sm text-white/40 transition-colors duration-300">Payment</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Select Variant -->
+    <div id="step-1" class="step-content animate-fadeUp">
+      <h3 class="text-2xl font-semibold mb-1">Choose a Variant</h3>
+      <p class="text-white/40 text-sm mb-6">Select the size or type that fits your motorcycle</p>
+
+      <div id="variants-container" class="flex flex-col gap-3">
+        <!-- Skeletons -->
+        <div class="skeleton-line h-16 rounded-xl"></div>
+        <div class="skeleton-line h-16 rounded-xl"></div>
+        <div class="skeleton-line h-16 rounded-xl"></div>
+      </div>
+
+      <button id="btn-step1-next"
+        class="cursor-pointer mt-8 w-full bg-red-600 hover:bg-red-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+        disabled>
+        Continue
+        <i class="ph ph-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Step 2: Select Date -->
+    <div id="step-2" class="step-content hidden animate-fadeUp">
+      <h3 class="text-2xl font-semibold mb-1">Choose a Date</h3>
+      <p class="text-white/40 text-sm mb-6">Pick an available date for your booking</p>
+
+      <!-- Calendar -->
+      <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+
+        <!-- Calendar Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <button id="cal-prev"
+            class="cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors duration-200 text-white/60 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed">
+            <i class="ph ph-caret-left"></i>
+          </button>
+          <div class="text-center">
+            <div id="cal-month-year" class="font-semibold text-white text-base"></div>
+          </div>
+          <button id="cal-next"
+            class="cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors duration-200 text-white/60 hover:text-white">
+            <i class="ph ph-caret-right"></i>
+          </button>
+        </div>
+
+        <!-- Day Headers -->
+        <div id="cal-day-headers" class="grid grid-cols-7 border-b border-white/10">
+          <!-- filled by JS -->
+        </div>
+
+        <!-- Calendar Grid -->
+        <div id="cal-grid" class="grid grid-cols-7 p-3 gap-1">
+          <!-- filled by JS -->
+        </div>
+
+        <!-- Legend -->
+        <div class="flex items-center justify-center gap-6 px-5 py-4 border-t border-white/10">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="text-xs text-white/50">Available</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-white/10"></div>
+            <span class="text-xs text-white/50">Unavailable</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-500 ring-2 ring-white ring-offset-1 ring-offset-[#0a0a0a]"></div>
+            <span class="text-xs text-white/50">Selected</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Date Display -->
+      <div id="selected-date-display"
+        class="hidden mt-4 items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+        <i class="ph ph-calendar-check text-red-400 text-xl"></i>
+        <div>
+          <p class="text-xs text-white/40 uppercase tracking-widest">Selected Date</p>
+          <p id="selected-date-text" class="text-white font-semibold text-sm"></p>
+        </div>
+      </div>
+
+      <div id="dates-empty" class="hidden text-center py-8">
+        <i class="ph ph-calendar-x text-4xl text-white/20 mb-3 block"></i>
+        <p class="text-white/40 text-sm">No available dates this month.</p>
+        <p class="text-white/20 text-xs mt-1">Try navigating to another month.</p>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <button id="btn-step2-back"
+          class="cursor-pointer w-1/3 border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+          <i class="ph ph-arrow-left"></i>
+          Back
+        </button>
+        <button id="btn-step2-next"
+          class="cursor-pointer w-2/3 bg-red-600 hover:bg-red-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+          disabled>
+          Continue
+          <i class="ph ph-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Details Form -->
+    <div id="step-3" class="step-content hidden animate-fadeUp">
+
+      <!-- Lock Timer -->
+      <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-8">
+        <i class="ph ph-timer text-red-400 text-xl"></i>
+        <div>
+          <p class="text-sm text-white font-medium">Slot reserved for <span id="timer-display"
+              class="text-red-400 font-bold">15:00</span></p>
+          <p class="text-xs text-white/40">Complete your booking before time runs out</p>
+        </div>
+      </div>
+
+      <h3 class="text-2xl font-semibold mb-1">Your Details</h3>
+      <p class="text-white/40 text-sm mb-6">Fill in your information and motorcycle details</p>
+
+      <!-- Personal Info -->
+      <div class="mb-6">
+        <p class="text-xs text-white/30 uppercase tracking-widest mb-3">Personal Information</p>
+        <div class="flex flex-col gap-3">
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Full Name</label>
+            <input id="input-name" type="text" placeholder="Juan dela Cruz"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+          </div>
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Email Address</label>
+            <input id="input-email" type="email" placeholder="juan@email.com"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+          </div>
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Phone Number</label>
+            <input id="input-phone" type="tel" placeholder="09XX XXX XXXX"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Motorcycle Info -->
+      <div class="mb-6">
+        <p class="text-xs text-white/30 uppercase tracking-widest mb-3">Motorcycle Details</p>
+        <div class="flex flex-col gap-3">
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Plate Number</label>
+            <input id="input-plate" type="text" placeholder="ABC 1234"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+          </div>
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Model</label>
+            <input id="input-model" type="text" placeholder="Honda Click 125i"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+          </div>
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Color</label>
+            <input id="input-color" type="text" placeholder="Matte Black"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+          </div>
+          <div>
+            <label class="text-sm text-white/60 mb-1 block">Description <span
+                class="text-white/20">(optional)</span></label>
+            <textarea id="input-description" placeholder="Any additional details about your motorcycle..." rows="3"
+              class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200 resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-8">
+        <button id="btn-step3-back"
+          class="cursor-pointer w-1/3 border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+          <i class="ph ph-arrow-left"></i>
+          Back
+        </button>
+        <button id="btn-step3-next"
+          class="cursor-pointer w-2/3 bg-red-600 hover:bg-red-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+          Continue
+          <i class="ph ph-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 4: Payment -->
+    <div id="step-4" class="step-content hidden animate-fadeUp">
+
+      <!-- Timer still showing -->
+      <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-8">
+        <i class="ph ph-timer text-red-400 text-xl"></i>
+        <div>
+          <p class="text-sm text-white font-medium">Slot reserved for <span id="timer-display-2"
+              class="text-red-400 font-bold">15:00</span></p>
+          <p class="text-xs text-white/40">Complete your payment before time runs out</p>
+        </div>
+      </div>
+
+      <h3 class="text-2xl font-semibold mb-1">Payment</h3>
+      <p class="text-white/40 text-sm mb-6">Choose how you'd like to pay</p>
+
+      <!-- Booking Summary -->
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6">
+        <p class="text-xs text-white/30 uppercase tracking-widest mb-4">Booking Summary</p>
+        <div class="flex flex-col gap-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-white/50">Service</span>
+            <span id="summary-service" class="text-white font-medium"></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-white/50">Variant</span>
+            <span id="summary-variant" class="text-white font-medium"></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-white/50">Date</span>
+            <span id="summary-date" class="text-white font-medium"></span>
+          </div>
+          <div class="border-t border-white/10 pt-2 mt-1 flex justify-between">
+            <span class="text-white/50">Total</span>
+            <span id="summary-price" class="text-red-400 font-bold text-base"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Type -->
+      <p class="text-xs text-white/30 uppercase tracking-widest mb-3">Payment Type</p>
+      <div class="flex flex-col gap-3 mb-8">
+        <label id="opt-full"
+          class="payment-option cursor-pointer flex items-center justify-between bg-white/5 border-2 border-red-500 rounded-xl px-5 py-4 transition-all duration-200">
+          <div class="flex items-center gap-3">
+            <i class="ph ph-check-circle text-red-500 text-xl"></i>
+            <div>
+              <p class="text-sm font-semibold">Full Payment</p>
+              <p class="text-xs text-white/40">Pay the full amount now</p>
+            </div>
+          </div>
+          <span id="full-amount" class="text-white font-bold"></span>
+          <input type="radio" name="payment_type" value="full" class="hidden" checked />
+        </label>
+
+        <label id="opt-down"
+          class="payment-option cursor-pointer flex items-center justify-between bg-white/5 border-2 border-white/10 rounded-xl px-5 py-4 transition-all duration-200 hover:border-white/30">
+          <div class="flex items-center gap-3">
+            <i class="ph ph-circle text-white/30 text-xl"></i>
+            <div>
+              <p class="text-sm font-semibold">Down Payment</p>
+              <p class="text-xs text-white/40">Pay 50% now, rest on pickup</p>
+            </div>
+          </div>
+          <span id="down-amount" class="text-white font-bold"></span>
+          <input type="radio" name="payment_type" value="downpayment" class="hidden" />
+        </label>
+      </div>
+
+      <div class="flex gap-3">
+        <button id="btn-step4-back"
+          class="cursor-pointer w-1/3 border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+          <i class="ph ph-arrow-left"></i>
+          Back
+        </button>
+        <button id="btn-pay"
+          class="cursor-pointer w-2/3 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+          <i class="ph ph-lock"></i>
+          Proceed to Payment
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div id="modal-confirm" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div class="bg-[#111111] border border-white/10 rounded-2xl p-6 max-w-sm w-full mx-4 animate-fadeUp">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+          <i class="ph ph-warning text-red-400 text-xl"></i>
+        </div>
+        <h4 id="modal-title" class="text-lg font-semibold">Are you sure?</h4>
+      </div>
+      <p id="modal-message" class="text-white/50 text-sm mb-6 leading-relaxed"></p>
+      <div class="flex gap-3">
+        <button id="modal-cancel"
+          class="cursor-pointer w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-semibold py-2.5 rounded-xl transition-all duration-200">
+          Cancel
+        </button>
+        <button id="modal-confirm-btn"
+          class="cursor-pointer w-1/2 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-2.5 rounded-xl transition-all duration-200">
+          Yes, go back
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    const serviceId = window.location.pathname.split('/').pop();
+    let state = {
+      service: null,
+      selectedVariant: null,
+      selectedDate: null,
+      availabilityId: null,
+      bookingId: null,
+      timerInterval: null,
+      timerSeconds: 15 * 60,
+      currentStep: 1,
+    };
+
+    // Utils
+    function showStep(step) {
+      document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`step-${step}`).classList.remove('hidden');
+      state.currentStep = step;
+      updateStepIndicator(step);
+    }
+
+    function updateStepIndicator(activeStep) {
+      document.querySelectorAll('.step-indicator').forEach(el => {
+        const s = parseInt(el.dataset.step);
+        const dot = el.querySelector('.step-dot');
+        const label = el.querySelector('.step-label');
+        if (s < activeStep) {
+          dot.className = 'step-dot w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300';
+          dot.innerHTML = '<i class="ph ph-check text-white text-sm"></i>';
+          label.className = 'step-label text-sm text-white/60 transition-colors duration-300';
+        } else if (s === activeStep) {
+          dot.className = 'step-dot w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300';
+          dot.innerHTML = s;
+          label.className = 'step-label text-sm text-white font-medium transition-colors duration-300';
+        } else {
+          dot.className = 'step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300';
+          dot.innerHTML = s;
+          label.className = 'step-label text-sm text-white/40 transition-colors duration-300';
+        }
+      });
+
+      // Update connector lines
+      for (let i = 1; i <= 3; i++) {
+        const line = document.getElementById(`line-${i}`);
+        line.className = `step-line flex-1 h-px mx-3 transition-colors duration-300 ${i < activeStep ? 'bg-red-500/50' : 'bg-white/10'}`;
+      }
+    }
+
+    function showModal(title, message, onConfirm) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-message').textContent = message;
+      const modal = document.getElementById('modal-confirm');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      const confirmBtn = document.getElementById('modal-confirm-btn');
+      const cancelBtn = document.getElementById('modal-cancel');
+
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+        cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+      };
+
+      document.getElementById('modal-confirm-btn').addEventListener('click', () => { cleanup(); onConfirm(); });
+      document.getElementById('modal-cancel').addEventListener('click', cleanup);
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-PH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function formatPrice(price) {
+      return '₱' + parseFloat(price).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    }
+
+    // Timer
+    function startTimer() {
+      state.timerSeconds = 15 * 60;
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds--;
+        const m = String(Math.floor(state.timerSeconds / 60)).padStart(2, '0');
+        const s = String(state.timerSeconds % 60).padStart(2, '0');
+        const display = `${m}:${s}`;
+        document.getElementById('timer-display').textContent = display;
+        document.getElementById('timer-display-2').textContent = display;
+        if (state.timerSeconds <= 0) {
+          clearInterval(state.timerInterval);
+          handleTimerExpired();
+        }
+      }, 1000);
+    }
+
+    function handleTimerExpired() {
+      showModal(
+        'Time Expired',
+        'Your slot reservation has expired. You will be redirected to select a new date.',
+        () => { showStep(2); loadDates(); }
+      );
+    }
+
+    function stopTimer() {
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+    }
+
+    // Load service
+    async function loadService() {
+      const res = await fetch(`/api/booking/service/${serviceId}`);
+      const json = await res.json();
+      if (!json.success) return;
+      state.service = json.data;
+
+      document.getElementById('service-skeleton').classList.add('hidden');
+      document.getElementById('service-heading').classList.remove('hidden');
+      document.getElementById('service-name').textContent = state.service.name;
+
+      renderVariants(state.service.variants);
+    }
+
+    // Step 1 - Variants
+    function renderVariants(variants) {
+      const container = document.getElementById('variants-container');
+      container.innerHTML = '';
+
+      if (!variants || variants.length === 0) {
+        // No variants — service uses base price
+        const card = document.createElement('div');
+        card.className = 'variant-card cursor-pointer flex items-center justify-between bg-white/5 border-2 border-red-500 rounded-xl px-5 py-4 transition-all duration-200 selected';
+        card.innerHTML = /* html */`
+          <div class="flex items-center gap-3">
+            <i class="ph ph-check-circle text-red-500 text-xl"></i>
+            <span class="text-white font-medium">Standard</span>
+          </div>
+          <span class="text-white font-bold">${formatPrice(state.service.price)}</span>
+        `;
+        container.appendChild(card);
+        state.selectedVariant = { id: null, name: 'Standard', price: state.service.price };
+        document.getElementById('btn-step1-next').disabled = false;
+        return;
+      }
+
+      variants.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'variant-card cursor-pointer flex items-center justify-between bg-white/5 border-2 border-white/10 rounded-xl px-5 py-4 transition-all duration-200 hover:border-white/30';
+        card.dataset.id = v.id;
+        card.dataset.name = v.name;
+        card.dataset.price = v.price;
+        card.innerHTML = /* html */`
+          <div class="flex items-center gap-3">
+            <i class="ph ph-circle text-white/20 text-xl variant-icon"></i>
+            <span class="text-white/70 font-medium variant-name">${v.name}</span>
+          </div>
+          <span class="text-white font-bold">${formatPrice(v.price)}</span>
+        `;
+        card.addEventListener('click', () => selectVariant(card, v));
+        container.appendChild(card);
+      });
+    }
+
+    function selectVariant(card, variant) {
+      document.querySelectorAll('.variant-card').forEach(c => {
+        c.classList.remove('border-red-500');
+        c.classList.add('border-white/10');
+        c.querySelector('.variant-icon').className = 'ph ph-circle text-white/20 text-xl variant-icon';
+        c.querySelector('.variant-name').classList.remove('text-white');
+        c.querySelector('.variant-name').classList.add('text-white/70');
+      });
+      card.classList.add('border-red-500');
+      card.classList.remove('border-white/10');
+      card.querySelector('.variant-icon').className = 'ph ph-check-circle text-red-500 text-xl variant-icon';
+      card.querySelector('.variant-name').classList.add('text-white');
+      card.querySelector('.variant-name').classList.remove('text-white/70');
+      state.selectedVariant = variant;
+      document.getElementById('btn-step1-next').disabled = false;
+    }
+
+    // Step 2 - Calendar
+    let calendarData = {};
+    let calendarMonth = new Date();
+    calendarMonth.setDate(1);
+
+    async function loadDates() {
+      document.getElementById('dates-empty').classList.add('hidden');
+      document.getElementById('btn-step2-next').disabled = true;
+      document.getElementById('selected-date-display').classList.add('hidden');
+      state.selectedDate = null;
+      state.availabilityId = null;
+      calendarData = {};
+
+      const grid = document.getElementById('cal-grid');
+      grid.innerHTML = Array(35).fill('<div class="skeleton-line h-9 rounded-lg"></div>').join('');
+
+      const res = await fetch(`/api/booking/availability/${serviceId}`);
+      const json = await res.json();
+
+      if (json.success && json.data.length > 0) {
+        json.data.forEach(slot => {
+          const dateStr = slot.date.split('T')[0];
+          calendarData[dateStr] = slot;
+        });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('cal-grid');
+      const monthYearEl = document.getElementById('cal-month-year');
+      const prevBtn = document.getElementById('cal-prev');
+
+      const year = calendarMonth.getFullYear();
+      const month = calendarMonth.getMonth();
+
+      monthYearEl.textContent = calendarMonth.toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      prevBtn.disabled = calendarMonth <= currentMonth;
+
+      // Render day headers
+      const headersEl = document.getElementById('cal-day-headers');
+      headersEl.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        .map(d => `<div class="text-center text-xs text-white/30 uppercase tracking-widest py-3">${d}</div>`)
+        .join('');
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(year, month, d);
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const slot = calendarData[dateStr];
+        const isPast = dateObj < today;
+        const isAvailable = !isPast && slot;
+        const isSelected = state.selectedDate && state.selectedDate.split('T')[0] === dateStr;
+        const isToday = dateObj.toDateString() === today.toDateString();
+
+        const cell = document.createElement('div');
+        cell.className = 'relative flex items-center justify-center rounded-lg h-10 text-sm font-medium transition-all duration-200 ';
+
+        if (isSelected) {
+          cell.className += 'bg-red-500 text-white cursor-pointer ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0a]';
+        } else if (isAvailable) {
+          cell.className += 'bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-white cursor-pointer border border-green-500/40';
+          cell.addEventListener('click', () => confirmSelectDate(slot, dateStr));
+        } else {
+          cell.className += 'text-white/20 cursor-not-allowed';
+        }
+
+        cell.textContent = d;
+
+        if (isToday) {
+          const dot = document.createElement('div');
+          dot.className = 'absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ' + (isSelected ? 'bg-white' : 'bg-white/40');
+          cell.appendChild(dot);
+        }
+
+        grid.appendChild(cell);
+      }
+    }
+
+    function confirmSelectDate(slot, dateStr) {
+      if (state.selectedDate && state.selectedDate.split('T')[0] === dateStr) {
+        state.selectedDate = null;
+        state.availabilityId = null;
+        document.getElementById('btn-step2-next').disabled = true;
+        document.getElementById('selected-date-display').classList.add('hidden');
+        renderCalendar();
+        return;
+      }
+
+      const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      showModal(
+        'Confirm Date',
+        `Book for ${label}? You can still go back to change this.`,
+        () => {
+          state.selectedDate = slot.date;
+          state.availabilityId = slot.availability_id;
+          document.getElementById('btn-step2-next').disabled = false;
+
+          const display = document.getElementById('selected-date-display');
+          display.classList.remove('hidden');
+          document.getElementById('selected-date-text').textContent =
+            `${label} — ${slot.remaining} slot${slot.remaining > 1 ? 's' : ''} left`;
+
+          renderCalendar();
+        }
+      );
+    }
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+      renderCalendar();
+    });
+
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+      renderCalendar();
+    });
+
+    // Lock slot
+    async function lockSlot() {
+      const res = await fetch('/api/booking/lock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceId,
+          variantId: state.selectedVariant?.id || null,
+          availabilityId: state.availabilityId,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        state.bookingId = json.data.id;
+        startTimer();
+      }
+      return json.success;
+    }
+
+    // Step 4 - Payment summary
+    function populateSummary() {
+      const price = state.selectedVariant?.price || state.service?.price || 0;
+      document.getElementById('summary-service').textContent = state.service?.name || '';
+      document.getElementById('summary-variant').textContent = state.selectedVariant?.name || 'Standard';
+      document.getElementById('summary-date').textContent = formatDate(state.selectedDate);
+      document.getElementById('summary-price').textContent = formatPrice(price);
+      document.getElementById('full-amount').textContent = formatPrice(price);
+      document.getElementById('down-amount').textContent = formatPrice(price / 2);
+    }
+
+    // Payment option toggle
+    document.querySelectorAll('.payment-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.payment-option').forEach(o => {
+          o.classList.remove('border-red-500');
+          o.classList.add('border-white/10');
+          o.querySelector('i').className = 'ph ph-circle text-white/30 text-xl';
+        });
+        opt.classList.add('border-red-500');
+        opt.classList.remove('border-white/10');
+        opt.querySelector('i').className = 'ph ph-check-circle text-red-500 text-xl';
+        opt.querySelector('input').checked = true;
+      });
+    });
+
+    // Navigation
+    document.getElementById('btn-back-services').addEventListener('click', () => {
+      if (state.currentStep === 1) {
+        showModal(
+          'Leave Booking?',
+          'Are you sure you want to go back? Your variant selection will be lost.',
+          () => window.location.href = '/services'
+        );
+      } else {
+        showModal(
+          'Leave Booking?',
+          'Are you sure you want to go back to services? Your progress will be lost.',
+          () => window.location.href = '/services'
+        );
+      }
+    });
+
+    document.getElementById('btn-step1-next').addEventListener('click', () => {
+      showStep(2);
+      loadDates();
+    });
+
+    document.getElementById('btn-step2-back').addEventListener('click', () => {
+      showStep(1);
+    });
+
+    document.getElementById('btn-step2-next').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-step2-next');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Reserving slot...';
+      const success = await lockSlot();
+      if (success) {
+        showStep(3);
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue <i class="ph ph-arrow-right"></i>';
+        alert('Failed to lock slot. Please try again.');
+      }
+    });
+
+    document.getElementById('btn-step3-back').addEventListener('click', () => {
+      showModal(
+        'Release Slot?',
+        'Going back will release your reserved slot and someone else may take it. Are you sure?',
+        async () => {
+          stopTimer();
+          // TODO: call release slot API
+          showStep(2);
+          loadDates();
+        }
+      );
+    });
+
+    document.getElementById('btn-step3-next').addEventListener('click', () => {
+      const name = document.getElementById('input-name').value.trim();
+      const email = document.getElementById('input-email').value.trim();
+      const phone = document.getElementById('input-phone').value.trim();
+      const plate = document.getElementById('input-plate').value.trim();
+      const model = document.getElementById('input-model').value.trim();
+      const color = document.getElementById('input-color').value.trim();
+
+      if (!name || !email || !phone || !plate || !model || !color) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      populateSummary();
+      showStep(4);
+    });
+
+    document.getElementById('btn-step4-back').addEventListener('click', () => {
+      showStep(3);
+    });
+
+    document.getElementById('btn-pay').addEventListener('click', () => {
+      const paymentType = document.querySelector('input[name="payment_type"]:checked').value;
+      // TODO: call Xendit payment API
+      console.log('Proceeding to payment:', paymentType);
+    });
+
+    // Init
+    loadService();
+  </script>
+
+</body>
+</html>

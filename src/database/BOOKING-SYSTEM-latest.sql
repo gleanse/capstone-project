@@ -68,7 +68,7 @@ CREATE TABLE bookings (
   guest_email VARCHAR(255),
   guest_phone VARCHAR(20),
   reference_code VARCHAR(20) UNIQUE,
-  queue_number INT NOT NULL,
+  queue_number INT,
   motorcycle_plate VARCHAR(100),
   motorcycle_description TEXT,
   motorcycle_color VARCHAR(100),
