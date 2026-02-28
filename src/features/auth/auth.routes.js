@@ -2,6 +2,24 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../config/database');
 const bcrypt = require('bcrypt');
+const path = require('path');
+
+router.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+router.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'signup.html'));
+});
+
+// STATIC assets
+router.get('/auth.css', (req, res) => {
+  res.sendFile(path.join(__dirname, 'auth.css'));
+});
+
+router.get('/auth.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'auth.js'));
+});
 
 // ===========================
 // POST /api/auth/signup
@@ -99,7 +117,7 @@ router.post('/login', async (req, res) => {
     res.json({
       success:  true,
       message:  'Login successful',
-      redirect: '/features/admin/admin.html',
+      redirect: '/admin',
       user: {
         id:    user.id,
         name:  user.name,

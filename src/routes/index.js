@@ -1,10 +1,20 @@
 const express = require('express');
-const router = express.Router();
 
+const auth = require('../shared/middlewares/auth');
 const servicesRoutes = require('../features/services/routes');
 const authRoutes = require('../features/auth/auth.routes');
+// const adminRoutes = require('../features/admin/admin.routes');
 
-router.use('/services', servicesRoutes);
-router.use('/auth', authRoutes);
+// PAGE router serves HTML pages
+const pagesRouter = express.Router();
+pagesRouter.use('/services', servicesRoutes);
+pagesRouter.use('/auth', authRoutes);
+// pagesRouter.use('/admin', auth, adminRoutes);
 
-module.exports = router;
+// API router serves JSON data
+const apiRouter = express.Router();
+apiRouter.use('/services', servicesRoutes);
+apiRouter.use('/auth', authRoutes);
+// apiRouter.use('/admin', auth, adminRoutes);
+
+module.exports = { apiRouter, pagesRouter };

@@ -1,5 +1,6 @@
 const pool = require('../../config/database');
 
+// get all active services with their variants
 const getAllServices = async () => {
   const result = await pool.query(`
     SELECT 

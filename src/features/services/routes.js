@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const { getServices } = require('./controller');
 
-router.get('/', getServices);
+// PAGE route serves the HTML
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'services.html'));
+});
+
+// LIST route returns services data as JSON
+router.get('/list', getServices);
 
 module.exports = router;

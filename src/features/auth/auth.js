@@ -278,7 +278,7 @@ if (isSignupPage) {
       if (data.success) {
         showMessage('success', 'Account created! Redirecting to login...');
         setTimeout(() => {
-          window.location.href = 'login.html';
+          window.location.href = '/auth/login';
         }, 1500);
       } else {
         showMessage('error', data.message || 'Failed to create account');

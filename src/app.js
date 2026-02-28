@@ -3,23 +3,15 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const pool = require('./config/database');
-const routes = require('./routes/index');
+const { apiRouter, pagesRouter } = require('./routes/index');
 
 const app = express();
 
 // MIDDLEWARE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.static(path.join(__dirname, '../src')));
-app.use(
-  '/phosphor',
-  express.static(
-    path.join(__dirname, '../node_modules/@phosphor-icons/web/src')
-  )
-);
 
-// SESSION
+// SESSION - before static
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'herco-secret-key-change-this',
@@ -33,7 +25,16 @@ app.use(
   })
 );
 
-// test DATABASE connection
+app.use(express.static(path.join(__dirname, '../public')));
+app.use('/styles', express.static(path.join(__dirname, './styles')));
+app.use(
+  '/phosphor',
+  express.static(
+    path.join(__dirname, '../node_modules/@phosphor-icons/web/src')
+  )
+);
+
+// DATABASE test
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('Database connection failed:', err.message);
@@ -42,7 +43,10 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
-// ROUTES
-app.use('/api', routes);
+// PAGE routes
+app.use('/', pagesRouter);
+
+// API routes
+app.use('/api', apiRouter);
 
 module.exports = app;

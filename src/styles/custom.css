@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* GLOBAL */
+:root {
+  --red: #e53535;
+  --red-dark: #b91c1c;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* GLOBAL - noise grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* HEADER - accent bar pseudo element */
+header::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 28px;
+  background: var(--red);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* SERVICE CARD - red glow on hover */
+.service-card:hover {
+  box-shadow: 0 0 0 1px var(--red), 0 20px 60px rgba(229, 53, 53, 0.12);
+}
+
+/* SERVICE CARD - red gradient sweep pseudo element */
+.service-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(229, 53, 53, 0.06) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.service-card:hover::after {
+  opacity: 1;
+}
+
+/* CARD IMAGE - dark gradient overlay pseudo element */
+.card-img-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+}
+
+/* BOOK BUTTON - shine sweep pseudo element */
+.book-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.4s ease;
+}
+.book-btn:hover::before {
+  left: 150%;
+}
+
+/* SKELETON - shimmer loading placeholders */
+.skeleton-img {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-line {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* KEYFRAMES */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ANIMATION CLASSES */
+.animate-slideDown {
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-fadeUp {
+  animation: fadeUp 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-card {
+  opacity: 0;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
