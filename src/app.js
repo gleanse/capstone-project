@@ -8,8 +8,8 @@ const { apiRouter, pagesRouter } = require('./routes/index');
 const app = express();
 
 // MIDDLEWARE
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // SESSION - before static
 app.use(

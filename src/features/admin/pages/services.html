@@ -13,6 +13,188 @@
     body { display: flex; }
     .layout-wrapper { display: flex; width: 100%; }
     #app { display: contents; }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none !important; }
+    @keyframes slideIn {
+      from { opacity:0; transform: translateY(-16px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Modal box ── */
+    .svc-modal {
+      background: var(--dark-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      width: 100%; max-width: 520px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      animation: slideIn 0.22s ease;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .svc-modal::-webkit-scrollbar { width: 4px; }
+    .svc-modal::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 4px; }
+
+    .svc-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--dark-2); z-index: 1;
+    }
+    .svc-modal-header h3 { font-size:16px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
+    .svc-modal-header h3 i { color: var(--red); }
+
+    .svc-modal-body { padding: 22px; }
+    .svc-modal-footer {
+      padding: 14px 22px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── Form fields ── */
+    .svc-field { margin-bottom: 16px; }
+    .svc-field label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .svc-field label i { color: var(--red); font-size: 11px; width: 12px; }
+    .svc-field input,
+    .svc-field textarea {
+      width: 100%; padding: 10px 13px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: var(--font-body); font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .svc-field input::placeholder,
+    .svc-field textarea::placeholder { color: var(--text-dim); }
+    .svc-field input:focus,
+    .svc-field textarea:focus { border-color: var(--red); background: rgba(220,38,38,0.04); }
+    .svc-field textarea { resize: vertical; min-height: 78px; }
+    .svc-field .field-hint { font-size:11px; color:var(--text-dim); margin-top:4px; }
+    .svc-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── Image Upload ── */
+    .img-upload-area {
+      position: relative;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background: var(--dark-3);
+      min-height: 130px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .img-upload-area:hover { border-color: var(--red); }
+    .img-upload-area.has-image { border-style: solid; border-color: rgba(255,255,255,0.15); }
+    .img-upload-area input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%; padding: 0; border: none; background: none;
+    }
+    .img-upload-placeholder {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; color: var(--text-dim); text-align: center; padding: 20px;
+      pointer-events: none;
+    }
+    .img-upload-placeholder i { font-size: 28px; color: var(--red); opacity: 0.5; }
+    .img-upload-placeholder p { font-size: 13px; }
+    .img-upload-placeholder span { font-size: 11px; color: var(--text-dim); }
+
+    .img-preview-wrap {
+      display: none; position: relative; width: 100%;
+    }
+    .img-preview-wrap.visible { display: block; }
+    .img-preview-wrap img {
+      width: 100%; height: 140px; object-fit: cover; display: block;
+    }
+    .img-preview-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .img-upload-area:hover .img-preview-overlay { opacity: 1; }
+    .img-preview-overlay span {
+      background: rgba(0,0,0,0.6);
+      color: white; font-size: 12px; font-weight: 600;
+      padding: 5px 12px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      pointer-events: none;
+    }
+    .img-clear-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2);
+      color: white; width: 28px; height: 28px; border-radius: 50%;
+      cursor: pointer; font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; z-index: 2;
+    }
+    .img-clear-btn:hover { background: rgba(220,38,38,0.7); }
+
+    /* ── Status message ── */
+    .modal-msg {
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; margin-bottom: 14px; display: none;
+      align-items: center; gap: 8px;
+    }
+    .modal-msg.success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:var(--success); display:flex; }
+    .modal-msg.error   { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:var(--danger); display:flex; }
+
+    /* ── Variants modal ── */
+    .variant-modal-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .variant-modal-item {
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--dark-3); border:1px solid var(--border);
+      border-radius:var(--radius-sm); padding:10px 14px; font-size:13px;
+    }
+    .variant-modal-item .v-name { color:var(--text); font-weight:500; }
+    .variant-modal-item .v-price { color:var(--red); font-weight:600; }
+    .variant-modal-item .v-dur { color:var(--text-dim); font-size:11px; }
+    .variant-modal-item .v-del {
+      background:none; border:1px solid transparent; color:var(--text-dim);
+      width:28px; height:28px; border-radius:6px; cursor:pointer; font-size:12px;
+      display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+    }
+    .variant-modal-item .v-del:hover { background:rgba(239,68,68,0.1); color:var(--danger); border-color:rgba(239,68,68,0.2); }
+
+    .add-variant-form {
+      background:var(--dark-3); border:1px dashed rgba(255,255,255,0.12);
+      border-radius:var(--radius-sm); padding:14px;
+    }
+    .add-variant-form .form-row { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px; align-items:end; }
+    .add-variant-form .mini-label { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+    .add-variant-form input {
+      width:100%; padding:8px 10px; background:var(--dark-2);
+      border:1px solid var(--border); border-radius:6px;
+      color:var(--text); font-family:var(--font-body); font-size:13px; outline:none;
+    }
+    .add-variant-form input:focus { border-color:var(--red); }
+    .add-variant-form input::placeholder { color:var(--text-dim); }
+
+    /* ── Confirm modal ── */
+    .confirm-modal {
+      background:var(--dark-2); border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--radius); width:100%; max-width:380px;
+      padding:24px; animation:slideIn 0.2s ease; text-align:center;
+    }
+    .confirm-modal .confirm-icon {
+      width:52px; height:52px; background:rgba(239,68,68,0.1); border-radius:50%;
+      display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
+    }
+    .confirm-modal .confirm-icon i { font-size:22px; color:var(--danger); }
+    .confirm-modal h4 { font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px; }
+    .confirm-modal p  { font-size:13px; color:var(--text-muted); margin-bottom:20px; line-height:1.5; }
+    .confirm-modal .confirm-btns { display:flex; gap:10px; justify-content:center; }
   </style>
 </head>
 <body>
@@ -38,21 +220,245 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     ADD / EDIT SERVICE MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="serviceModal">
+  <div class="svc-modal">
+    <div class="svc-modal-header">
+      <h3 id="serviceModalTitle"><i class="fas fa-spray-can"></i> Add Service</h3>
+      <button class="modal-close" id="serviceModalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="svc-modal-body">
+      <div class="modal-msg" id="serviceModalMsg"></div>
+
+      <!-- Image Upload -->
+      <div class="svc-field">
+        <label><i class="fas fa-image"></i> Service Image</label>
+        <div class="img-upload-area" id="imgUploadArea">
+          <input type="file" id="svc_image_file" accept="image/*">
+          <!-- Placeholder shown when no image -->
+          <div class="img-upload-placeholder" id="imgPlaceholder">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Click to upload image</p>
+            <span>PNG, JPG, WEBP — max 5MB</span>
+          </div>
+          <!-- Preview shown when image selected -->
+          <div class="img-preview-wrap" id="imgPreviewWrap">
+            <img id="imgPreview" src="" alt="Preview">
+            <div class="img-preview-overlay">
+              <span><i class="fas fa-camera"></i> Change Image</span>
+            </div>
+          </div>
+        </div>
+        <!-- Clear button outside area for easy access -->
+        <button type="button" id="imgClearBtn"
+          style="display:none;margin-top:6px;font-size:12px;color:var(--text-dim);background:none;border:none;cursor:pointer;display:none;align-items:center;gap:5px;">
+          <i class="fas fa-times-circle"></i> Remove image
+        </button>
+      </div>
+
+      <div class="svc-field">
+        <label><i class="fas fa-tag"></i> Service Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="svc_name" placeholder="e.g. Ceramic Coating" maxlength="255">
+      </div>
+      <div class="svc-field">
+        <label><i class="fas fa-align-left"></i> Description</label>
+        <textarea id="svc_description" placeholder="Short description of the service..."></textarea>
+      </div>
+      <div class="svc-field-row">
+        <div class="svc-field" style="margin-bottom:0">
+          <label><i class="fas fa-peso-sign"></i> Base Price (₱) <span style="color:var(--red)">*</span></label>
+          <input type="number" id="svc_price" placeholder="0.00" min="0" step="0.01">
+          <p class="field-hint">Display only — actual billing uses variants.</p>
+        </div>
+        <div class="svc-field" style="margin-bottom:0">
+          <label><i class="fas fa-clock"></i> Est. Duration (hrs)</label>
+          <input type="number" id="svc_duration" placeholder="e.g. 3" min="1" step="1">
+        </div>
+      </div>
+    </div>
+    <div class="svc-modal-footer">
+      <button class="btn-secondary" id="serviceModalCancel">Cancel</button>
+      <button class="btn-primary" id="serviceModalSave">
+        <i class="fas fa-save"></i> <span id="serviceModalSaveLabel">Save Service</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MANAGE VARIANTS MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="variantsModal">
+  <div class="svc-modal">
+    <div class="svc-modal-header">
+      <h3><i class="fas fa-tags"></i> Variants — <span id="variantsModalServiceName"></span></h3>
+      <button class="modal-close" id="variantsModalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="svc-modal-body">
+      <div class="modal-msg" id="variantsModalMsg"></div>
+      <div class="variant-modal-list" id="variantsList">
+        <div class="empty-state" style="padding:16px 0">
+          <i class="fas fa-spinner fa-spin"></i><p>Loading variants...</p>
+        </div>
+      </div>
+      <div class="add-variant-form">
+        <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+          <i class="fas fa-plus" style="color:var(--red);margin-right:5px;"></i> Add New Variant
+        </p>
+        <div class="form-row">
+          <div>
+            <p class="mini-label">Name *</p>
+            <input type="text" id="v_name" placeholder="e.g. Underbone">
+          </div>
+          <div>
+            <p class="mini-label">Price (₱) *</p>
+            <input type="number" id="v_price" placeholder="0" min="0" step="0.01">
+          </div>
+          <div>
+            <p class="mini-label">Duration (hrs)</p>
+            <input type="number" id="v_duration" placeholder="–" min="1" step="1">
+          </div>
+          <div>
+            <p class="mini-label">&nbsp;</p>
+            <button class="btn-primary btn-sm" id="addVariantBtn" style="white-space:nowrap;height:34px;">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="svc-modal-footer">
+      <button class="btn-secondary" id="variantsModalClose2">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DELETE CONFIRM MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="deleteModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon"><i class="fas fa-trash"></i></div>
+    <h4>Delete Service?</h4>
+    <p id="deleteModalMsg">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn-secondary" id="deleteModalCancel">Cancel</button>
+      <button class="btn-danger" id="deleteModalConfirm"><i class="fas fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
 <script src="/admin/admin-layout.js"></script>
 <script>
   AdminLayout.init({ activePage: 'services', breadcrumb: 'Services' });
 
   const { formatCurrency } = AdminLayout;
 
+  // ── State ──────────────────────────────────────────────
+  let editingServiceId  = null;
+  let variantsServiceId = null;
+  let deletingServiceId = null;
+  let currentImageBase64 = null; // base64 of newly selected file
+  let clearImageFlag     = false; // user clicked "remove image"
+
+  // ── Image upload handling ──────────────────────────────
+  const imgFileInput    = document.getElementById('svc_image_file');
+  const imgUploadArea   = document.getElementById('imgUploadArea');
+  const imgPlaceholder  = document.getElementById('imgPlaceholder');
+  const imgPreviewWrap  = document.getElementById('imgPreviewWrap');
+  const imgPreview      = document.getElementById('imgPreview');
+  const imgClearBtn     = document.getElementById('imgClearBtn');
+
+  imgFileInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      showModalMsg('serviceModalMsg', 'error', 'Image too large. Please choose a file under 5MB.');
+      this.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      currentImageBase64 = e.target.result;
+      clearImageFlag = false;
+      setImagePreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function setImagePreview(src) {
+    imgPreview.src = src;
+    imgPreviewWrap.classList.add('visible');
+    imgPlaceholder.style.display = 'none';
+    imgUploadArea.classList.add('has-image');
+    imgClearBtn.style.display = 'inline-flex';
+  }
+
+  function clearImagePreview() {
+    imgPreview.src = '';
+    imgPreviewWrap.classList.remove('visible');
+    imgPlaceholder.style.display = '';
+    imgUploadArea.classList.remove('has-image');
+    imgClearBtn.style.display = 'none';
+    imgFileInput.value = '';
+    currentImageBase64 = null;
+  }
+
+  imgClearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearImageFlag = true;
+    clearImagePreview();
+  });
+
+  // Reset image state when modal opens
+  function resetImageState(existingImageUrl) {
+    clearImageFlag     = false;
+    currentImageBase64 = null;
+    imgFileInput.value = '';
+
+    if (existingImageUrl) {
+      setImagePreview(existingImageUrl);
+    } else {
+      clearImagePreview();
+    }
+  }
+
+  // ── Helpers ────────────────────────────────────────────
+  function showModalMsg(msgId, type, text) {
+    const el = document.getElementById(msgId);
+    el.className = 'modal-msg ' + type;
+    el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${text}`;
+  }
+  function hideModalMsg(msgId) {
+    document.getElementById(msgId).className = 'modal-msg';
+  }
+  function openOverlay(id)  { document.getElementById(id).classList.remove('hidden'); }
+  function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
+  function escHtml(str) {
+    return String(str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  }
+
+  // ── Load Services ──────────────────────────────────────
   async function loadServices() {
     const grid = document.getElementById('servicesGrid');
+    grid.innerHTML = `<div class="empty-state full-width"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
+
     try {
       const res  = await fetch('/api/admin/services');
       const data = await res.json();
+
       if (!data.success || !data.data.length) {
-        grid.innerHTML = `<div class="full-width"><div class="empty-state"><i class="fas fa-spray-can"></i><p>No services yet. Add your first service.</p></div></div>`;
+        grid.innerHTML = `<div class="full-width"><div class="empty-state">
+          <i class="fas fa-spray-can"></i><p>No services yet. Add your first service.</p>
+        </div></div>`;
         return;
       }
+
       grid.innerHTML = data.data.map(s => `
         <div class="service-card">
           <div class="service-card-header">
@@ -69,28 +475,276 @@
                       <strong>${formatCurrency(v.price)}</strong>
                     </li>`).join('')}
                 </ul>`
-              : '<p class="service-desc" style="font-style:italic;">No variants yet</p>'}
+              : '<p class="service-desc" style="font-style:italic;color:var(--text-dim);">No variants yet</p>'}
           </div>
           <div class="service-card-footer">
-            <button class="action-btn" onclick="editService('${s.id}')"><i class="fas fa-edit"></i> Edit</button>
-            <button class="action-btn" onclick="manageVariants('${s.id}','${s.name}')"><i class="fas fa-tags"></i> Variants</button>
-            <button class="action-btn danger" onclick="deleteService('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+            <button class="action-btn"
+              data-id="${s.id}"
+              data-name="${escHtml(s.name)}"
+              data-desc="${escHtml(s.description||'')}"
+              data-price="${s.price}"
+              data-duration="${s.duration_hours||''}"
+              data-img="${escHtml(s.image_url||'')}"
+              onclick="openEditService(this)">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="action-btn"
+              onclick="openVariants('${s.id}','${escHtml(s.name)}')">
+              <i class="fas fa-tags"></i> Variants
+            </button>
+            <button class="action-btn danger"
+              onclick="openDelete('${s.id}','${escHtml(s.name)}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
           </div>
         </div>`).join('');
     } catch (err) {
       console.error('Load services error:', err);
-      grid.innerHTML = `<div class="full-width"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load services</p></div></div>`;
+      grid.innerHTML = `<div class="full-width"><div class="empty-state">
+        <i class="fas fa-exclamation-triangle"></i><p>Failed to load services</p>
+      </div></div>`;
     }
   }
 
-  document.getElementById('addServiceBtn')?.addEventListener('click', () => {
-    alert('Add Service modal — connect to your API here.');
+  // ── ADD SERVICE ────────────────────────────────────────
+  document.getElementById('addServiceBtn').addEventListener('click', () => {
+    editingServiceId = null;
+    document.getElementById('serviceModalTitle').innerHTML = '<i class="fas fa-spray-can"></i> Add Service';
+    document.getElementById('serviceModalSaveLabel').textContent = 'Save Service';
+    document.getElementById('svc_name').value        = '';
+    document.getElementById('svc_description').value = '';
+    document.getElementById('svc_price').value       = '';
+    document.getElementById('svc_duration').value    = '';
+    resetImageState(null);
+    hideModalMsg('serviceModalMsg');
+    openOverlay('serviceModal');
+    document.getElementById('svc_name').focus();
   });
 
-  function editService(id)          { alert('Edit service: ' + id); }
-  function manageVariants(id, name) { alert('Manage variants for: ' + name); }
-  function deleteService(id)        { if (confirm('Delete this service?')) alert('Delete service: ' + id); }
+  // ── EDIT SERVICE ───────────────────────────────────────
+  function openEditService(btn) {
+    editingServiceId = btn.dataset.id;
+    document.getElementById('serviceModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Service';
+    document.getElementById('serviceModalSaveLabel').textContent = 'Update Service';
+    document.getElementById('svc_name').value        = btn.dataset.name;
+    document.getElementById('svc_description').value = btn.dataset.desc;
+    document.getElementById('svc_price').value       = btn.dataset.price;
+    document.getElementById('svc_duration').value    = btn.dataset.duration || '';
+    resetImageState(btn.dataset.img || null);
+    hideModalMsg('serviceModalMsg');
+    openOverlay('serviceModal');
+    document.getElementById('svc_name').focus();
+  }
 
+  // Close service modal
+  ['serviceModalClose','serviceModalCancel'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => closeOverlay('serviceModal'));
+  });
+  document.getElementById('serviceModal').addEventListener('click', e => {
+    if (e.target.id === 'serviceModal') closeOverlay('serviceModal');
+  });
+
+  // ── SAVE SERVICE ───────────────────────────────────────
+  document.getElementById('serviceModalSave').addEventListener('click', async () => {
+    const name     = document.getElementById('svc_name').value.trim();
+    const desc     = document.getElementById('svc_description').value.trim();
+    const price    = document.getElementById('svc_price').value.trim();
+    const duration = document.getElementById('svc_duration').value.trim();
+
+    if (!name) {
+      showModalMsg('serviceModalMsg', 'error', 'Service name is required.');
+      document.getElementById('svc_name').focus();
+      return;
+    }
+    if (!price || isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+      showModalMsg('serviceModalMsg', 'error', 'Please enter a valid base price.');
+      document.getElementById('svc_price').focus();
+      return;
+    }
+
+    const btn = document.getElementById('serviceModalSave');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    const payload = {
+      name, price,
+      description:    desc     || null,
+      duration_hours: duration || null,
+      image_base64:   currentImageBase64 || null,
+      clear_image:    clearImageFlag,
+    };
+
+    try {
+      const url    = editingServiceId ? `/api/admin/services/${editingServiceId}` : '/api/admin/services';
+      const method = editingServiceId ? 'PUT' : 'POST';
+
+      const res  = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showModalMsg('serviceModalMsg', 'success', data.message || 'Saved!');
+        setTimeout(() => { closeOverlay('serviceModal'); loadServices(); }, 900);
+      } else {
+        showModalMsg('serviceModalMsg', 'error', data.message || 'Failed to save service.');
+      }
+    } catch (err) {
+      showModalMsg('serviceModalMsg', 'error', 'Network error. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fas fa-save"></i> <span id="serviceModalSaveLabel">${editingServiceId?'Update Service':'Save Service'}</span>`;
+    }
+  });
+
+  // ── DELETE SERVICE ─────────────────────────────────────
+  function openDelete(id, name) {
+    deletingServiceId = id;
+    document.getElementById('deleteModalMsg').textContent =
+      `Are you sure you want to delete "${name}"? This cannot be undone.`;
+    openOverlay('deleteModal');
+  }
+
+  document.getElementById('deleteModalCancel').addEventListener('click', () => closeOverlay('deleteModal'));
+  document.getElementById('deleteModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteModal') closeOverlay('deleteModal');
+  });
+
+  document.getElementById('deleteModalConfirm').addEventListener('click', async () => {
+    if (!deletingServiceId) return;
+    const btn = document.getElementById('deleteModalConfirm');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    try {
+      const res  = await fetch(`/api/admin/services/${deletingServiceId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) { closeOverlay('deleteModal'); loadServices(); }
+      else alert('Failed to delete: ' + (data.message || 'Unknown error'));
+    } catch (err) {
+      alert('Network error. Try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+    }
+  });
+
+  // ── VARIANTS MODAL ─────────────────────────────────────
+  async function openVariants(serviceId, serviceName) {
+    variantsServiceId = serviceId;
+    document.getElementById('variantsModalServiceName').textContent = serviceName;
+    document.getElementById('v_name').value     = '';
+    document.getElementById('v_price').value    = '';
+    document.getElementById('v_duration').value = '';
+    hideModalMsg('variantsModalMsg');
+    openOverlay('variantsModal');
+    await loadVariants();
+  }
+
+  async function loadVariants() {
+    const list = document.getElementById('variantsList');
+    list.innerHTML = `<div class="empty-state" style="padding:12px 0"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
+    try {
+      const res  = await fetch(`/api/admin/services/${variantsServiceId}/variants`);
+      const data = await res.json();
+      if (!data.success || !data.data.length) {
+        list.innerHTML = `<div class="empty-state" style="padding:12px 0">
+          <i class="fas fa-tags" style="font-size:20px;opacity:.3"></i>
+          <p>No variants yet. Add one below.</p>
+        </div>`;
+        return;
+      }
+      list.innerHTML = data.data.map(v => `
+        <div class="variant-modal-item">
+          <div>
+            <span class="v-name">${v.name}</span>
+            ${v.duration_hours ? `<span class="v-dur" style="margin-left:8px;">~${v.duration_hours}h</span>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="v-price">${formatCurrency(v.price)}</span>
+            <button class="v-del" onclick="deleteVariant('${v.id}','${escHtml(v.name)}')" title="Remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>`).join('');
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state" style="padding:12px 0">
+        <i class="fas fa-exclamation-triangle" style="font-size:20px;"></i><p>Failed to load</p>
+      </div>`;
+    }
+  }
+
+  document.getElementById('addVariantBtn').addEventListener('click', async () => {
+    const name     = document.getElementById('v_name').value.trim();
+    const price    = document.getElementById('v_price').value.trim();
+    const duration = document.getElementById('v_duration').value.trim();
+
+    if (!name || !price) {
+      showModalMsg('variantsModalMsg', 'error', 'Variant name and price are required.');
+      return;
+    }
+    if (isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+      showModalMsg('variantsModalMsg', 'error', 'Enter a valid price.');
+      return;
+    }
+
+    const btn = document.getElementById('addVariantBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+      const res  = await fetch(`/api/admin/services/${variantsServiceId}/variants`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, price: parseFloat(price), duration_hours: duration||null }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showModalMsg('variantsModalMsg', 'success', `Variant "${name}" added!`);
+        document.getElementById('v_name').value     = '';
+        document.getElementById('v_price').value    = '';
+        document.getElementById('v_duration').value = '';
+        await loadVariants();
+        loadServices();
+      } else {
+        showModalMsg('variantsModalMsg', 'error', data.message || 'Failed to add variant.');
+      }
+    } catch (err) {
+      showModalMsg('variantsModalMsg', 'error', 'Network error. Try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-plus"></i>';
+    }
+  });
+
+  async function deleteVariant(variantId, variantName) {
+    if (!confirm(`Remove variant "${variantName}"?`)) return;
+    try {
+      const res  = await fetch(`/api/admin/services/${variantsServiceId}/variants/${variantId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) { await loadVariants(); loadServices(); }
+      else alert('Failed: ' + data.message);
+    } catch (err) {
+      alert('Network error. Try again.');
+    }
+  }
+
+  ['variantsModalClose','variantsModalClose2'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => { closeOverlay('variantsModal'); loadServices(); });
+  });
+  document.getElementById('variantsModal').addEventListener('click', e => {
+    if (e.target.id === 'variantsModal') { closeOverlay('variantsModal'); loadServices(); }
+  });
+
+  // Enter to add variant quickly
+  ['v_name','v_price','v_duration'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('addVariantBtn').click();
+    });
+  });
+
+  // ── Init ───────────────────────────────────────────────
   loadServices();
 </script>
 </body>
