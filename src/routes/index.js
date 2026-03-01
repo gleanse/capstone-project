@@ -9,6 +9,10 @@ const adminPages     = require('../features/admin/admin.pages');  // HTML pages 
 
 // PAGE router serves HTML pages
 const pagesRouter = express.Router();
+// NOTE: temporary redirect change this to landing page later
+pagesRouter.get('/', (req, res) => {
+  res.redirect('/services');
+});
 pagesRouter.use('/services', servicesRoutes);
 pagesRouter.use('/auth', authRoutes);
 pagesRouter.use('/booking', bookingRoutes);

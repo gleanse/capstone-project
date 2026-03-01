@@ -82,4 +82,66 @@ const lockSlot = async ({ availabilityId, serviceId, variantId, userId }) => {
   return result.rows[0];
 };
 
-module.exports = { getServiceById, getAvailableDates, lockSlot };
+const releaseSlot = async (bookingId) => {
+  const result = await pool.query(
+    `
+    UPDATE bookings
+    SET booking_status = 'expired'
+    WHERE id = $1
+    AND booking_status = 'locked'
+    RETURNING *
+  `,
+    [bookingId]
+  );
+  return result.rows[0] || null;
+};
+
+const updateBookingDetails = async (
+  bookingId,
+  {
+    guestName,
+    guestEmail,
+    guestPhone,
+    motorcyclePlate,
+    motorcycleModel,
+    motorcycleColor,
+    motorcycleDescription,
+  }
+) => {
+  const result = await pool.query(
+    `
+    UPDATE bookings
+    SET
+      guest_name = $2,
+      guest_email = $3,
+      guest_phone = $4,
+      motorcycle_plate = $5,
+      motorcycle_model = $6,
+      motorcycle_color = $7,
+      motorcycle_description = $8,
+      updated_at = NOW()
+    WHERE id = $1
+    AND booking_status = 'locked'
+    RETURNING *
+  `,
+    [
+      bookingId,
+      guestName,
+      guestEmail,
+      guestPhone,
+      motorcyclePlate,
+      motorcycleModel,
+      motorcycleColor,
+      motorcycleDescription || null,
+    ]
+  );
+  return result.rows[0] || null;
+};
+
+module.exports = {
+  getServiceById,
+  getAvailableDates,
+  lockSlot,
+  releaseSlot,
+  updateBookingDetails,
+};
