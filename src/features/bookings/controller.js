@@ -1,5 +1,11 @@
 const path = require('path');
-const { getServiceById, getAvailableDates, lockSlot } = require('./queries');
+const {
+  getServiceById,
+  getAvailableDates,
+  lockSlot,
+  releaseSlot,
+  updateBookingDetails,
+} = require('./queries');
 
 const getBookingPage = (req, res) => {
   res.sendFile(path.join(__dirname, 'booking.html'));
@@ -58,9 +64,88 @@ const lockBookingSlot = async (req, res) => {
   }
 };
 
+const releaseBookingSlot = async (req, res) => {
+  try {
+    const { bookingId } = req.body;
+
+    if (!bookingId) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Missing bookingId' });
+    }
+
+    const booking = await releaseSlot(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found or already released',
+      });
+    }
+
+    res.json({ success: true, data: booking });
+  } catch (error) {
+    console.error('Release slot error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const updateBooking = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const {
+      guestName,
+      guestEmail,
+      guestPhone,
+      motorcyclePlate,
+      motorcycleModel,
+      motorcycleColor,
+      motorcycleDescription,
+    } = req.body;
+
+    if (
+      !bookingId ||
+      !guestName ||
+      !guestEmail ||
+      !guestPhone ||
+      !motorcyclePlate ||
+      !motorcycleModel ||
+      !motorcycleColor
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Missing required fields' });
+    }
+
+    const booking = await updateBookingDetails(bookingId, {
+      guestName,
+      guestEmail,
+      guestPhone,
+      motorcyclePlate,
+      motorcycleModel,
+      motorcycleColor,
+      motorcycleDescription,
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found or already confirmed',
+      });
+    }
+
+    res.json({ success: true, data: booking });
+  } catch (error) {
+    console.error('Update booking error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getBookingPage,
   getServiceDetails,
   getAvailability,
   lockBookingSlot,
+  releaseBookingSlot,
+  updateBooking,
 };
