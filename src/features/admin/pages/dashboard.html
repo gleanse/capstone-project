@@ -251,20 +251,30 @@
         const bData = await bookingsRes.json();
         renderTodayTable(bData.success ? bData.data : []);
       }
-      const pickupRes  = await fetch('/api/admin/bookings/pickup-pending');
-      if (pickupRes.ok) {
-        const pData = await pickupRes.json();
-        if (pData.success && pData.data.length > 0) {
-          document.getElementById('pickupCard').style.display = 'block';
-          renderPickupTable(pData.data);
-        }
-      }
+      const pickupRes = await fetch('/api/admin/bookings/pickup-pending');
+if (pickupRes.ok) {
+  const pData = await pickupRes.json();
+  if (pData.success && pData.data.length > 0) {
+    document.getElementById('pickupCard').style.display = 'block';
+    renderPickupTable(pData.data);
+  } else {
+    document.getElementById('pickupCard').style.display = 'none';
+  }
+}
     } catch (err) {
       console.error('Dashboard load error:', err);
     }
   }
 
-  document.getElementById('refreshDashboard')?.addEventListener('click', loadDashboard);
+  document.getElementById('refreshDashboard')?.addEventListener('click', async () => {
+  const btn = document.getElementById('refreshDashboard');
+  const icon = btn?.querySelector('i');
+  btn.disabled = true;
+  icon?.classList.add('fa-spin');
+  await loadDashboard();
+  icon?.classList.remove('fa-spin');
+  btn.disabled = false;
+});
   loadDashboard();
 </script>
 </body>
