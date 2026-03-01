@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmed</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="border-b border-white/10 px-6 py-5 flex items-center gap-3 relative z-10 animate-slideDown">
+    <h1
+      class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
+      style="font-family:'Bebas Neue',sans-serif;">
+      Herco Detailing Garage
+    </h1>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-xl mx-auto px-6 py-16 relative z-10 flex flex-col items-center text-center animate-fadeUp">
+
+    <!-- Success Icon -->
+    <div class="relative mb-8">
+      <div class="w-24 h-24 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+        <i class="ph ph-check-circle text-green-400 text-5xl"></i>
+      </div>
+      <!-- Glow -->
+      <div class="absolute inset-0 rounded-full bg-green-500/10 blur-xl"></div>
+    </div>
+
+    <!-- Heading -->
+    <p class="text-green-400 text-xs uppercase tracking-widest mb-2">Payment Confirmed</p>
+    <h2 class="text-5xl font-bold mb-3 tracking-wide" style="font-family:'Bebas Neue',sans-serif;">
+      You're All Set!
+    </h2>
+    <p class="text-white/40 text-sm mb-10 leading-relaxed max-w-sm">
+      Your booking has been confirmed. Check your email for the booking details and your queue number.
+    </p>
+
+    <!-- Info Card -->
+    <div class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left">
+      <p class="text-xs text-white/30 uppercase tracking-widest mb-4">What's Next</p>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-start gap-3">
+          <div
+            class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="ph ph-envelope text-white/50 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-white">Check your email</p>
+            <p class="text-xs text-white/40 mt-0.5">Your booking confirmation and queue number has been sent to your
+              email.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div
+            class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="ph ph-clock text-white/50 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-white">Arrive on time</p>
+            <p class="text-xs text-white/40 mt-0.5">Please arrive at the garage on your scheduled date with your queue
+              number ready.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div
+            class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="ph ph-motorcycle text-white/50 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-white">Bring your motorcycle</p>
+            <p class="text-xs text-white/40 mt-0.5">Make sure your motorcycle matches the details you provided during
+              booking.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col gap-3 w-full">
+      <a href="/services"
+        class="cursor-pointer w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+        <i class="ph ph-arrow-left"></i>
+        Back to Services
+      </a>
+    </div>
+
+  </main>
+
+</body>
+</html>

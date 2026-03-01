@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Failed</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="border-b border-white/10 px-6 py-5 flex items-center gap-3 relative z-10 animate-slideDown">
+    <h1
+      class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
+      style="font-family:'Bebas Neue',sans-serif;">
+      Herco Detailing Garage
+    </h1>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-xl mx-auto px-6 py-16 relative z-10 flex flex-col items-center text-center animate-fadeUp">
+
+    <!-- Failed Icon -->
+    <div class="relative mb-8">
+      <div class="w-24 h-24 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+        <i class="ph ph-x-circle text-red-400 text-5xl"></i>
+      </div>
+      <!-- Glow -->
+      <div class="absolute inset-0 rounded-full bg-red-500/10 blur-xl"></div>
+    </div>
+
+    <!-- Heading -->
+    <p class="text-red-400 text-xs uppercase tracking-widest mb-2">Payment Failed</p>
+    <h2 class="text-5xl font-bold mb-3 tracking-wide" style="font-family:'Bebas Neue',sans-serif;">
+      Something Went Wrong
+    </h2>
+    <p class="text-white/40 text-sm mb-10 leading-relaxed max-w-sm">
+      Your payment was not completed. Your slot reservation may have been released. Please try booking again.
+    </p>
+
+    <!-- Info Card -->
+    <div class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left">
+      <p class="text-xs text-white/30 uppercase tracking-widest mb-4">What Happened</p>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-start gap-3">
+          <div
+            class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="ph ph-credit-card text-white/50 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-white">Payment was not completed</p>
+            <p class="text-xs text-white/40 mt-0.5">Your payment did not go through. No charges were made to your
+              account.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div
+            class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="ph ph-calendar-x text-white/50 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-white">Slot may have been released</p>
+            <p class="text-xs text-white/40 mt-0.5">Your reserved slot may no longer be available. You'll need to select
+              a new date.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div
+            class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="ph ph-arrows-clockwise text-white/50 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-white">Try again</p>
+            <p class="text-xs text-white/40 mt-0.5">Go back to services and start a new booking. The process only takes
+              a few minutes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col gap-3 w-full">
+      <a href="/services"
+        class="cursor-pointer w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+        <i class="ph ph-arrows-clockwise"></i>
+        Try Again
+      </a>
+      <a href="/"
+        class="cursor-pointer w-full border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+        <i class="ph ph-house"></i>
+        Go Home
+      </a>
+    </div>
+
+  </main>
+
+</body>
+</html>

@@ -138,10 +138,80 @@ const updateBookingDetails = async (
   return result.rows[0] || null;
 };
 
+const createPayment = async ({
+  bookingId,
+  amount,
+  amountPaid,
+  paymentType,
+}) => {
+  const result = await pool.query(
+    `
+    INSERT INTO payments (
+      booking_id,
+      amount,
+      amount_paid,
+      remaining_balance,
+      payment_type,
+      is_fully_paid,
+      status
+    ) VALUES ($1, $2, $3, $4, $5, $6, 'unpaid')
+    RETURNING *
+  `,
+    [
+      bookingId,
+      amount,
+      amountPaid,
+      amount - amountPaid,
+      paymentType,
+      paymentType === 'full',
+    ]
+  );
+  return result.rows[0];
+};
+
+const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
+  const result = await pool.query(
+    `
+    UPDATE bookings
+    SET
+      booking_status = 'confirmed',
+      reference_code = 'HRC-' || UPPER(SUBSTRING(id::text, 1, 8)),
+      queue_number = (
+        SELECT COALESCE(MAX(queue_number), 0) + 1
+        FROM bookings
+        WHERE availability_id = (
+          SELECT availability_id FROM bookings WHERE id = $1
+        )
+        AND booking_status = 'confirmed'
+      ),
+      updated_at = NOW()
+    WHERE id = $1
+    RETURNING *
+  `,
+    [bookingId]
+  );
+
+  await pool.query(
+    `
+    UPDATE payments
+    SET
+      status = 'paid',
+      xendit_invoice_id = $2,
+      paid_at = NOW()
+    WHERE booking_id = $1
+  `,
+    [bookingId, xenditInvoiceId]
+  );
+
+  return result.rows[0] || null;
+};
+
 module.exports = {
   getServiceById,
   getAvailableDates,
   lockSlot,
   releaseSlot,
   updateBookingDetails,
+  createPayment,
+  confirmBooking,
 };

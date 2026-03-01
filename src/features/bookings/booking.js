@@ -82,7 +82,7 @@ function showModal(title, message, onConfirm, confirmLabel = 'Yes, go back') {
 }
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
+  const d = new Date(dateStr.split('T')[0] + 'T00:00:00');
   return d.toLocaleDateString('en-PH', {
     weekday: 'short',
     year: 'numeric',
@@ -365,7 +365,8 @@ function confirmSelectDate(slot, dateStr) {
       } slot${slot.remaining > 1 ? 's' : ''} left`;
 
       renderCalendar();
-    }
+    },
+    'Confirm'
   );
 }
 
@@ -540,12 +541,32 @@ document.getElementById('btn-step4-back').addEventListener('click', () => {
   showStep(3);
 });
 
-document.getElementById('btn-pay').addEventListener('click', () => {
+document.getElementById('btn-pay').addEventListener('click', async () => {
   const paymentType = document.querySelector(
     'input[name="payment_type"]:checked'
   ).value;
-  // TODO: call Xendit payment API
-  console.log('Proceeding to payment:', paymentType);
+  const btn = document.getElementById('btn-pay');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Processing...';
+
+  const res = await fetch('/api/booking/pay', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      bookingId: state.bookingId,
+      paymentType,
+    }),
+  });
+
+  const json = await res.json();
+  if (json.success) {
+    window.location.href = json.invoiceUrl;
+  } else {
+    alert('Failed to create payment. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph ph-lock"></i> Proceed to Payment';
+  }
 });
 
 // Init
