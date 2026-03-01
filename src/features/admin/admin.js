@@ -128,7 +128,7 @@ if (logoutBtn) {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch (_) {}
-    window.location.href = '/features/auth/login.html';
+    window.location.href = '/auth/login';
   });
 }
 
