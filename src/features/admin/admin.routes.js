@@ -53,13 +53,19 @@ function saveBase64Image(base64String, oldImageUrl) {
 router.get('/stats/today', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE booking_status = 'confirmed') AS total,
-        COUNT(*) FILTER (WHERE status = 'pending' AND booking_status = 'confirmed') AS pending,
-        COUNT(*) FILTER (WHERE status = 'in_progress') AS in_progress,
-        COUNT(*) FILTER (WHERE status IN ('done', 'picked_up')) AS done
-      FROM bookings WHERE DATE(created_at) = CURRENT_DATE
-    `);
+  SELECT
+    COUNT(*) FILTER (WHERE b.booking_status = 'confirmed') AS total,
+    COUNT(*) FILTER (WHERE b.status = 'pending' AND b.booking_status = 'confirmed') AS pending,
+    COUNT(*) FILTER (WHERE b.status = 'in_progress') AS in_progress,
+    COUNT(*) FILTER (WHERE b.status IN ('done', 'picked_up')) AS done
+  FROM bookings b
+  LEFT JOIN availability a ON a.id = b.availability_id
+  WHERE b.booking_status = 'confirmed'
+    AND (
+      DATE(a.date) = CURRENT_DATE
+      OR (b.availability_id IS NULL AND DATE(b.created_at) = CURRENT_DATE)
+    )
+`);
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -72,16 +78,20 @@ router.get('/stats/today', async (req, res) => {
 router.get('/bookings/today', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT b.id, b.reference_code, b.guest_name, b.guest_email,
-             b.status, b.booking_status, b.payment_method, b.is_walkin,
-             a.date AS booking_date, s.name AS service_name, sv.name AS variant_name
-      FROM bookings b
-      LEFT JOIN availability a      ON a.id  = b.availability_id
-      LEFT JOIN services s          ON s.id  = b.service_id
-      LEFT JOIN service_variants sv ON sv.id = b.variant_id
-      WHERE DATE(a.date) = CURRENT_DATE AND b.booking_status = 'confirmed'
-      ORDER BY b.created_at DESC
-    `);
+  SELECT b.id, b.reference_code, b.guest_name, b.guest_email,
+         b.status, b.booking_status, b.payment_method, b.is_walkin,
+         a.date AS booking_date, s.name AS service_name, sv.name AS variant_name
+  FROM bookings b
+  LEFT JOIN availability a      ON a.id  = b.availability_id
+  LEFT JOIN services s          ON s.id  = b.service_id
+  LEFT JOIN service_variants sv ON sv.id = b.variant_id
+  WHERE b.booking_status = 'confirmed'
+    AND (
+      DATE(a.date) = CURRENT_DATE
+      OR (b.availability_id IS NULL AND DATE(b.created_at) = CURRENT_DATE)
+    )
+  ORDER BY b.created_at DESC
+`);
     res.json({ success: true, data: result.rows });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -500,6 +510,248 @@ router.get('/audit-logs', async (req, res) => {
       ORDER BY al.created_at DESC LIMIT 100
     `);
     res.json({ success: true, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// POST /api/admin/availability
+// ===========================
+router.post('/availability', async (req, res) => {
+  try {
+    const { service_id, date, capacity, is_open } = req.body;
+
+    if (!service_id || !date || !capacity) {
+      return res.status(400).json({ success: false, message: 'service_id, date, and capacity are required' });
+    }
+    if (parseInt(capacity) < 1) {
+      return res.status(400).json({ success: false, message: 'Capacity must be at least 1' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO availability (service_id, date, capacity, is_open)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (service_id, date)
+       DO UPDATE SET capacity = $3, is_open = $4
+       RETURNING id, date, capacity, is_open`,
+      [service_id, date, parseInt(capacity), is_open !== false]
+    );
+
+    const staffId = req.session?.user?.id || null;
+    if (staffId) {
+      await pool.query(
+        `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
+         VALUES ($1, 'Set availability capacity', 'availability', $2, $3)`,
+        [staffId, result.rows[0].id, `Capacity ${capacity} set for date ${date}`]
+      );
+    }
+
+    res.status(201).json({ success: true, data: result.rows[0], message: 'Capacity saved successfully' });
+  } catch (err) {
+    console.error('Create availability error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// PUT /api/admin/availability/:id
+// ===========================
+router.put('/availability/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { capacity, is_open, date } = req.body;
+
+    if (!capacity || parseInt(capacity) < 1) {
+      return res.status(400).json({ success: false, message: 'Capacity must be at least 1' });
+    }
+
+    const result = await pool.query(
+      `UPDATE availability
+       SET capacity = $1, is_open = $2, date = COALESCE($3, date)
+       WHERE id = $4
+       RETURNING id, date, capacity, is_open`,
+      [parseInt(capacity), is_open !== false, date || null, id]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: 'Availability entry not found' });
+    }
+
+    res.json({ success: true, data: result.rows[0], message: 'Capacity updated successfully' });
+  } catch (err) {
+    console.error('Update availability error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// DELETE /api/admin/availability/:id
+// ===========================
+router.delete('/availability/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `DELETE FROM availability WHERE id = $1 RETURNING id`,
+      [id]
+    );
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: 'Availability entry not found' });
+    }
+    res.json({ success: true, message: 'Availability entry deleted' });
+  } catch (err) {
+    console.error('Delete availability error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// POST /api/admin/closed-dates
+// ===========================
+router.post('/closed-dates', async (req, res) => {
+  try {
+    const { type, day_of_week, date, reason } = req.body;
+
+    if (!type || !['recurring', 'specific'].includes(type)) {
+      return res.status(400).json({ success: false, message: 'Type must be recurring or specific' });
+    }
+    if (type === 'recurring' && day_of_week === undefined) {
+      return res.status(400).json({ success: false, message: 'day_of_week is required for recurring closure' });
+    }
+    if (type === 'specific' && !date) {
+      return res.status(400).json({ success: false, message: 'date is required for specific closure' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO closed_dates (type, day_of_week, date, reason)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, type, day_of_week, date, reason`,
+      [type, type === 'recurring' ? parseInt(day_of_week) : null, type === 'specific' ? date : null, reason || null]
+    );
+
+    const staffId = req.session?.user?.id || null;
+    if (staffId) {
+      await pool.query(
+        `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
+         VALUES ($1, 'Added closed date', 'closed_dates', $2, $3)`,
+        [staffId, result.rows[0].id, `Closure: ${type}, ${reason || 'no reason'}`]
+      );
+    }
+
+    res.status(201).json({ success: true, data: result.rows[0], message: 'Closure added successfully' });
+  } catch (err) {
+    console.error('Create closed date error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// DELETE /api/admin/closed-dates/:id
+// ===========================
+router.delete('/closed-dates/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `DELETE FROM closed_dates WHERE id = $1 RETURNING id`,
+      [id]
+    );
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: 'Closed date not found' });
+    }
+    res.json({ success: true, message: 'Closure deleted successfully' });
+  } catch (err) {
+    console.error('Delete closed date error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// GET /api/admin/notifications/count
+// ===========================
+router.get('/notifications/count', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT COUNT(*) AS count
+      FROM bookings b
+      LEFT JOIN availability a ON a.id = b.availability_id
+      WHERE b.booking_status = 'confirmed'
+        AND b.status IN ('pending', 'done')
+        AND (
+          DATE(a.date) = CURRENT_DATE
+          OR (b.availability_id IS NULL AND DATE(b.created_at) = CURRENT_DATE)
+        )
+    `);
+    res.json({ success: true, count: parseInt(result.rows[0].count) });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ===========================
+// GET /api/admin/notifications/list
+// ===========================
+router.get('/notifications/list', async (req, res) => {
+  try {
+    // 1. New bookings today (confirmed today)
+    const newRes = await pool.query(`
+      SELECT b.id, b.reference_code, b.guest_name, b.status,
+             s.name AS service_name, sv.name AS variant_name
+      FROM bookings b
+      LEFT JOIN availability a      ON a.id  = b.availability_id
+      LEFT JOIN services s          ON s.id  = b.service_id
+      LEFT JOIN service_variants sv ON sv.id = b.variant_id
+      WHERE b.booking_status = 'confirmed'
+        AND DATE(b.created_at) = CURRENT_DATE
+      ORDER BY b.created_at DESC
+    `);
+
+    // 2. Pending bookings (confirmed but not yet in_progress) — today
+    const pendingRes = await pool.query(`
+      SELECT b.id, b.reference_code, b.guest_name, b.status,
+             s.name AS service_name
+      FROM bookings b
+      LEFT JOIN availability a ON a.id = b.availability_id
+      LEFT JOIN services s     ON s.id = b.service_id
+      WHERE b.booking_status = 'confirmed'
+        AND b.status = 'pending'
+        AND (
+          DATE(a.date) = CURRENT_DATE
+          OR (b.availability_id IS NULL AND DATE(b.created_at) = CURRENT_DATE)
+        )
+      ORDER BY b.created_at ASC
+    `);
+
+    // 3. Done — waiting for pickup
+    const pickupRes = await pool.query(`
+      SELECT b.id, b.reference_code, b.guest_name, b.status,
+             s.name AS service_name
+      FROM bookings b
+      LEFT JOIN services s ON s.id = b.service_id
+      WHERE b.booking_status = 'confirmed'
+        AND b.status = 'done'
+      ORDER BY b.updated_at DESC
+    `);
+
+    // 4. Expired bookings today
+    const expiredRes = await pool.query(`
+      SELECT b.id, b.reference_code, b.guest_name, b.status,
+             s.name AS service_name
+      FROM bookings b
+      LEFT JOIN services s ON s.id = b.service_id
+      WHERE b.booking_status = 'expired'
+        AND DATE(b.created_at) = CURRENT_DATE
+      ORDER BY b.created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      data: {
+        newBookings: newRes.rows,
+        pending:     pendingRes.rows,
+        pickup:      pickupRes.rows,
+        expired:     expiredRes.rows,
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
