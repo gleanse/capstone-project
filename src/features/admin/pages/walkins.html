@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walk-ins — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Walk-in Booking</h1>
+      <p class="page-sub">Create walk-in bookings for customers at the garage</p>
+    </div>
+  </div>
+
+  <div class="walkin-layout">
+    <!-- Form -->
+    <div class="card walkin-form-card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-user-plus"></i> New Walk-in</h2>
+      </div>
+      <form id="walkinForm" novalidate style="padding:20px;">
+        <div class="field-group">
+          <label><i class="fas fa-user"></i> Customer Name</label>
+          <div class="input-wrap"><input type="text" id="wi_name" placeholder="Juan Dela Cruz"></div>
+          <span class="field-error" id="wi_nameError"></span>
+        </div>
+        <div class="field-group">
+          <label><i class="fas fa-envelope"></i> Email (optional)</label>
+          <div class="input-wrap"><input type="email" id="wi_email" placeholder="juan@example.com"></div>
+        </div>
+        <div class="field-group">
+          <label><i class="fas fa-phone"></i> Phone</label>
+          <div class="input-wrap"><input type="tel" id="wi_phone" placeholder="09171234567" maxlength="11"></div>
+          <span class="field-error" id="wi_phoneError"></span>
+        </div>
+        <div class="field-group">
+          <label><i class="fas fa-spray-can"></i> Service</label>
+          <div class="input-wrap select-wrap"><select id="wi_service"><option value="">-- Select service --</option></select></div>
+          <span class="field-error" id="wi_serviceError"></span>
+        </div>
+        <div class="field-group">
+          <label><i class="fas fa-tags"></i> Variant / Size</label>
+          <div class="input-wrap select-wrap">
+            <select id="wi_variant" disabled><option value="">-- Select service first --</option></select>
+          </div>
+          <span class="field-error" id="wi_variantError"></span>
+        </div>
+        <div class="field-group">
+          <label><i class="fas fa-motorcycle"></i> Plate Number</label>
+          <div class="input-wrap"><input type="text" id="wi_plate" placeholder="ABC 1234"></div>
+        </div>
+        <div class="field-group">
+          <label><i class="fas fa-info-circle"></i> Motorcycle Description</label>
+          <div class="input-wrap"><input type="text" id="wi_desc" placeholder="e.g. Black Honda CBR 150"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="walkin-summary" id="walkinSummary" style="display:none;">
+          <div class="summary-row"><span>Service:</span><span id="summary_service">—</span></div>
+          <div class="summary-row"><span>Variant:</span><span id="summary_variant">—</span></div>
+          <div class="summary-row total"><span>Amount:</span><span id="summary_amount">₱0</span></div>
+        </div>
+
+        <button type="submit" class="btn-primary full-width" id="walkinSubmit">
+          <i class="fas fa-check"></i> Confirm Walk-in Booking
+        </button>
+        <div class="form-message" id="walkinMessage"></div>
+      </form>
+    </div>
+
+    <!-- Info Sidebar -->
+    <div class="walkin-info">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-info-circle"></i> Walk-in Guidelines</h2>
+        </div>
+        <ul class="guideline-list">
+          <li><i class="fas fa-check-circle"></i> Check today's capacity before accepting</li>
+          <li><i class="fas fa-check-circle"></i> Payment is collected immediately in cash</li>
+          <li><i class="fas fa-check-circle"></i> Walk-in is marked confirmed right away</li>
+          <li><i class="fas fa-exclamation-circle warning"></i> Use judgment on closing time vs service duration</li>
+          <li><i class="fas fa-exclamation-circle warning"></i> If no capacity, ask customer to book online</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-calendar-day"></i> Today's Capacity</h2>
+        </div>
+        <div id="todayCapacityList">
+          <div class="empty-state"><i class="fas fa-calendar-alt"></i><p>Loading...</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
+
+  const { formatCurrency } = AdminLayout;
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  // ── Load services & capacity ──────────────────────────
+  async function loadWalkinData() {
+    // Services
+    const res  = await fetch('/api/admin/services');
+    const data = await res.json();
+    const wiService = document.getElementById('wi_service');
+    if (wiService && data.success) {
+      wiService.innerHTML = '<option value="">-- Select service --</option>' +
+        data.data.map(s =>
+          `<option value="${s.id}" data-variants='${JSON.stringify(s.variants || [])}'>${s.name}</option>`
+        ).join('');
+    }
+
+    // Capacity
+    const today  = new Date().toISOString().split('T')[0];
+    const capRes = await fetch('/api/admin/availability?date=' + today);
+    const capData = await capRes.json();
+    const capList = document.getElementById('todayCapacityList');
+    if (capList && capData.success && capData.data.length) {
+      capList.innerHTML = capData.data.map(c => {
+        const remaining = c.capacity - (c.bookings_count || 0);
+        const cls = remaining === 0 ? 'low' : remaining <= 2 ? 'mid' : 'ok';
+        return `<div class="capacity-item">
+          <span class="capacity-name">${c.service_name}</span>
+          <span class="capacity-count ${cls}">${remaining} / ${c.capacity} left</span>
+        </div>`;
+      }).join('');
+    } else if (capList) {
+      capList.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No capacity set for today</p></div>`;
+    }
+  }
+
+  // ── Variant chain ─────────────────────────────────────
+  document.getElementById('wi_service')?.addEventListener('change', function () {
+    const selected  = this.options[this.selectedIndex];
+    const variantEl = document.getElementById('wi_variant');
+    let variants = [];
+    try { variants = JSON.parse(selected.dataset.variants || '[]'); } catch (_) {}
+    variantEl.innerHTML = variants.length
+      ? '<option value="">-- Select size/variant --</option>' +
+        variants.map(v =>
+          `<option value="${v.id}" data-price="${v.price}">${v.name} — ₱${Number(v.price).toLocaleString()}</option>`
+        ).join('')
+      : '<option value="">No variants available</option>';
+    variantEl.disabled = variants.length === 0;
+    document.getElementById('walkinSummary').style.display = 'none';
+    updateSummary();
+  });
+
+  document.getElementById('wi_variant')?.addEventListener('change', updateSummary);
+
+  function updateSummary() {
+    const serviceEl = document.getElementById('wi_service');
+    const variantEl = document.getElementById('wi_variant');
+    const summary   = document.getElementById('walkinSummary');
+    if (!summary) return;
+    const variantOpt = variantEl?.options[variantEl.selectedIndex];
+    if (serviceEl?.value && variantEl?.value) {
+      summary.style.display = 'block';
+      setText('summary_service', serviceEl.options[serviceEl.selectedIndex].text);
+      setText('summary_variant', variantOpt?.text || '');
+      setText('summary_amount', formatCurrency(variantOpt?.dataset?.price || 0));
+    } else {
+      summary.style.display = 'none';
+    }
+  }
+
+  // ── Validation helpers ────────────────────────────────
+  function setWiError(id, msg) {
+    const err = document.getElementById(id + 'Error');
+    if (err) err.textContent = msg;
+    document.getElementById(id)?.classList.add('is-error');
+  }
+  function clearWiError(id) {
+    const err = document.getElementById(id + 'Error');
+    if (err) err.textContent = '';
+    document.getElementById(id)?.classList.remove('is-error');
+  }
+
+  // ── Form submit ───────────────────────────────────────
+  document.getElementById('walkinForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name    = document.getElementById('wi_name')?.value.trim();
+    const phone   = document.getElementById('wi_phone')?.value.trim();
+    const service = document.getElementById('wi_service')?.value;
+    const variant = document.getElementById('wi_variant')?.value;
+    let valid = true;
+
+    if (!name || name.length < 2)                    { setWiError('wi_name', 'Name is required'); valid = false; }
+    else clearWiError('wi_name');
+    if (!phone || phone.replace(/\D/g,'').length !== 11) { setWiError('wi_phone', 'Valid 11-digit phone required'); valid = false; }
+    else clearWiError('wi_phone');
+    if (!service)                                    { setWiError('wi_service', 'Select a service'); valid = false; }
+    else clearWiError('wi_service');
+    if (!variant)                                    { setWiError('wi_variant', 'Select a variant'); valid = false; }
+    else clearWiError('wi_variant');
+    if (!valid) return;
+
+    const btn = document.getElementById('walkinSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    const payload = {
+      guest_name:             name,
+      guest_email:            document.getElementById('wi_email')?.value.trim() || null,
+      guest_phone:            phone,
+      service_id:             service,
+      variant_id:             variant,
+      motorcycle_plate:       document.getElementById('wi_plate')?.value.trim() || null,
+      motorcycle_description: document.getElementById('wi_desc')?.value.trim() || null,
+      is_walkin:              true,
+      payment_method:         'cash',
+    };
+
+    try {
+      const res  = await fetch('/api/admin/bookings/walkin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      const msgEl = document.getElementById('walkinMessage');
+      if (data.success) {
+        msgEl.className = 'form-message success';
+        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Ref: <strong>${data.reference_code}</strong> — Queue #${data.queue_number}`;
+        msgEl.style.display = 'flex';
+        document.getElementById('walkinForm').reset();
+        document.getElementById('walkinSummary').style.display = 'none';
+        loadWalkinData(); // refresh capacity
+      } else {
+        msgEl.className = 'form-message error';
+        msgEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${data.message || 'Booking failed'}`;
+        msgEl.style.display = 'flex';
+      }
+    } catch (err) {
+      const msgEl = document.getElementById('walkinMessage');
+      msgEl.className = 'form-message error';
+      msgEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error. Try again.';
+      msgEl.style.display = 'flex';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Confirm Walk-in Booking';
+    }
+  });
+
+  loadWalkinData();
+</script>
+</body>
+</html>

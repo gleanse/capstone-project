@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Audit Logs</h1>
+      <p class="page-sub">Track all system actions and changes</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Action</th><th>By</th><th>Table</th><th>Details</th><th>Date & Time</th></tr>
+        </thead>
+        <tbody id="auditTableBody">
+          <tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'audit', breadcrumb: 'Audit Logs' });
+
+  const { formatDateTime } = AdminLayout;
+
+  async function loadAuditLogs() {
+    const tbody = document.getElementById('auditTableBody');
+    try {
+      const res  = await fetch('/api/admin/audit-logs');
+      const data = await res.json();
+      if (!data.success || !data.data.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-clipboard-list"></i><p>No audit logs found</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.data.map(l => `
+        <tr>
+          <td><strong>${l.action}</strong></td>
+          <td>${l.user_name || 'System'}</td>
+          <td><code style="font-size:11px;background:var(--dark-3);padding:2px 6px;border-radius:4px;">${l.target_table || '—'}</code></td>
+          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.details || '—'}</td>
+          <td>${formatDateTime(l.created_at)}</td>
+        </tr>`).join('');
+    } catch (err) {
+      console.error('Load audit logs error:', err);
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load logs</p></div></td></tr>`;
+    }
+  }
+
+  loadAuditLogs();
+</script>
+</body>
+</html>
