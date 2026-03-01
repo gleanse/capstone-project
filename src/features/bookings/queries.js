@@ -206,6 +206,36 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
   return result.rows[0] || null;
 };
 
+const getBookingByPaymentId = async (paymentId) => {
+  const result = await pool.query(
+    `SELECT 
+      b.id,
+      b.reference_code,
+      b.queue_number,
+      b.guest_name,
+      b.guest_email,
+      b.booking_status,
+      b.motorcycle_plate,
+      b.motorcycle_model,
+      b.motorcycle_color,
+      a.date AS booking_date,
+      s.name AS service_name,
+      sv.name AS variant_name,
+      p.amount_paid,
+      p.remaining_balance,
+      p.payment_type,
+      p.is_fully_paid
+    FROM payments p
+    JOIN bookings b ON b.id = p.booking_id
+    JOIN availability a ON a.id = b.availability_id
+    JOIN services s ON s.id = b.service_id
+    LEFT JOIN service_variants sv ON sv.id = b.variant_id
+    WHERE p.id = $1`,
+    [paymentId]
+  );
+  return result.rows[0] || null;
+};
+
 module.exports = {
   getServiceById,
   getAvailableDates,
@@ -214,4 +244,5 @@ module.exports = {
   updateBookingDetails,
   createPayment,
   confirmBooking,
+  getBookingByPaymentId,
 };

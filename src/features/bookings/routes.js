@@ -10,12 +10,14 @@ const {
   updateBooking,
   createInvoice,
   handleWebhook,
+  getBookingDetails,
 } = require('./controller');
 
 // STATIC assets
 router.get('/booking.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'booking.js'));
 });
+router.get('/details', getBookingDetails);  
 router.get('/success', (req, res) => {
   res.sendFile(path.join(__dirname, 'booking-success.html'));
 });

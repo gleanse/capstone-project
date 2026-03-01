@@ -297,7 +297,7 @@ function renderCalendar() {
       d
     ).padStart(2, '0')}`;
     const slot = calendarData[dateStr];
-    const isPast = dateObj < today;
+    const isPast = dateObj <= today;
     const isAvailable = !isPast && slot;
     const isSelected =
       state.selectedDate && state.selectedDate.split('T')[0] === dateStr;

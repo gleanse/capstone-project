@@ -1,6 +1,7 @@
 const path = require('path');
 const pool = require('../../config/database');
 const { xenditInvoiceClient } = require('../../config/xendit');
+const { sendBookingConfirmationEmail } = require('../../shared/utils/email');
 const {
   getServiceById,
   getAvailableDates,
@@ -9,6 +10,7 @@ const {
   updateBookingDetails,
   createPayment,
   confirmBooking,
+  getBookingByPaymentId,
 } = require('./queries');
 
 const getBookingPage = (req, res) => {
@@ -198,7 +200,7 @@ const createInvoice = async (req, res) => {
         description: `${booking.service_name} - ${
           booking.variant_name || 'Standard'
         } (${paymentType === 'full' ? 'Full Payment' : '50% Down Payment'})`,
-        successRedirectUrl: `${process.env.APP_URL}/booking/success`,
+        successRedirectUrl: `${process.env.APP_URL}/booking/success?external_id=${payment.id}`,
         failureRedirectUrl: `${process.env.APP_URL}/booking/failed`,
         currency: 'PHP',
       },
@@ -234,9 +236,34 @@ const handleWebhook = async (req, res) => {
     const payment = paymentResult.rows[0];
     await confirmBooking({ bookingId: payment.booking_id, xenditInvoiceId });
 
+    // fetch full booking details then send confirmation email
+    const bookingDetails = await getBookingByPaymentId(external_id);
+    await sendBookingConfirmationEmail(bookingDetails);
+
     res.json({ success: true });
   } catch (error) {
     console.error('Webhook error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getBookingDetails = async (req, res) => {
+  try {
+    const { external_id } = req.query;
+    if (!external_id)
+      return res
+        .status(400)
+        .json({ success: false, message: 'Missing external_id' });
+
+    const booking = await getBookingByPaymentId(external_id);
+    if (!booking)
+      return res
+        .status(404)
+        .json({ success: false, message: 'Booking not found' });
+
+    res.json({ success: true, data: booking });
+  } catch (error) {
+    console.error('Get booking details error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -250,4 +277,5 @@ module.exports = {
   updateBooking,
   createInvoice,
   handleWebhook,
+  getBookingDetails,
 };
