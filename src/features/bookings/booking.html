@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book a Service</title>
   <link rel="stylesheet" href="/css/output.css">
   <link rel="stylesheet" href="/styles/custom.css">
@@ -10,7 +11,8 @@
 <body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
 
   <!-- Header -->
-  <header class="border-b border-white/10 px-6 py-5 flex items-center gap-3 relative z-10 animate-slideDown">
+  <header
+    class="sticky top-0 z-50 border-b border-white/10 px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 animate-slideDown bg-[#0a0a0a]">
     <h1
       class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
       style="font-family:'Bebas Neue',sans-serif;">
@@ -44,35 +46,35 @@
     <!-- Step Indicator -->
     <div class="flex items-center gap-0 mb-10">
       <!-- Step 1 -->
-      <div class="step-indicator flex items-center gap-2" data-step="1">
+      <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="1">
         <div
-          class="step-dot w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300">
+          class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300">
           1</div>
-        <span class="step-label text-sm text-white font-medium transition-colors duration-300">Variant</span>
+        <span class="step-label text-xs sm:text-sm text-white font-medium transition-colors duration-300">Variant</span>
       </div>
-      <div class="step-line flex-1 h-px bg-white/10 mx-3 transition-colors duration-300" id="line-1"></div>
+      <div class="step-line flex-1 h-px bg-white/10 mx-1 sm:mx-3 transition-colors duration-300" id="line-1"></div>
       <!-- Step 2 -->
-      <div class="step-indicator flex items-center gap-2" data-step="2">
+      <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="2">
         <div
-          class="step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
+          class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
           2</div>
-        <span class="step-label text-sm text-white/40 transition-colors duration-300">Date</span>
+        <span class="step-label text-xs sm:text-sm text-white/40 transition-colors duration-300">Date</span>
       </div>
-      <div class="step-line flex-1 h-px bg-white/10 mx-3 transition-colors duration-300" id="line-2"></div>
+      <div class="step-line flex-1 h-px bg-white/10 mx-1 sm:mx-3 transition-colors duration-300" id="line-2"></div>
       <!-- Step 3 -->
-      <div class="step-indicator flex items-center gap-2" data-step="3">
+      <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="3">
         <div
-          class="step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
+          class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
           3</div>
-        <span class="step-label text-sm text-white/40 transition-colors duration-300">Details</span>
+        <span class="step-label text-xs sm:text-sm text-white/40 transition-colors duration-300">Details</span>
       </div>
-      <div class="step-line flex-1 h-px bg-white/10 mx-3 transition-colors duration-300" id="line-3"></div>
+      <div class="step-line flex-1 h-px bg-white/10 mx-1 sm:mx-3 transition-colors duration-300" id="line-3"></div>
       <!-- Step 4 -->
-      <div class="step-indicator flex items-center gap-2" data-step="4">
+      <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="4">
         <div
-          class="step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
+          class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
           4</div>
-        <span class="step-label text-sm text-white/40 transition-colors duration-300">Payment</span>
+        <span class="step-label text-xs sm:text-sm text-white/40 transition-colors duration-300">Payment</span>
       </div>
     </div>
 

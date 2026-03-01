@@ -1,4 +1,6 @@
 const pool = require('../../config/database');
+const cloudinary = require('../../config/cloudinary');
+const QRCode = require('qrcode');
 
 const getServiceById = async (serviceId) => {
   const result = await pool.query(
@@ -191,6 +193,48 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
     [bookingId]
   );
 
+  const booking = result.rows[0];
+
+  // TODO: update qr content to full url once staff scan page is built
+  // example: `${process.env.APP_URL}/staff/booking/${booking.reference_code}`
+  const qrDataUrl = await QRCode.toDataURL(booking.reference_code, {
+    width: 300,
+    margin: 2,
+    color: { dark: '#000000', light: '#ffffff' },
+  });
+
+  let qrUrl;
+
+  if (process.env.NODE_ENV === 'production') {
+    // LIVE: upload to Cloudinary
+    const cloudinary = require('../../config/cloudinary');
+    const uploaded = await cloudinary.uploader.upload(qrDataUrl, {
+      folder: 'herco-qr',
+      public_id: booking.reference_code,
+      overwrite: true,
+    });
+    qrUrl = uploaded.secure_url;
+  } else {
+    // LOCAL: save to /public/uploads/qr/
+    const fs = require('fs');
+    const path = require('path');
+    const qrDir = path.join(__dirname, '../../../public/uploads/qr');
+    if (!fs.existsSync(qrDir)) fs.mkdirSync(qrDir, { recursive: true });
+    const qrFilename = `${booking.reference_code}.png`;
+    const base64Data = qrDataUrl.replace('data:image/png;base64,', '');
+    fs.writeFileSync(
+      path.join(qrDir, qrFilename),
+      Buffer.from(base64Data, 'base64')
+    );
+    qrUrl = `${process.env.APP_URL}/uploads/qr/${qrFilename}`;
+  }
+
+  // Store URL in DB
+  await pool.query(`UPDATE bookings SET qr_code = $2 WHERE id = $1`, [
+    bookingId,
+    qrUrl,
+  ]);
+
   await pool.query(
     `
     UPDATE payments
@@ -203,7 +247,7 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
     [bookingId, xenditInvoiceId]
   );
 
-  return result.rows[0] || null;
+  return { ...booking, qr_code: qrUrl };
 };
 
 const getBookingByPaymentId = async (paymentId) => {
@@ -218,6 +262,7 @@ const getBookingByPaymentId = async (paymentId) => {
       b.motorcycle_plate,
       b.motorcycle_model,
       b.motorcycle_color,
+      b.qr_code,
       a.date AS booking_date,
       s.name AS service_name,
       sv.name AS variant_name,

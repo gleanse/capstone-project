@@ -28,29 +28,29 @@ function updateStepIndicator(activeStep) {
     const label = el.querySelector('.step-label');
     if (s < activeStep) {
       dot.className =
-        'step-dot w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300';
+        'step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300';
       dot.innerHTML = '<i class="ph ph-check text-white text-sm"></i>';
       label.className =
-        'step-label text-sm text-white/60 transition-colors duration-300';
+        'step-label text-xs sm:text-sm text-white/60 transition-colors duration-300';
     } else if (s === activeStep) {
       dot.className =
-        'step-dot w-8 h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300';
+        'step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300';
       dot.innerHTML = s;
       label.className =
-        'step-label text-sm text-white font-medium transition-colors duration-300';
+        'step-label text-xs sm:text-sm text-white font-medium transition-colors duration-300';
     } else {
       dot.className =
-        'step-dot w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300';
+        'step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300';
       dot.innerHTML = s;
       label.className =
-        'step-label text-sm text-white/40 transition-colors duration-300';
+        'step-label text-xs sm:text-sm text-white/40 transition-colors duration-300';
     }
   });
 
   // Update connector lines
   for (let i = 1; i <= 3; i++) {
     const line = document.getElementById(`line-${i}`);
-    line.className = `step-line flex-1 h-px mx-3 transition-colors duration-300 ${
+    line.className = `step-line flex-1 h-px mx-1 sm:mx-3 transition-colors duration-300 ${
       i < activeStep ? 'bg-red-500/50' : 'bg-white/10'
     }`;
   }

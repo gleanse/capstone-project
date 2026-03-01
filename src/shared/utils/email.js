@@ -16,6 +16,7 @@ const sendBookingConfirmationEmail = async (booking) => {
     amount_paid,
     remaining_balance,
     payment_type,
+    qr_code,
   } = booking;
 
   const formattedDate = new Date(booking_date).toLocaleDateString('en-PH', {
@@ -85,6 +86,29 @@ const sendBookingConfirmationEmail = async (booking) => {
               </p>
             </td>
           </tr>
+
+          <!-- QR Code (right after You're All Set!) -->
+          ${
+            qr_code
+              ? `
+          <tr>
+            <td align="center" style="padding-bottom:32px;">
+              <table cellpadding="0" cellspacing="0" style="background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;width:100%;">
+                <tr>
+                  <td align="center">
+                    <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Your QR Code</p>
+                    <div style="display:inline-block;background-color:#ffffff;padding:12px;border-radius:12px;">
+                      <img src='${qr_code}' width="160" height="160" alt="QR Code" style="display:block;border-radius:4px;" />
+                    </div>
+                    <p style="margin:12px 0 0;font-size:11px;color:rgba(255,255,255,0.2);">Present this QR code to our staff upon arrival. Save or screenshot this email as a backup.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          `
+              : ''
+          }
 
           <!-- Booking Details Card -->
           <tr>

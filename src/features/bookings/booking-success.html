@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Booking Confirmed</title>
   <link rel="stylesheet" href="/css/output.css">
   <link rel="stylesheet" href="/styles/custom.css">
@@ -9,70 +10,89 @@
 </head>
 <body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
 
-  <header class="border-b border-white/10 px-6 py-5 flex items-center gap-3 relative z-10 animate-slideDown">
+  <header
+    class="sticky top-0 z-50 border-b border-white/10 px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 animate-slideDown bg-[#0a0a0a]">
     <h1
-      class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
+      class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
       style="font-family:'Bebas Neue',sans-serif;">
       Herco Detailing Garage
     </h1>
   </header>
 
-  <main class="max-w-xl mx-auto px-6 py-16 relative z-10 flex flex-col items-center text-center animate-fadeUp">
+  <main
+    class="max-w-xl mx-auto px-4 sm:px-6 py-10 sm:py-16 relative z-10 flex flex-col items-center text-center animate-fadeUp">
 
     <!-- Success Icon -->
-    <div class="relative mb-8">
-      <div class="w-24 h-24 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-        <i class="ph ph-check-circle text-green-400 text-5xl"></i>
+    <div class="relative mb-6">
+      <div
+        class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+        <i class="ph ph-check-circle text-green-400 text-4xl sm:text-5xl"></i>
       </div>
       <div class="absolute inset-0 rounded-full bg-green-500/10 blur-xl"></div>
     </div>
 
     <p class="text-green-400 text-xs uppercase tracking-widest mb-2">Payment Confirmed</p>
-    <h2 class="text-5xl font-bold mb-3 tracking-wide" style="font-family:'Bebas Neue',sans-serif;">
+    <h2 class="text-4xl sm:text-5xl font-bold mb-3 tracking-wide" style="font-family:'Bebas Neue',sans-serif;">
       You're All Set!
     </h2>
-    <p class="text-white/40 text-sm mb-10 leading-relaxed max-w-sm">
+    <p class="text-white/40 text-sm mb-6 leading-relaxed max-w-sm px-2">
       Your booking has been confirmed. Details below and a copy has been sent to your email.
     </p>
 
-    <!-- Booking Details Card (hidden until loaded) -->
-    <div id="bookingCard" class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left hidden">
+    <!-- QR CODE (shown right away, above details) -->
+    <div id="qrContainer"
+      class="hidden w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-6 flex-col items-center gap-3">
+      <p class="text-xs text-white/30 uppercase tracking-widest">Your QR Code</p>
+      <div class="bg-white p-3 rounded-xl">
+        <img id="qrCode" src="" alt="QR Code" class="w-36 h-36 sm:w-40 sm:h-40 rounded-lg block" />
+      </div>
+      <p class="text-xs text-white/30 leading-relaxed max-w-xs">Show this QR to staff upon arrival. Screenshot this page
+        as backup.</p>
+    </div>
+
+    <!-- Booking Details Card -->
+    <div id="bookingCard" class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 text-left hidden">
       <p class="text-xs text-white/30 uppercase tracking-widest mb-4">Booking Details</p>
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-3 sm:gap-4">
 
-        <div class="flex justify-between items-center border-b border-white/5 pb-4">
-          <span class="text-xs text-white/40">Reference Code</span>
-          <span id="referenceCode" class="text-sm font-bold text-white tracking-widest"></span>
+        <div class="flex justify-between items-center border-b border-white/5 pb-3 sm:pb-4 gap-4">
+          <span class="text-xs text-white/40 shrink-0">Reference Code</span>
+          <span id="referenceCode" class="text-sm font-bold text-white tracking-widest text-right"></span>
         </div>
 
-        <div class="flex justify-between items-center border-b border-white/5 pb-4">
-          <span class="text-xs text-white/40">Queue Number</span>
-          <span id="queueNumber" class="text-sm font-bold text-white"></span>
+        <div class="flex justify-between items-center border-b border-white/5 pb-3 sm:pb-4 gap-4">
+          <span class="text-xs text-white/40 shrink-0">Queue Number</span>
+          <span id="queueNumber" class="text-sm font-bold text-white text-right"></span>
         </div>
 
-        <div class="flex justify-between items-center border-b border-white/5 pb-4">
-          <span class="text-xs text-white/40">Service</span>
+        <div class="flex justify-between items-start border-b border-white/5 pb-3 sm:pb-4 gap-4">
+          <span class="text-xs text-white/40 shrink-0">Service</span>
           <span id="serviceName" class="text-sm text-white text-right max-w-[60%]"></span>
         </div>
 
-        <div class="flex justify-between items-center border-b border-white/5 pb-4">
-          <span class="text-xs text-white/40">Date</span>
-          <span id="bookingDate" class="text-sm text-white"></span>
+        <div class="flex justify-between items-center border-b border-white/5 pb-3 sm:pb-4 gap-4">
+          <span class="text-xs text-white/40 shrink-0">Date</span>
+          <span id="bookingDate" class="text-sm text-white text-right"></span>
         </div>
 
-        <div class="flex justify-between items-center border-b border-white/5 pb-4">
-          <span class="text-xs text-white/40">Name</span>
-          <span id="guestName" class="text-sm text-white"></span>
+        <div class="flex justify-between items-center border-b border-white/5 pb-3 sm:pb-4 gap-4">
+          <span class="text-xs text-white/40 shrink-0">Name</span>
+          <span id="guestName" class="text-sm text-white text-right"></span>
         </div>
 
-        <div class="flex justify-between items-center border-b border-white/5 pb-4">
-          <span class="text-xs text-white/40">Amount Paid</span>
-          <span id="amountPaid" class="text-sm font-bold text-green-400"></span>
+        <div class="flex justify-between items-center border-b border-white/5 pb-3 sm:pb-4 gap-4">
+          <span class="text-xs text-white/40 shrink-0">Payment Type</span>
+          <span id="paymentType" class="text-sm text-white text-right"></span>
         </div>
 
-        <div id="remainingRow" class="justify-between items-center hidden">
-          <span class="text-xs text-white/40">Remaining Balance</span>
-          <span id="remainingBalance" class="text-sm font-bold text-yellow-400"></span>
+        <div class="flex justify-between items-center gap-4" id="amountRow">
+          <span class="text-xs text-white/40 shrink-0">Amount Paid</span>
+          <span id="amountPaid" class="text-sm font-bold text-green-400 text-right"></span>
+        </div>
+
+        <div id="remainingRow" class="justify-between items-center gap-4 hidden">
+          <span class="text-xs text-white/40 shrink-0">Remaining Balance</span>
+          <span id="remainingBalance" class="text-sm font-bold text-yellow-400 text-right"></span>
         </div>
 
       </div>
@@ -80,17 +100,17 @@
 
     <!-- Loading state -->
     <div id="loadingCard"
-      class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 flex items-center justify-center">
+      class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-6 flex items-center justify-center">
       <p class="text-white/30 text-sm animate-pulse">Loading booking details...</p>
     </div>
 
     <!-- Error state -->
-    <div id="errorCard" class="w-full bg-red-500/5 border border-red-500/20 rounded-2xl p-6 mb-8 text-center hidden">
+    <div id="errorCard" class="w-full bg-red-500/5 border border-red-500/20 rounded-2xl p-6 mb-6 text-center hidden">
       <p class="text-red-400 text-sm">Could not load booking details. Please check your email for confirmation.</p>
     </div>
 
     <!-- What's Next -->
-    <div class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left">
+    <div class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 text-left">
       <p class="text-xs text-white/30 uppercase tracking-widest mb-4">What's Next</p>
       <div class="flex flex-col gap-4">
         <div class="flex items-start gap-3">
@@ -100,8 +120,8 @@
           </div>
           <div>
             <p class="text-sm font-medium text-white">Check your email</p>
-            <p class="text-xs text-white/40 mt-0.5">Your booking confirmation and queue number has been sent to your
-              email.</p>
+            <p class="text-xs text-white/40 mt-0.5 leading-relaxed">Your booking confirmation and QR code has been sent
+              to your email.</p>
           </div>
         </div>
         <div class="flex items-start gap-3">
@@ -111,8 +131,8 @@
           </div>
           <div>
             <p class="text-sm font-medium text-white">Arrive on time</p>
-            <p class="text-xs text-white/40 mt-0.5">Please arrive at the garage on your scheduled date with your queue
-              number ready.</p>
+            <p class="text-xs text-white/40 mt-0.5 leading-relaxed">Please arrive at the garage on your scheduled date
+              with your queue number ready.</p>
           </div>
         </div>
         <div class="flex items-start gap-3">
@@ -122,8 +142,8 @@
           </div>
           <div>
             <p class="text-sm font-medium text-white">Bring your motorcycle</p>
-            <p class="text-xs text-white/40 mt-0.5">Make sure your motorcycle matches the details you provided during
-              booking.</p>
+            <p class="text-xs text-white/40 mt-0.5 leading-relaxed">Make sure your motorcycle matches the details you
+              provided during booking.</p>
           </div>
         </div>
       </div>
@@ -131,7 +151,7 @@
 
     <div class="flex flex-col gap-3 w-full">
       <a href="/services"
-        class="cursor-pointer w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+        class="cursor-pointer w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
         <i class="ph ph-arrow-left"></i>
         Back to Services
       </a>
@@ -163,12 +183,21 @@
         document.getElementById('serviceName').textContent = b.variant_name ? `${b.service_name} - ${b.variant_name}` : b.service_name;
         document.getElementById('bookingDate').textContent = new Date(b.booking_date).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('guestName').textContent = b.guest_name;
+        document.getElementById('paymentType').textContent = b.payment_type === 'full' ? 'Full Payment' : '50% Down Payment';
         document.getElementById('amountPaid').textContent = `₱${parseFloat(b.amount_paid).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
 
         if (!b.is_fully_paid && b.remaining_balance > 0) {
+          // add border to amount row since remaining row follows
+          document.getElementById('amountRow').classList.add('border-b', 'border-white/5', 'pb-3');
           document.getElementById('remainingRow').classList.remove('hidden');
           document.getElementById('remainingRow').classList.add('flex');
           document.getElementById('remainingBalance').textContent = `₱${parseFloat(b.remaining_balance).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+        }
+
+        if (b.qr_code) {
+          document.getElementById('qrCode').src = b.qr_code;
+          document.getElementById('qrContainer').classList.remove('hidden');
+          document.getElementById('qrContainer').classList.add('flex');
         }
 
         document.getElementById('loadingCard').classList.add('hidden');
