@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Availability — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Availability</h1>
+      <p class="page-sub">Set capacity and manage closed dates</p>
+    </div>
+  </div>
+
+  <div class="avail-grid">
+    <!-- Capacity -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-calendar-alt"></i> Date Capacity</h2>
+        <button class="btn-primary btn-sm" id="addCapacityBtn">
+          <i class="fas fa-plus"></i> Set Capacity
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Date</th><th>Service</th><th>Capacity</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="capacityTableBody">
+            <tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Closed Dates -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-ban"></i> Closed Dates</h2>
+        <button class="btn-danger btn-sm" id="addClosedBtn">
+          <i class="fas fa-plus"></i> Add Closure
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Type</th><th>Day / Date</th><th>Reason</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="closedDatesBody">
+            <tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'availability', breadcrumb: 'Availability' });
+
+  const { formatDate } = AdminLayout;
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  async function loadAvailability() {
+    try {
+      const [capRes, closeRes] = await Promise.all([
+        fetch('/api/admin/availability'),
+        fetch('/api/admin/closed-dates'),
+      ]);
+      if (capRes.ok)   renderCapacity((await capRes.json()).data || []);
+      if (closeRes.ok) renderClosedDates((await closeRes.json()).data || []);
+    } catch (err) {
+      console.error('Load availability error:', err);
+    }
+  }
+
+  function renderCapacity(rows) {
+    const tbody = document.getElementById('capacityTableBody');
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>No capacity set yet</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td>${formatDate(r.date)}</td>
+        <td>${r.service_name || '—'}</td>
+        <td><strong>${r.capacity}</strong></td>
+        <td>${r.is_open
+          ? '<span class="status-badge status-confirmed">Open</span>'
+          : '<span class="status-badge status-expired">Closed</span>'}</td>
+        <td>
+          <button class="action-btn" onclick="editCapacity('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
+          <button class="action-btn danger" onclick="deleteCapacity('${r.id}')"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function renderClosedDates(rows) {
+    const tbody = document.getElementById('closedDatesBody');
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-calendar-check"></i><p>No closures set</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.type === 'recurring'
+          ? '<span class="status-badge status-staff">Recurring</span>'
+          : '<span class="status-badge status-pending">One-time</span>'}</td>
+        <td>${r.type === 'recurring' ? DAYS[r.day_of_week] : formatDate(r.date)}</td>
+        <td>${r.reason || '—'}</td>
+        <td><button class="action-btn danger" onclick="deleteClosedDate('${r.id}')"><i class="fas fa-trash"></i></button></td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('addCapacityBtn')?.addEventListener('click', () => alert('Set Capacity modal — connect to API.'));
+  document.getElementById('addClosedBtn')?.addEventListener('click',   () => alert('Add Closure modal — connect to API.'));
+
+  function editCapacity(id)     { alert('Edit capacity: ' + id); }
+  function deleteCapacity(id)   { if (confirm('Remove this capacity entry?')) alert('Delete: ' + id); }
+  function deleteClosedDate(id) { if (confirm('Remove this closure?')) alert('Delete: ' + id); }
+
+  loadAvailability();
+</script>
+</body>
+</html>

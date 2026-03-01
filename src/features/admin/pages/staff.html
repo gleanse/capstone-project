@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Staff Accounts</h1>
+      <p class="page-sub">Manage admin and staff access</p>
+    </div>
+    <div class="page-actions">
+      <button class="btn-primary" id="addStaffBtn">
+        <i class="fas fa-user-plus"></i> Add Staff
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="staffTableBody">
+          <tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'staff', breadcrumb: 'Staff Accounts' });
+
+  const { statusBadge, formatDate } = AdminLayout;
+
+  async function loadStaff() {
+    const tbody = document.getElementById('staffTableBody');
+    try {
+      const res  = await fetch('/api/admin/staff');
+      const data = await res.json();
+      if (!data.success || !data.data.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No staff accounts found</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.data.map(u => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="user-avatar" style="width:32px;height:32px;font-size:12px;border-radius:8px;">
+                ${(u.name || '?')[0].toUpperCase()}
+              </div>
+              <strong>${u.name}</strong>
+            </div>
+          </td>
+          <td>${u.email}</td>
+          <td>${statusBadge(u.role)}</td>
+          <td>${formatDate(u.created_at)}</td>
+          <td>
+            <button class="action-btn danger" onclick="deleteStaff('${u.id}')">
+              <i class="fas fa-user-times"></i> Remove
+            </button>
+          </td>
+        </tr>`).join('');
+    } catch (err) {
+      console.error('Load staff error:', err);
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load staff</p></div></td></tr>`;
+    }
+  }
+
+  document.getElementById('addStaffBtn')?.addEventListener('click', () => {
+    window.location.href = '/auth/signup';
+  });
+
+  function deleteStaff(id) {
+    if (confirm('Remove this account?')) alert('Delete staff: ' + id);
+  }
+
+  loadStaff();
+</script>
+</body>
+</html>

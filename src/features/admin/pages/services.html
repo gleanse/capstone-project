@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Services</h1>
+      <p class="page-sub">Manage services and pricing variants</p>
+    </div>
+    <div class="page-actions">
+      <button class="btn-primary" id="addServiceBtn">
+        <i class="fas fa-plus"></i> Add Service
+      </button>
+    </div>
+  </div>
+
+  <div class="services-grid" id="servicesGrid">
+    <div class="empty-state full-width">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading services...</p>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'services', breadcrumb: 'Services' });
+
+  const { formatCurrency } = AdminLayout;
+
+  async function loadServices() {
+    const grid = document.getElementById('servicesGrid');
+    try {
+      const res  = await fetch('/api/admin/services');
+      const data = await res.json();
+      if (!data.success || !data.data.length) {
+        grid.innerHTML = `<div class="full-width"><div class="empty-state"><i class="fas fa-spray-can"></i><p>No services yet. Add your first service.</p></div></div>`;
+        return;
+      }
+      grid.innerHTML = data.data.map(s => `
+        <div class="service-card">
+          <div class="service-card-header">
+            <span class="service-name">${s.name}</span>
+            <span class="service-price">from ${formatCurrency(s.price)}</span>
+          </div>
+          <div class="service-card-body">
+            ${s.description ? `<p class="service-desc">${s.description}</p>` : ''}
+            ${s.variants && s.variants.length
+              ? `<ul class="variant-list">
+                  ${s.variants.map(v => `
+                    <li class="variant-item">
+                      <span>${v.name}</span>
+                      <strong>${formatCurrency(v.price)}</strong>
+                    </li>`).join('')}
+                </ul>`
+              : '<p class="service-desc" style="font-style:italic;">No variants yet</p>'}
+          </div>
+          <div class="service-card-footer">
+            <button class="action-btn" onclick="editService('${s.id}')"><i class="fas fa-edit"></i> Edit</button>
+            <button class="action-btn" onclick="manageVariants('${s.id}','${s.name}')"><i class="fas fa-tags"></i> Variants</button>
+            <button class="action-btn danger" onclick="deleteService('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </div>`).join('');
+    } catch (err) {
+      console.error('Load services error:', err);
+      grid.innerHTML = `<div class="full-width"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load services</p></div></div>`;
+    }
+  }
+
+  document.getElementById('addServiceBtn')?.addEventListener('click', () => {
+    alert('Add Service modal — connect to your API here.');
+  });
+
+  function editService(id)          { alert('Edit service: ' + id); }
+  function manageVariants(id, name) { alert('Manage variants for: ' + name); }
+  function deleteService(id)        { if (confirm('Delete this service?')) alert('Delete service: ' + id); }
+
+  loadServices();
+</script>
+</body>
+</html>

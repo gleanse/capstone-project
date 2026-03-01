@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookings — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Bookings</h1>
+      <p class="page-sub">Manage all customer bookings</p>
+    </div>
+    <div class="page-actions">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="bookingSearch" placeholder="Search by ref, name, or email...">
+      </div>
+      <select class="filter-select" id="bookingStatusFilter">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="done">Done</option>
+        <option value="picked_up">Picked Up</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref #</th><th>Customer</th><th>Service</th><th>Date</th>
+            <th>Amount</th><th>Payment</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTableBody">
+          <tr><td colspan="8"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Status Modal -->
+<div class="modal-overlay" id="statusModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Update Booking Status</h3>
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Select new status for this booking:</p>
+      <div class="status-options" id="statusOptions"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="modalCancel">Cancel</button>
+      <button class="btn-primary" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'bookings', breadcrumb: 'Bookings' });
+
+  const { statusBadge, formatCurrency, formatDate } = AdminLayout;
+
+  // ── Status Modal ──────────────────────────────────────
+  let currentBookingId = null, selectedStatus = null;
+  const statusFlow = {
+    pending:     [{ value: 'in_progress', label: 'Mark In Progress', icon: 'fas fa-tools' }],
+    in_progress: [{ value: 'done',        label: 'Mark Done',        icon: 'fas fa-check-circle' }],
+    done:        [{ value: 'picked_up',   label: 'Mark Picked Up',   icon: 'fas fa-motorcycle' }],
+    picked_up:   [],
+  };
+
+  function openStatusModal(bookingId, currentStatus, refCode) {
+    currentBookingId = bookingId; selectedStatus = null;
+    document.getElementById('modalTitle').textContent = `Update: ${refCode}`;
+    const options    = document.getElementById('statusOptions');
+    const confirmBtn = document.getElementById('modalConfirm');
+    const nextStatuses = statusFlow[currentStatus] || [];
+    if (!nextStatuses.length) {
+      options.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">No further updates available.</p>';
+      confirmBtn.style.display = 'none';
+    } else {
+      confirmBtn.style.display = 'inline-flex';
+      options.innerHTML = nextStatuses.map(s => `
+        <div class="status-option" data-value="${s.value}" onclick="selectStatus(this,'${s.value}')">
+          <i class="${s.icon}"></i> ${s.label}
+        </div>`).join('');
+    }
+    document.getElementById('statusModal').style.display = 'flex';
+  }
+
+  function selectStatus(el, value) {
+    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected'); selectedStatus = value;
+  }
+
+  const closeModal = () => document.getElementById('statusModal').style.display = 'none';
+  document.getElementById('modalClose')?.addEventListener('click', closeModal);
+  document.getElementById('modalCancel')?.addEventListener('click', closeModal);
+  document.getElementById('statusModal')?.addEventListener('click', e => { if (e.target.id === 'statusModal') closeModal(); });
+
+  document.getElementById('modalConfirm')?.addEventListener('click', async () => {
+    if (!selectedStatus || !currentBookingId) { alert('Select a status first.'); return; }
+    const res  = await fetch(`/api/admin/bookings/${currentBookingId}/status`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: selectedStatus }),
+    });
+    const data = await res.json();
+    if (data.success) { closeModal(); loadBookings(); }
+    else alert('Failed: ' + (data.message || 'Unknown error'));
+  });
+
+  // ── Load ──────────────────────────────────────────────
+  async function loadBookings() {
+    const status = document.getElementById('bookingStatusFilter')?.value || '';
+    const search = document.getElementById('bookingSearch')?.value || '';
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (search) params.set('search', search);
+
+    const tbody = document.getElementById('bookingsTableBody');
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>`;
+
+    try {
+      const res  = await fetch('/api/admin/bookings?' + params.toString());
+      const data = await res.json();
+      if (!data.success || !data.data.length) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-search"></i><p>No bookings found</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.data.map(b => `
+        <tr>
+          <td><strong>${b.reference_code || '—'}</strong></td>
+          <td><strong>${b.guest_name || b.user_name || '—'}</strong><br><small>${b.guest_email || ''}</small></td>
+          <td>${b.service_name || '—'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
+          <td>${formatDate(b.booking_date)}</td>
+          <td>${formatCurrency(b.total_price || b.variant_price)}</td>
+          <td>${b.payment_method === 'cash'
+            ? '<span class="status-badge status-staff">Cash</span>'
+            : '<span class="status-badge status-info">Online</span>'}</td>
+          <td>${statusBadge(b.status)}</td>
+          <td><button class="action-btn" onclick="openStatusModal('${b.id}','${b.status}','${b.reference_code}')">
+            <i class="fas fa-edit"></i> Update</button></td>
+        </tr>`).join('');
+    } catch (err) {
+      console.error('Load bookings error:', err);
+    }
+  }
+
+  ['bookingSearch', 'bookingStatusFilter'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', loadBookings);
+  });
+
+  loadBookings();
+</script>
+</body>
+</html>

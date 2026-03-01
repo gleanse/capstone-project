@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        Good <span id="greetingTime">morning</span>,
+        <span id="greetingName">Admin</span>
+      </h1>
+      <p class="page-sub">Here's what's happening at the garage today.</p>
+    </div>
+    <div class="page-actions">
+      <button class="btn-secondary" id="refreshDashboard">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:#dc2626">
+      <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="stat-info">
+        <span class="stat-value" id="statBookingsToday">—</span>
+        <span class="stat-label">Bookings Today</span>
+      </div>
+      <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Today</div>
+    </div>
+    <div class="stat-card" style="--accent:#f59e0b">
+      <div class="stat-icon"><i class="fas fa-clock"></i></div>
+      <div class="stat-info">
+        <span class="stat-value" id="statPending">—</span>
+        <span class="stat-label">Pending</span>
+      </div>
+      <div class="stat-trend"><i class="fas fa-minus"></i> Awaiting</div>
+    </div>
+    <div class="stat-card" style="--accent:#3b82f6">
+      <div class="stat-icon"><i class="fas fa-tools"></i></div>
+      <div class="stat-info">
+        <span class="stat-value" id="statInProgress">—</span>
+        <span class="stat-label">In Progress</span>
+      </div>
+      <div class="stat-trend"><i class="fas fa-spinner"></i> Active</div>
+    </div>
+    <div class="stat-card" style="--accent:#10b981">
+      <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info">
+        <span class="stat-value" id="statDone">—</span>
+        <span class="stat-label">Done / Pickup</span>
+      </div>
+      <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Ready</div>
+    </div>
+  </div>
+
+  <!-- Today's Bookings -->
+  <div class="card mt-6">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fas fa-list"></i> Today's Bookings</h2>
+      <a href="/admin/bookings" class="btn-text"><i class="fas fa-external-link-alt"></i> View all</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref #</th><th>Customer</th><th>Service</th>
+            <th>Payment</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="todayTableBody">
+          <tr><td colspan="6"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pickup Pending -->
+  <div class="card mt-4" id="pickupCard" style="display:none;">
+    <div class="card-header">
+      <h2 class="card-title warning"><i class="fas fa-motorcycle"></i> Motorcycles Ready for Pickup</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref #</th><th>Customer</th><th>Service</th>
+            <th>Down Payment</th><th>Remaining</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pickupTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Status Modal -->
+<div class="modal-overlay" id="statusModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Update Booking Status</h3>
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Select new status for this booking:</p>
+      <div class="status-options" id="statusOptions"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="modalCancel">Cancel</button>
+      <button class="btn-primary" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'dashboard', breadcrumb: 'Dashboard' });
+
+  // Greeting time
+  const hour = new Date().getHours();
+  const greetEl = document.getElementById('greetingTime');
+  if (greetEl) greetEl.textContent = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+
+  // ── Helpers ──────────────────────────────────────────
+  const { statusBadge, formatCurrency } = AdminLayout;
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  // ── Status Modal ──────────────────────────────────────
+  let currentBookingId = null, selectedStatus = null;
+  const statusFlow = {
+    pending:     [{ value: 'in_progress', label: 'Mark In Progress', icon: 'fas fa-tools' }],
+    in_progress: [{ value: 'done',        label: 'Mark Done',        icon: 'fas fa-check-circle' }],
+    done:        [{ value: 'picked_up',   label: 'Mark Picked Up',   icon: 'fas fa-motorcycle' }],
+    picked_up:   [],
+  };
+
+  function openStatusModal(bookingId, currentStatus, refCode) {
+    currentBookingId = bookingId; selectedStatus = null;
+    document.getElementById('modalTitle').textContent = `Update: ${refCode}`;
+    const options    = document.getElementById('statusOptions');
+    const confirmBtn = document.getElementById('modalConfirm');
+    const nextStatuses = statusFlow[currentStatus] || [];
+    if (!nextStatuses.length) {
+      options.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">No further updates available.</p>';
+      confirmBtn.style.display = 'none';
+    } else {
+      confirmBtn.style.display = 'inline-flex';
+      options.innerHTML = nextStatuses.map(s => `
+        <div class="status-option" data-value="${s.value}" onclick="selectStatus(this,'${s.value}')">
+          <i class="${s.icon}"></i> ${s.label}
+        </div>`).join('');
+    }
+    document.getElementById('statusModal').style.display = 'flex';
+  }
+
+  function selectStatus(el, value) {
+    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected'); selectedStatus = value;
+  }
+
+  const closeModal = () => document.getElementById('statusModal').style.display = 'none';
+  document.getElementById('modalClose')?.addEventListener('click', closeModal);
+  document.getElementById('modalCancel')?.addEventListener('click', closeModal);
+  document.getElementById('statusModal')?.addEventListener('click', e => { if (e.target.id === 'statusModal') closeModal(); });
+
+  document.getElementById('modalConfirm')?.addEventListener('click', async () => {
+    if (!selectedStatus || !currentBookingId) { alert('Select a status first.'); return; }
+    const res  = await fetch(`/api/admin/bookings/${currentBookingId}/status`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: selectedStatus }),
+    });
+    const data = await res.json();
+    if (data.success) { closeModal(); loadDashboard(); }
+    else alert('Failed: ' + (data.message || 'Unknown error'));
+  });
+
+  // ── Render ────────────────────────────────────────────
+  function renderTodayTable(bookings) {
+    const tbody = document.getElementById('todayTableBody');
+    if (!bookings.length) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>No bookings for today</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = bookings.map(b => `
+      <tr>
+        <td><strong>${b.reference_code || '—'}</strong></td>
+        <td><strong>${b.guest_name || b.user_name || '—'}</strong><br><small>${b.guest_email || ''}</small></td>
+        <td>${b.service_name || '—'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
+        <td>${b.payment_method === 'cash'
+          ? '<span class="status-badge status-staff">Cash</span>'
+          : '<span class="status-badge status-info">Online</span>'}</td>
+        <td>${statusBadge(b.status)}</td>
+        <td><button class="action-btn" onclick="openStatusModal('${b.id}','${b.status}','${b.reference_code}')">
+          <i class="fas fa-edit"></i> Update</button></td>
+      </tr>`).join('');
+  }
+
+  function renderPickupTable(bookings) {
+    const tbody = document.getElementById('pickupTableBody');
+    tbody.innerHTML = bookings.map(b => `
+      <tr>
+        <td><strong>${b.reference_code || '—'}</strong></td>
+        <td><strong>${b.guest_name || '—'}</strong></td>
+        <td>${b.service_name || '—'}</td>
+        <td>${b.is_fully_paid
+          ? '<span class="status-badge status-paid">Fully Paid</span>'
+          : '<span class="status-badge status-unpaid">Down Payment</span>'}</td>
+        <td>${b.remaining_balance > 0
+          ? `<strong style="color:var(--warning)">${formatCurrency(b.remaining_balance)}</strong>`
+          : '—'}</td>
+        <td><button class="action-btn" onclick="openStatusModal('${b.id}','done','${b.reference_code}')">
+          <i class="fas fa-check"></i> Mark Picked Up</button></td>
+      </tr>`).join('');
+  }
+
+  // ── Load ──────────────────────────────────────────────
+  async function loadDashboard() {
+    try {
+      const [bookingsRes, statsRes] = await Promise.all([
+        fetch('/api/admin/bookings/today'),
+        fetch('/api/admin/stats/today'),
+      ]);
+      if (statsRes.ok) {
+        const stats = await statsRes.json();
+        if (stats.success) {
+          const s = stats.data;
+          setText('statBookingsToday', s.total    ?? '—');
+          setText('statPending',       s.pending  ?? '—');
+          setText('statInProgress',    s.in_progress ?? '—');
+          setText('statDone',          s.done     ?? '—');
+          const badge = document.getElementById('pendingBadge');
+          if (badge) badge.textContent = s.pending || 0;
+        }
+      }
+      if (bookingsRes.ok) {
+        const bData = await bookingsRes.json();
+        renderTodayTable(bData.success ? bData.data : []);
+      }
+      const pickupRes  = await fetch('/api/admin/bookings/pickup-pending');
+      if (pickupRes.ok) {
+        const pData = await pickupRes.json();
+        if (pData.success && pData.data.length > 0) {
+          document.getElementById('pickupCard').style.display = 'block';
+          renderPickupTable(pData.data);
+        }
+      }
+    } catch (err) {
+      console.error('Dashboard load error:', err);
+    }
+  }
+
+  document.getElementById('refreshDashboard')?.addEventListener('click', loadDashboard);
+  loadDashboard();
+</script>
+</body>
+</html>
