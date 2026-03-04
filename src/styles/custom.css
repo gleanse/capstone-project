@@ -21,17 +21,6 @@ body::before {
   opacity: 0.4;
 }
 
-/* HEADER - accent bar pseudo element */
-header::before {
-  content: '';
-  display: block;
-  width: 3px;
-  height: 28px;
-  background: var(--red);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
 /* SERVICE CARD - red glow on hover */
 .service-card:hover {
   box-shadow: 0 0 0 1px var(--red), 0 20px 60px rgba(229, 53, 53, 0.12);
@@ -149,4 +138,192 @@ header::before {
 .animate-card {
   opacity: 0;
   animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes green-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 40px 12px rgba(34, 197, 94, 0.12);
+  }
+}
+
+.success-glow {
+  animation: green-glow-pulse 3s ease-in-out infinite;
+}
+
+/* NAV LINK hover underline */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #e53535;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+.nav-link.active::after {
+  width: 100%;
+}
+.nav-link.active {
+  color: white;
+}
+
+/* MOBILE MENU */
+#mobile-menu {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+#mobile-menu.open {
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* BOOK NOW button shine */
+.book-now-btn {
+  position: relative;
+  overflow: hidden;
+}
+.book-now-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.4s ease;
+}
+.book-now-btn:hover::before {
+  left: 150%;
+}
+
+/* TRACK CARD hover lift */
+.track-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+.track-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* CARD title red accent */
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::before {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 12px;
+  background: #e53535;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* QUEUE badge */
+.queue-badge {
+  background: linear-gradient(
+    135deg,
+    rgba(229, 53, 53, 0.12),
+    rgba(229, 53, 53, 0.04)
+  );
+  border: 1px solid rgba(229, 53, 53, 0.25);
+}
+
+/* STATUS HERO glow pulse */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 53, 53, 0);
+  }
+  50% {
+    box-shadow: 0 0 40px 10px rgba(229, 53, 53, 0.1);
+  }
+}
+.status-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* CARD stagger delays */
+.card-1 {
+  animation-delay: 0.08s;
+}
+.card-2 {
+  animation-delay: 0.16s;
+}
+.card-3 {
+  animation-delay: 0.24s;
+}
+.card-4 {
+  animation-delay: 0.12s;
+}
+.card-5 {
+  animation-delay: 0.2s;
+}
+.card-6 {
+  animation-delay: 0.28s;
+}
+
+/* Hamburger bars */
+#bar1,
+#bar2,
+#bar3 {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* DISABLE hover effects on touch devices */
+@media (hover: none) {
+  .track-card:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+  }
+  .book-now-btn:hover::before {
+    left: -100%;
+  }
+}
+
+/* SCALE DOWN glow on mobile */
+@media (max-width: 640px) {
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(229, 53, 53, 0);
+    }
+    50% {
+      box-shadow: 0 0 20px 4px rgba(229, 53, 53, 0.08);
+    }
+  }
+  #mobile-menu {
+    max-height: 0;
+  }
+  #mobile-menu.open {
+    max-height: 400px;
+  }
 }

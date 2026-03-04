@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Confirmed — Herco Detailing Garage</title>
+  <title>Track Booking — Herco Detailing Garage</title>
   <link rel="stylesheet" href="/css/output.css">
   <link rel="stylesheet" href="/styles/custom.css">
   <link rel="stylesheet" href="/phosphor/regular/style.css">
@@ -15,6 +15,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="flex items-center justify-between h-16">
 
+        <!-- Logo -->
         <a href="/" class="flex items-center gap-3 group">
           <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
           <span
@@ -24,20 +25,21 @@
           </span>
         </a>
 
+        <!-- Desktop Nav -->
         <nav class="hidden md:flex items-center gap-7">
           <a href="/services"
             class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Services</a>
-          <a href="/track"
-            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Track
-            Booking</a>
+          <a href="/track" class="nav-link active text-sm tracking-wide">Track Booking</a>
         </nav>
 
+        <!-- Desktop CTA -->
         <a href="/services"
           class="hidden md:flex book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors duration-200 items-center gap-2">
           <i class="ph ph-calendar-plus text-base"></i>
           Book Now
         </a>
 
+        <!-- Mobile hamburger -->
         <button id="menu-toggle"
           class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
           <span class="w-5 h-px bg-white/60" id="bar1"></span>
@@ -48,13 +50,12 @@
       </div>
     </div>
 
+    <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden border-t border-white/5 bg-[#0d0d0d]">
       <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
         <a href="/services"
           class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Services</a>
-        <a href="/track"
-          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Track
-          Booking</a>
+        <a href="/track" class="text-sm text-white py-3 border-b border-white/5">Track Booking</a>
         <a href="/services"
           class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-3 rounded-xl text-center transition-colors">
           Book Now
@@ -63,6 +64,7 @@
     </div>
   </header>
 
+  <!--  BREADCRUMB -->
   <div class="max-w-6xl mx-auto px-6 pt-5 relative z-10">
     <button onclick="window.location.href='/services'"
       class="cursor-pointer flex items-center gap-2 text-white/25 hover:text-white/60 text-xs transition-colors duration-200 group">
@@ -71,65 +73,59 @@
     </button>
   </div>
 
-  <!-- MAIN -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+  <!--  MAIN -->
+  <main class="max-w-6xl mx-auto px-6 py-6 relative z-10">
 
-    <!-- LOADING STATE -->
-    <div id="loadingCard" class="flex flex-col items-center justify-center py-32 animate-fadeUp">
-      <div class="w-10 h-10 rounded-full border-2 border-white/10 border-t-green-500 animate-spin mb-5"></div>
-      <p class="text-white/30 text-xs uppercase tracking-widest">Loading booking details...</p>
+    <!-- LOADING -->
+    <div id="loading" class="flex flex-col items-center justify-center py-32 animate-fadeUp">
+      <div class="w-10 h-10 rounded-full border-2 border-white/10 border-t-red-500 animate-spin mb-5"></div>
+      <p class="text-white/30 text-xs uppercase tracking-widest">Fetching booking details...</p>
     </div>
 
-    <!-- ERROR STATE -->
-    <div id="errorCard" class="hidden flex-col items-center justify-center py-32 text-center animate-fadeUp">
-      <p class="text-red-500 font-bold text-8xl mb-2" style="font-family:'Bebas Neue',sans-serif;">Oops</p>
-      <p class="text-white/60 font-semibold mb-1">Could Not Load Booking</p>
-      <p class="text-white/30 text-sm mb-6">Please check your email for confirmation details.</p>
+    <!-- ERROR -->
+    <div id="error" class="hidden flex-col items-center justify-center py-32 text-center animate-fadeUp">
+      <p class="text-red-500 font-bold text-8xl mb-2" style="font-family:'Bebas Neue',sans-serif;">404</p>
+      <p class="text-white/60 font-semibold mb-1">Booking Not Found</p>
+      <p class="text-white/30 text-sm mb-6">Please check your reference code and try again.</p>
+      <a href="/track"
+        class="text-xs text-red-400 hover:text-red-300 underline underline-offset-4 transition-colors">Try another
+        code</a>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="mainContent" class="hidden">
+    <!-- CONTENT -->
+    <div id="content" class="hidden">
 
-      <!-- SUCCESS HERO -->
-      <div class="flex flex-col items-center text-center py-10 sm:py-12 animate-fadeUp">
-        <div class="relative mb-5">
-          <div
-            class="success-glow w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-green-500/10 border-2 border-green-500/20 flex items-center justify-center">
-            <i class="ph ph-check-circle text-green-400 text-4xl sm:text-5xl"></i>
-          </div>
-          <div class="absolute inset-0 rounded-full bg-green-500/10 blur-xl"></div>
-        </div>
-        <p class="text-green-400 text-xs uppercase tracking-[0.2em] mb-2 font-medium">Payment Confirmed</p>
-        <h2 class="text-5xl sm:text-6xl font-bold mb-3 tracking-wide" style="font-family:'Bebas Neue',sans-serif;">
-          You're All Set!
-        </h2>
-        <p class="text-white/40 text-sm leading-relaxed max-w-sm px-2">
-          Your booking is confirmed. A copy has been sent to your email.
-        </p>
+      <!-- ── STATUS HERO ── -->
+      <div class="text-center py-10 sm:py-12 animate-fadeUp">
+        <div id="status-icon"
+          class="status-glow w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 border-2"></div>
+        <p id="status-label" class="text-xs uppercase tracking-[0.2em] mb-2 font-medium"></p>
+        <h2 id="status-heading" class="text-5xl sm:text-6xl font-bold tracking-wide mb-3"
+          style="font-family:'Bebas Neue',sans-serif;"></h2>
+        <p id="status-sub" class="text-white/40 text-sm leading-relaxed max-w-md mx-auto"></p>
       </div>
 
-      <!-- SECTION DIVIDER -->
+      <!--  SECTION DIVIDER  -->
       <div class="flex items-center gap-4 mb-6">
         <div class="flex-1 h-px bg-white/5"></div>
-        <span class="text-white/15 text-xs uppercase tracking-widest px-2">Booking Details</span>
+        <span class="text-white/15 text-xs uppercase tracking-widest px-2">Details</span>
         <div class="flex-1 h-px bg-white/5"></div>
       </div>
 
-      <!-- 3 COLUMN GRID -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
 
-        <!--  COL 1: Booking Details + What's Next  -->
+        <!--  COL 1: Booking + Motorcycle  -->
         <div class="flex flex-col gap-4">
 
-          <!-- BOOKING DETAILS -->
+          <!-- Booking Details -->
           <div class="track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-1">
             <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-4">Booking Details</p>
 
-            <!-- Queue badge -->
+            <!-- Queue Number — hero within card -->
             <div class="queue-badge rounded-xl px-4 py-3 mb-4 flex items-center justify-between">
               <div>
                 <p class="text-white/30 text-xs uppercase tracking-wider mb-0.5">Queue Number</p>
-                <p id="queueNumber" class="text-red-400 font-bold text-3xl leading-none"
+                <p id="queue-number" class="text-red-400 font-bold text-3xl leading-none"
                   style="font-family:'Bebas Neue',sans-serif;"></p>
               </div>
               <i class="ph ph-ticket text-red-400/30 text-3xl"></i>
@@ -138,94 +134,54 @@
             <div class="flex flex-col divide-y divide-white/[0.06]">
               <div class="flex justify-between items-center py-2.5 gap-3">
                 <span class="text-white/40 text-xs shrink-0">Reference</span>
-                <span id="referenceCode"
-                  class="text-white font-mono font-bold tracking-widest text-xs text-right"></span>
+                <span id="ref-code" class="text-white font-mono font-bold tracking-widest text-xs text-right"></span>
               </div>
               <div class="flex justify-between items-start py-2.5 gap-3">
                 <span class="text-white/40 text-xs shrink-0">Service</span>
-                <span id="serviceName" class="text-white font-medium text-xs text-right leading-snug"></span>
+                <span id="service-name" class="text-white font-medium text-xs text-right leading-snug"></span>
               </div>
               <div class="flex justify-between items-center py-2.5 gap-3">
                 <span class="text-white/40 text-xs shrink-0">Date</span>
-                <span id="bookingDate" class="text-white font-medium text-xs"></span>
+                <span id="booking-date" class="text-white font-medium text-xs"></span>
               </div>
               <div class="flex justify-between items-center py-2.5 gap-3">
                 <span class="text-white/40 text-xs shrink-0">Name</span>
-                <span id="guestName" class="text-white font-medium text-xs text-right"></span>
+                <span id="guest-name" class="text-white font-medium text-xs text-right"></span>
               </div>
             </div>
           </div>
 
-          <!-- WHAT'S NEXT -->
+          <!-- Motorcycle Details -->
           <div class="track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-2">
-            <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-4">What's Next</p>
-            <div class="flex flex-col gap-4">
-              <div class="flex items-start gap-3">
-                <div
-                  class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <i class="ph ph-envelope text-white/40 text-sm"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-white">Check your email</p>
-                  <p class="text-xs text-white/35 mt-0.5 leading-relaxed">Confirmation and QR code sent to your email.
-                  </p>
-                </div>
+            <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-4">Motorcycle</p>
+            <div class="flex flex-col divide-y divide-white/[0.06]">
+              <div class="flex justify-between items-center py-2.5 gap-3">
+                <span class="text-white/40 text-xs shrink-0">Plate</span>
+                <span id="moto-plate" class="text-white font-mono font-bold tracking-widest text-xs"></span>
               </div>
-              <div class="flex items-start gap-3">
-                <div
-                  class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <i class="ph ph-clock text-white/40 text-sm"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-white">Arrive on time</p>
-                  <p class="text-xs text-white/35 mt-0.5 leading-relaxed">Come on your scheduled date with your queue
-                    number ready.</p>
-                </div>
+              <div class="flex justify-between items-center py-2.5 gap-3">
+                <span class="text-white/40 text-xs shrink-0">Model</span>
+                <span id="moto-model" class="text-white font-medium text-xs text-right"></span>
               </div>
-              <div class="flex items-start gap-3">
-                <div
-                  class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <i class="ph ph-motorcycle text-white/40 text-sm"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-white">Bring your motorcycle</p>
-                  <p class="text-xs text-white/35 mt-0.5 leading-relaxed">Make sure it matches the details you provided.
-                  </p>
-                </div>
+              <div class="flex justify-between items-center py-2.5 gap-3">
+                <span class="text-white/40 text-xs shrink-0">Color</span>
+                <span id="moto-color" class="text-white font-medium text-xs"></span>
               </div>
-              <div id="remainingNextItem" class="hidden items-start gap-3">
-                <div
-                  class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <i class="ph ph-cash-register text-yellow-400 text-sm"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-white">Settle remaining balance</p>
-                  <p class="text-xs text-white/35 mt-0.5 leading-relaxed">Prepare <span id="remainingNextAmount"
-                      class="text-yellow-400 font-semibold"></span> in cash upon pickup.</p>
-                </div>
+              <div class="flex justify-between items-start py-2.5 gap-3 hidden" id="moto-desc-row">
+                <span class="text-white/40 text-xs shrink-0">Notes</span>
+                <span id="moto-desc" class="text-white font-medium text-xs text-right leading-snug"></span>
               </div>
             </div>
           </div>
 
         </div><!-- /COL 1 -->
 
-        <!--  COL 2: QR + Recommended Arrival  -->
+        <!--  COL 2: Arrival + Timeline  -->
         <div class="flex flex-col gap-4">
 
-          <!-- QR CODE -->
-          <div id="qrContainer"
-            class="hidden track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-4 flex-col items-center gap-3 text-center">
-            <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-3 self-start">Your QR Code</p>
-            <div class="bg-white p-3 rounded-xl mx-auto">
-              <img id="qrCode" src="" alt="QR Code" class="w-40 h-40 rounded-lg block" />
-            </div>
-            <p class="text-xs text-white/25 leading-relaxed max-w-xs">Show this QR to staff upon arrival. Screenshot as
-              backup.</p>
-          </div>
-
-          <!-- RECOMMENDED ARRIVAL -->
-          <div id="arrivalCard"
-            class="track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-5">
+          <!-- Recommended Arrival -->
+          <div id="arrival-card"
+            class="hidden track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-4">
             <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-4">Recommended Arrival</p>
             <div class="flex items-center gap-4 mb-4">
               <div
@@ -233,8 +189,8 @@
                 <i class="ph ph-clock text-red-400 text-2xl"></i>
               </div>
               <div>
-                <p id="arrivalBlock" class="text-white font-bold text-base"></p>
-                <p id="arrivalTime" class="text-red-400 text-sm font-semibold mt-0.5 tabular-nums"></p>
+                <p id="arrival-block" class="text-white font-bold text-base"></p>
+                <p id="arrival-time" class="text-red-400 text-sm font-semibold mt-0.5 tabular-nums"></p>
               </div>
             </div>
             <div class="bg-yellow-500/[0.04] border border-yellow-500/10 rounded-xl p-3">
@@ -245,31 +201,46 @@
             </div>
           </div>
 
+          <!-- Service Status Timeline -->
+          <div class="track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-5">
+            <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-6">Service Timeline</p>
+            <div id="timeline" class="flex flex-col"></div>
+          </div>
+
         </div><!-- /COL 2 -->
 
-        <!--  COL 3: Payment + Reminders + Back  -->
+        <!--  COL 3: Payment + Help  -->
+        <!-- On md: spans 2 cols to fill, on lg: normal 1 col -->
         <div class="flex flex-col gap-4 md:col-span-2 lg:col-span-1">
 
-          <!-- PAYMENT -->
+          <!-- Payment -->
           <div class="track-card bg-white/[0.03] border border-white/10 rounded-2xl p-5 animate-card card-3">
             <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-4">Payment</p>
             <div class="flex flex-col divide-y divide-white/[0.06]">
               <div class="flex justify-between items-center py-2.5 gap-3">
                 <span class="text-white/40 text-xs shrink-0">Type</span>
-                <span id="paymentType" class="text-white font-medium text-xs text-right"></span>
+                <span id="payment-type" class="text-white font-medium text-xs text-right"></span>
               </div>
               <div class="flex justify-between items-center py-2.5 gap-3">
-                <span class="text-white/40 text-xs shrink-0">Amount Paid</span>
-                <span id="amountPaid" class="text-green-400 font-bold text-sm"></span>
+                <span class="text-white/40 text-xs shrink-0">Total</span>
+                <span id="total-amount" class="text-white font-semibold text-sm"></span>
               </div>
-              <div class="flex justify-between items-center py-2.5 gap-3 hidden" id="remainingRow">
+              <div class="flex justify-between items-center py-2.5 gap-3">
+                <span class="text-white/40 text-xs shrink-0">Paid</span>
+                <span id="amount-paid" class="text-green-400 font-bold text-sm"></span>
+              </div>
+              <div class="flex justify-between items-center py-2.5 gap-3 hidden" id="remaining-row">
                 <span class="text-white/40 text-xs shrink-0">Balance Due</span>
-                <span id="remainingBalance" class="text-yellow-400 font-bold text-sm"></span>
+                <span id="remaining-balance" class="text-yellow-400 font-bold text-sm"></span>
+              </div>
+              <div class="flex justify-between items-center pt-3 gap-3">
+                <span class="text-white/40 text-xs shrink-0">Status</span>
+                <span id="payment-status"></span>
               </div>
             </div>
           </div>
 
-          <!-- REMINDERS -->
+          <!-- Important Reminders -->
           <div class="track-card bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 animate-card card-6">
             <p class="card-title text-xs text-white/20 uppercase tracking-widest mb-4">Reminders</p>
             <div class="flex flex-col gap-3">
@@ -282,7 +253,7 @@
               </div>
               <div class="flex items-start gap-3">
                 <div class="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <i class="ph ph-ticket text-white/30 text-sm"></i>
+                  <i class="ph ph-identification-card text-white/30 text-sm"></i>
                 </div>
                 <p class="text-white/30 text-xs leading-relaxed">Have your <span class="text-white/50 font-medium">queue
                     number</span> ready when you arrive.</p>
@@ -297,13 +268,6 @@
             </div>
           </div>
 
-          <!-- BACK BUTTON -->
-          <a href="/services"
-            class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm">
-            <i class="ph ph-arrow-left"></i>
-            Back to Services
-          </a>
-
         </div><!-- /COL 3 -->
 
       </div><!-- /GRID -->
@@ -316,17 +280,18 @@
       </div>
       <p class="text-center text-white/10 text-xs pb-8">For concerns, contact us directly.</p>
 
-    </div><!-- /MAIN CONTENT -->
-
+    </div><!-- /CONTENT -->
   </main>
 
   <script>
+    // mobile menu toggle
     const toggle = document.getElementById('menu-toggle');
     const menu = document.getElementById('mobile-menu');
     const bar1 = document.getElementById('bar1');
     const bar2 = document.getElementById('bar2');
     const bar3 = document.getElementById('bar3');
     let menuOpen = false;
+
     toggle.addEventListener('click', () => {
       menuOpen = !menuOpen;
       menu.classList.toggle('open', menuOpen);
@@ -336,6 +301,6 @@
     });
   </script>
 
-  <script src="/booking/booking-success.js"></script>
+  <script src="/booking/booking-track.js"></script>
 </body>
 </html>

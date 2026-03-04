@@ -11,10 +11,14 @@ const {
   createPayment,
   confirmBooking,
   getBookingByPaymentId,
+  getBookingByReferenceCode,
 } = require('./queries');
 
 const getBookingPage = (req, res) => {
   res.sendFile(path.join(__dirname, 'booking.html'));
+};
+const getPublicTrackingPage = (req, res) => {
+  res.sendFile(path.join(__dirname, 'booking-track.html'));
 };
 
 const getServiceDetails = async (req, res) => {
@@ -268,6 +272,24 @@ const getBookingDetails = async (req, res) => {
   }
 };
 
+const getPublicBookingDetails = async (req, res) => {
+  try {
+    const { referenceCode } = req.params;
+    const booking = await getBookingByReferenceCode(referenceCode);
+
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Booking not found' });
+    }
+
+    res.json({ success: true, data: booking });
+  } catch (error) {
+    console.error('Get public booking details error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getBookingPage,
   getServiceDetails,
@@ -278,4 +300,6 @@ module.exports = {
   createInvoice,
   handleWebhook,
   getBookingDetails,
+  getPublicTrackingPage,
+  getPublicBookingDetails,
 };

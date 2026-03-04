@@ -35,7 +35,7 @@ const getAvailableDates = async (serviceId) => {
     `
     SELECT 
       a.id AS availability_id,
-      a.date,
+      TO_CHAR(a.date, 'YYYY-MM-DD') AS date,
       a.capacity,
       COUNT(b.id) FILTER (
         WHERE b.booking_status IN ('locked', 'confirmed')
@@ -194,14 +194,14 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
   );
 
   const booking = result.rows[0];
-
-  // TODO: update qr content to full url once staff scan page is built
-  // example: `${process.env.APP_URL}/staff/booking/${booking.reference_code}`
-  const qrDataUrl = await QRCode.toDataURL(booking.reference_code, {
-    width: 300,
-    margin: 2,
-    color: { dark: '#000000', light: '#ffffff' },
-  });
+  const qrDataUrl = await QRCode.toDataURL(
+    `${process.env.APP_URL}/track/${booking.reference_code}`,
+    {
+      width: 300,
+      margin: 2,
+      color: { dark: '#000000', light: '#ffffff' },
+    }
+  );
 
   let qrUrl;
 
@@ -247,6 +247,12 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
     [bookingId, xenditInvoiceId]
   );
 
+  await pool.query(
+    `INSERT INTO booking_status_logs (booking_id, status, changed_by)
+     VALUES ($1, 'confirmed', NULL)`,
+    [bookingId]
+  );
+
   return { ...booking, qr_code: qrUrl };
 };
 
@@ -263,7 +269,8 @@ const getBookingByPaymentId = async (paymentId) => {
       b.motorcycle_model,
       b.motorcycle_color,
       b.qr_code,
-      a.date AS booking_date,
+      TO_CHAR(a.date, 'YYYY-MM-DD') AS booking_date,
+      a.capacity AS date_capacity,
       s.name AS service_name,
       sv.name AS variant_name,
       p.amount_paid,
@@ -281,6 +288,63 @@ const getBookingByPaymentId = async (paymentId) => {
   return result.rows[0] || null;
 };
 
+const getBookingByReferenceCode = async (referenceCode) => {
+  const bookingResult = await pool.query(
+    `SELECT 
+      b.id,
+      b.reference_code,
+      b.queue_number,
+      b.guest_name,
+      b.guest_email,
+      b.guest_phone,
+      b.status,
+      b.booking_status,
+      b.motorcycle_plate,
+      b.motorcycle_model,
+      b.motorcycle_color,
+      b.motorcycle_description,
+      b.is_walkin,
+      b.payment_method,
+      b.qr_code,
+      b.created_at,
+      TO_CHAR(a.date, 'YYYY-MM-DD') AS booking_date,
+      s.name AS service_name,
+      sv.name AS variant_name,
+      p.amount_paid,
+      p.remaining_balance,
+      p.payment_type,
+      p.is_fully_paid,
+      p.amount AS total_amount,
+      a.capacity AS date_capacity
+    FROM bookings b
+    JOIN availability a ON a.id = b.availability_id
+    JOIN services s ON s.id = b.service_id
+    LEFT JOIN service_variants sv ON sv.id = b.variant_id
+    LEFT JOIN payments p ON p.booking_id = b.id
+    WHERE b.reference_code = $1`,
+    [referenceCode]
+  );
+
+  if (!bookingResult.rows.length) return null;
+
+  const booking = bookingResult.rows[0];
+
+  // fetch status logs
+  const logsResult = await pool.query(
+    `SELECT 
+      bsl.status,
+      bsl.created_at,
+      u.name AS changed_by_name
+    FROM booking_status_logs bsl
+    LEFT JOIN users u ON u.id = bsl.changed_by
+    WHERE bsl.booking_id = $1
+    ORDER BY bsl.created_at ASC`,
+    [booking.id]
+  );
+
+  return { ...booking, status_logs: logsResult.rows };
+};
+
 module.exports = {
   getServiceById,
   getAvailableDates,
@@ -290,4 +354,5 @@ module.exports = {
   createPayment,
   confirmBooking,
   getBookingByPaymentId,
+  getBookingByReferenceCode,
 };

@@ -82,8 +82,8 @@ function showModal(title, message, onConfirm, confirmLabel = 'Yes, go back') {
 }
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr.split('T')[0] + 'T00:00:00');
-  return d.toLocaleDateString('en-PH', {
+  const [year, month, day] = dateStr.split('T')[0].split('-');
+  return new Date(year, month - 1, day).toLocaleDateString('en-PH', {
     weekday: 'short',
     year: 'numeric',
     month: 'short',
@@ -341,8 +341,9 @@ function confirmSelectDate(slot, dateStr) {
     renderCalendar();
     return;
   }
-
-  const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-PH', {
+  
+  const [y, m, d] = dateStr.split('-');
+  const label = new Date(y, m - 1, d).toLocaleDateString('en-PH', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
