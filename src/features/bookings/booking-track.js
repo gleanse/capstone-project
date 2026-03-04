@@ -152,6 +152,7 @@ function render(b) {
   document.getElementById('moto-color').textContent = b.motorcycle_color || '—';
   if (b.motorcycle_description) {
     document.getElementById('moto-desc-row').classList.remove('hidden');
+    document.getElementById('moto-desc-row').classList.add('flex');
     document.getElementById('moto-desc').textContent = b.motorcycle_description;
   } else {
     document.getElementById('moto-desc-row').classList.add('hidden');
@@ -167,6 +168,7 @@ function render(b) {
 
   if (parseFloat(b.remaining_balance) > 0) {
     document.getElementById('remaining-row').classList.remove('hidden');
+    document.getElementById('remaining-row').classList.add('flex');
     document.getElementById('remaining-balance').textContent = fmtMoney(
       b.remaining_balance
     );
