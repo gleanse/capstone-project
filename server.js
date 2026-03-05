@@ -1,3 +1,4 @@
+// SERVER
 const app = require('./src/app');
 const { startCronJobs } = require('./src/shared/utils/cron');
 

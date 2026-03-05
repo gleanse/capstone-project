@@ -1,3 +1,4 @@
+// MIDDLEWARES AUTH
 const isAuth = (req, res, next) => {
   if (!req.session?.user) {
     if (req.accepts('html')) return res.redirect('/auth/login');

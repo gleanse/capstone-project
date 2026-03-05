@@ -9,10 +9,11 @@ const {
 const servicesRoutes = require('../features/services/routes');
 const authRoutes = require('../features/auth/auth.routes');
 const bookingRoutes = require('../features/bookings/routes');
-const adminRoutes = require('../features/admin/admin.routes'); // JSON API only
-const adminPages = require('../features/admin/admin.pages'); // HTML pages only
+const adminRoutes = require('../features/admin/admin.routes');
+const adminPages = require('../features/admin/admin.pages');
 const trackRoutes = require('../features/track/track.routes');
 const customerRoutes = require('../features/customer/routes');
+const staffRoutes = require('../features/staff/staff.routes');
 
 // PAGE router serves HTML pages
 const pagesRouter = express.Router();
@@ -26,9 +27,7 @@ pagesRouter.use('/booking', bookingRoutes);
 pagesRouter.use('/admin', isAdmin, adminPages);
 pagesRouter.use('/track', trackRoutes);
 pagesRouter.use('/customer', customerRoutes);
-pagesRouter.get('/staff/bookings/:referenceCode', (req, res) => {
-  res.send('Staff page coming soon');
-});
+pagesRouter.use('/staff', staffRoutes);
 
 // API router serves JSON data
 const apiRouter = express.Router();
@@ -37,8 +36,6 @@ apiRouter.use('/auth', authRoutes);
 apiRouter.use('/booking', bookingRoutes);
 apiRouter.use('/admin', isAdmin, adminRoutes);
 apiRouter.use('/customer', customerRoutes);
-// TODO: uncomment once built
-// apiRouter.use('/staff', isStaff, staffRoutes);
-// apiRouter.use('/account', isCustomer, accountRoutes);
+apiRouter.use('/staff', staffRoutes);
 
 module.exports = { apiRouter, pagesRouter };

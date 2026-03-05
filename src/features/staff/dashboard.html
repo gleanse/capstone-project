@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Dashboard — Herco Detailing Garage</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/staff/staff.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        <a href="/staff/dashboard" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing Garage
+          </span>
+        </a>
+        <div class="flex items-center gap-3">
+          <span
+            class="hidden sm:flex items-center gap-1.5 text-xs text-white/30 border border-white/10 px-3 py-1.5 rounded-lg">
+            <i class="ph ph-identification-badge text-red-500 text-sm"></i>
+            <span id="staff-name">Staff</span>
+          </span>
+          <a href="/staff/walkin"
+            class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors duration-200">
+            <i class="ph ph-plus text-sm"></i>
+            Walk-in
+          </a>
+          <button id="btn-logout"
+            class="flex items-center gap-1.5 text-xs text-white/30 hover:text-red-400 border border-white/10 hover:border-red-500/30 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer">
+            <i class="ph ph-sign-out text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-8 animate-fadeUp">
+      <p class="text-white/30 text-xs uppercase tracking-[0.2em] mb-1">Staff Portal</p>
+      <h1 class="text-5xl font-bold tracking-wide" style="font-family:'Bebas Neue',sans-serif;">Dashboard</h1>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-6 animate-fadeUp">
+      <div class="flex gap-1 bg-[#111] border border-white/8 rounded-xl p-1 flex-shrink-0">
+        <button data-view="today"
+          class="view-toggle active text-xs px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer">Today</button>
+        <button data-view="upcoming"
+          class="view-toggle text-xs px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer">All
+          Upcoming</button>
+      </div>
+      <div id="today-controls" class="flex items-center gap-2 bg-[#111] border border-white/8 rounded-xl px-4 py-2.5">
+        <i class="ph ph-calendar text-red-500 text-sm flex-shrink-0"></i>
+        <input type="date" id="date-picker" class="bg-transparent text-sm outline-none cursor-pointer w-full" />
+      </div>
+      <div id="upcoming-controls"
+        class="hidden items-center gap-2 bg-[#111] border border-white/8 rounded-xl px-4 py-2.5">
+        <i class="ph ph-funnel text-white/30 text-sm flex-shrink-0"></i>
+        <input type="date" id="upcoming-date-filter" class="bg-transparent text-sm outline-none cursor-pointer" />
+        <span class="text-white/20 text-xs">filter by date</span>
+      </div>
+      <div class="flex items-center gap-2 bg-[#111] border border-white/8 rounded-xl px-4 py-2.5 flex-1">
+        <i class="ph ph-magnifying-glass text-white/30 text-sm flex-shrink-0"></i>
+        <input type="text" id="search-input" placeholder="Search by reference code…"
+          class="bg-transparent text-white text-sm outline-none w-full placeholder:text-white/20" />
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 animate-fadeUp">
+      <div class="bg-[#111] border border-white/6 rounded-2xl px-4 py-3">
+        <p class="text-white/30 text-xs uppercase tracking-widest mb-1">Total</p>
+        <p id="stat-total" class="text-2xl font-bold text-white" style="font-family:'Bebas Neue',sans-serif;">—</p>
+      </div>
+      <div class="bg-[#111] border border-white/6 rounded-2xl px-4 py-3">
+        <p class="text-white/30 text-xs uppercase tracking-widest mb-1">Pending</p>
+        <p id="stat-pending" class="text-2xl font-bold text-yellow-400" style="font-family:'Bebas Neue',sans-serif;">—
+        </p>
+      </div>
+      <div class="bg-[#111] border border-white/6 rounded-2xl px-4 py-3">
+        <p class="text-white/30 text-xs uppercase tracking-widest mb-1">In Progress</p>
+        <p id="stat-inprogress" class="text-2xl font-bold text-blue-400" style="font-family:'Bebas Neue',sans-serif;">—
+        </p>
+      </div>
+      <div class="bg-[#111] border border-white/6 rounded-2xl px-4 py-3">
+        <p class="text-white/30 text-xs uppercase tracking-widest mb-1">Done</p>
+        <p id="stat-done" class="text-2xl font-bold text-green-400" style="font-family:'Bebas Neue',sans-serif;">—</p>
+      </div>
+    </div>
+
+    <!-- MY IN PROGRESS — bookings this staff personally started -->
+    <div id="my-inprogress-section" class="hidden mb-6 animate-fadeUp">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-5 bg-blue-500 rounded-full"></div>
+        <h2 class="text-sm font-semibold text-white/60 uppercase tracking-widest">My In Progress</h2>
+        <span id="my-inprogress-count"
+          class="text-xs bg-blue-500/20 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full"></span>
+      </div>
+      <div id="my-inprogress-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </div>
+
+    <!-- BOOKINGS LIST -->
+    <div class="bg-[#111] border border-white/6 rounded-2xl overflow-hidden animate-fadeUp">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b border-white/5 gap-3">
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-5 bg-red-500 rounded-full"></div>
+          <h2 class="text-sm font-semibold text-white uppercase tracking-widest">Bookings</h2>
+        </div>
+        <div class="flex gap-1 bg-white/4 rounded-lg p-1 overflow-x-auto scrollbar-none">
+          <button data-filter="all"
+            class="filter-tab active text-xs px-3 py-1 rounded-md transition-all duration-200 whitespace-nowrap">All</button>
+          <button data-filter="pending"
+            class="filter-tab text-xs px-3 py-1 rounded-md transition-all duration-200 whitespace-nowrap">Pending</button>
+          <button data-filter="in_progress"
+            class="filter-tab text-xs px-3 py-1 rounded-md transition-all duration-200 whitespace-nowrap">In
+            Progress</button>
+          <button data-filter="done"
+            class="filter-tab text-xs px-3 py-1 rounded-md transition-all duration-200 whitespace-nowrap">Done</button>
+          <button data-filter="picked_up"
+            class="filter-tab text-xs px-3 py-1 rounded-md transition-all duration-200 whitespace-nowrap">Picked
+            Up</button>
+        </div>
+      </div>
+      <div id="bookings-list" class="divide-y divide-white/4">
+        <div class="px-5 py-4">
+          <div class="skeleton-line h-14 rounded-xl"></div>
+        </div>
+        <div class="px-5 py-4">
+          <div class="skeleton-line h-14 rounded-xl"></div>
+        </div>
+        <div class="px-5 py-4">
+          <div class="skeleton-line h-14 rounded-xl"></div>
+        </div>
+      </div>
+      <div id="pagination"></div>
+    </div>
+
+    <!-- DONE AWAITING PICKUP -->
+    <div class="mt-6 animate-fadeUp">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-5 bg-green-500 rounded-full"></div>
+        <h2 class="text-sm font-semibold text-white/60 uppercase tracking-widest">Done — Awaiting Pickup</h2>
+        <span id="done-count"
+          class="hidden text-xs bg-green-500/20 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-full"></span>
+      </div>
+      <div id="done-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="skeleton-line h-20 rounded-2xl"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BOOKING DETAIL MODAL -->
+  <div id="modal-booking"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col animate-fadeUp">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 flex-shrink-0">
+        <div>
+          <p class="text-white/30 text-xs uppercase tracking-widest mb-0.5">Booking Details</p>
+          <h3 id="modal-ref" class="text-white font-semibold"></h3>
+        </div>
+        <button id="modal-close"
+          class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 text-white/40 hover:text-white transition-all duration-200 cursor-pointer">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="overflow-y-auto scrollbar-hide flex-1 p-6" id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- IN PROGRESS MODAL — retype last 4 chars for accountability -->
+  <div id="modal-inprogress"
+    class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-sm animate-fadeUp p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+          <i class="ph ph-wrench text-blue-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm">Mark as In Progress?</h3>
+          <p class="text-white/40 text-xs mt-0.5">This action cannot be undone.</p>
+        </div>
+      </div>
+      <p id="inprogress-warn"
+        class="hidden text-yellow-400 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2 mb-4">
+      </p>
+      <div class="bg-white/3 rounded-xl px-4 py-3 mb-4">
+        <p class="text-white/30 text-[10px] uppercase tracking-widest mb-1">Reference</p>
+        <p id="inprogress-ref" class="text-white font-semibold text-sm font-mono"></p>
+      </div>
+      <p class="text-white/40 text-xs mb-4">You will own this booking. Make sure the correct motorcycle is ready for
+        service.</p>
+      <div class="mb-5">
+        <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Retype the 8 characters after HRC- to
+          confirm</label>
+        <input id="inprogress-confirm-input" type="text" maxlength="8"
+          class="w-full bg-white/4 border border-white/8 focus:border-blue-500 outline-none rounded-xl px-4 py-3 text-white text-sm tracking-[0.3em] text-center uppercase transition-colors duration-200"
+          placeholder="_ _ _ _ _ _ _ _" autocomplete="off" />
+        <p id="inprogress-input-error" class="hidden text-red-400 text-xs mt-1.5"></p>
+      </div>
+      <div class="flex gap-3">
+        <button id="inprogress-cancel"
+          class="w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Cancel</button>
+        <button id="inprogress-confirm"
+          class="w-1/2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONE MODAL — ownership warning + retype last 4 chars -->
+  <div id="modal-done" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-sm animate-fadeUp p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
+          <i class="ph ph-check-circle text-green-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm">Mark as Done?</h3>
+          <p class="text-white/40 text-xs mt-0.5">Customer will be notified via email.</p>
+        </div>
+      </div>
+      <p id="done-warn"
+        class="hidden text-yellow-400 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2 mb-3">
+      </p>
+      <!-- ownership warning shown if a different staff started this booking -->
+      <p id="done-owner-warn"
+        class="hidden text-orange-400 text-xs bg-orange-500/10 border border-orange-500/20 rounded-xl px-3 py-2 mb-3">
+      </p>
+      <div class="bg-white/3 rounded-xl px-4 py-3 mb-4">
+        <p class="text-white/30 text-[10px] uppercase tracking-widest mb-1">Reference</p>
+        <p id="done-ref-display" class="text-white font-semibold text-sm font-mono"></p>
+      </div>
+      <div class="mb-5">
+        <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Retype the 8 characters after HRC- to
+          confirm</label>
+        <input id="done-confirm-input" type="text" maxlength="8"
+          class="w-full bg-white/4 border border-white/8 focus:border-green-500 outline-none rounded-xl px-4 py-3 text-white text-sm tracking-[0.3em] text-center uppercase transition-colors duration-200"
+          placeholder="_ _ _ _ _ _ _ _" autocomplete="off" />
+        <p id="done-input-error" class="hidden text-red-400 text-xs mt-1.5"></p>
+      </div>
+      <div class="flex gap-3">
+        <button id="done-cancel"
+          class="w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Cancel</button>
+        <button id="done-confirm"
+          class="w-1/2 bg-green-600 hover:bg-green-700 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Mark
+          Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PICKED UP MODAL -->
+  <div id="modal-pickup"
+    class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-sm animate-fadeUp p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center flex-shrink-0">
+          <i class="ph ph-check-square text-white/60 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm">Mark as Picked Up?</h3>
+          <p class="text-white/40 text-xs mt-0.5">Motorcycle will be released to customer.</p>
+        </div>
+      </div>
+      <p id="pickup-warn"
+        class="hidden text-yellow-400 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2 mb-4">
+      </p>
+      <div class="bg-white/3 rounded-xl px-4 py-3 mb-5">
+        <p class="text-white/30 text-[10px] uppercase tracking-widest mb-1">Reference</p>
+        <p id="pickup-ref" class="text-white font-semibold text-sm font-mono"></p>
+      </div>
+      <p class="text-white/40 text-xs mb-5">Confirm the customer has presented their QR and the motorcycle is being
+        released.</p>
+      <div class="flex gap-3">
+        <button id="pickup-cancel"
+          class="w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Cancel</button>
+        <button id="pickup-confirm"
+          class="w-1/2 bg-white/10 hover:bg-white/15 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Confirm
+          Pickup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARK PAID MODAL -->
+  <div id="modal-paid" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-sm animate-fadeUp p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
+          <i class="ph ph-money text-green-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm">Collect Remaining Balance?</h3>
+          <p class="text-white/40 text-xs mt-0.5">Confirm cash has been collected.</p>
+        </div>
+      </div>
+      <div class="bg-white/3 rounded-xl px-4 py-3 mb-5 space-y-2 text-xs">
+        <div class="flex justify-between text-white/40"><span>Reference</span><span id="paid-ref"
+            class="text-white font-mono font-semibold"></span></div>
+        <div class="flex justify-between text-white/40 border-t border-white/8 pt-2"><span>Amount to Collect</span><span
+            id="paid-amount" class="text-green-400 font-bold text-sm"></span></div>
+      </div>
+      <p class="text-white/40 text-xs mb-5">Confirm you have physically received the remaining cash from the customer.
+      </p>
+      <div class="flex gap-3">
+        <button id="paid-cancel"
+          class="w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Cancel</button>
+        <button id="paid-confirm"
+          class="w-1/2 bg-green-600 hover:bg-green-700 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Confirm
+          Collected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIANT SWAP MODAL -->
+  <div id="modal-variant"
+    class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-sm animate-fadeUp p-6">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-orange-500/15 flex items-center justify-center flex-shrink-0">
+          <i class="ph ph-arrows-left-right text-orange-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm">Update Variant</h3>
+          <p class="text-white/40 text-xs mt-0.5">Customer brought a different size.</p>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Select Correct Variant</label>
+        <select id="variant-select"
+          class="w-full border border-white/8 focus:border-orange-500 outline-none rounded-xl px-4 py-3 text-sm transition-colors duration-200"></select>
+      </div>
+      <div id="variant-balance-preview"
+        class="hidden bg-white/3 rounded-xl px-4 py-3 mb-5 text-xs text-white/60 space-y-1">
+        <div class="flex justify-between"><span>New Price</span><span id="vp-price"
+            class="text-white font-medium"></span></div>
+        <div class="flex justify-between"><span>Already Paid</span><span id="vp-paid"
+            class="text-white font-medium"></span></div>
+        <div class="flex justify-between border-t border-white/10 pt-1 mt-1"><span
+            id="vp-remaining-label">Remaining</span><span id="vp-remaining" class="text-green-400 font-semibold"></span>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button id="variant-cancel"
+          class="w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Cancel</button>
+        <button id="variant-confirm"
+          class="w-1/2 bg-orange-600 hover:bg-orange-700 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGOUT MODAL -->
+  <div id="modal-logout"
+    class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-xs animate-fadeUp p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center flex-shrink-0">
+          <i class="ph ph-sign-out text-red-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm">Sign Out?</h3>
+          <p class="text-white/40 text-xs mt-0.5">You will be redirected to login.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button id="logout-cancel"
+          class="w-1/2 border border-white/10 hover:border-white/30 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Cancel</button>
+        <button id="logout-confirm"
+          class="w-1/2 bg-red-600 hover:bg-red-700 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">Sign
+          Out</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .filter-tab {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .filter-tab.active {
+      background: rgba(229, 53, 53, 0.15);
+      color: #fff;
+    }
+
+    .view-toggle {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .view-toggle.active {
+      background: rgba(229, 53, 53, 0.15);
+      color: #fff;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-pending {
+      background: rgba(234, 179, 8, 0.12);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.2);
+    }
+
+    .status-in_progress {
+      background: rgba(59, 130, 246, 0.12);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .status-done {
+      background: rgba(34, 197, 94, 0.12);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .status-picked_up {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+
+  <script src="/staff/dashboard.js"></script>
+</body>
+</html>

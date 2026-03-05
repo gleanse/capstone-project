@@ -1,0 +1,105 @@
+/* date inputs - force white text and visible calendar icon */
+input[type='date'] {
+  color: white;
+  color-scheme: dark;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.4);
+  cursor: pointer;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) opacity(0.8);
+}
+
+/* select dropdowns - dark theme */
+select {
+  color-scheme: dark;
+  background-color: rgba(255, 255, 255, 0.04);
+  color: white;
+}
+
+select option {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+/* pagination */
+.pg-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pg-info {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.pg-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pg-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+}
+
+.pg-btn:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.pg-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.pg-btn.active {
+  background: rgba(229, 53, 53, 0.15);
+  border-color: rgba(229, 53, 53, 0.3);
+  color: white;
+}
+
+.pg-ellipsis {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.7rem;
+}
+
+/* generic confirmation modal overlay */
+.staff-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  padding: 16px;
+}
+
+.staff-modal-overlay.open {
+  display: flex;
+}

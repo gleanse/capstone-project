@@ -25,6 +25,7 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "node-cron": "^4.2.1",
+    "pdfkit": "^0.17.2",
     "pg": "^8.17.1",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.2.1",

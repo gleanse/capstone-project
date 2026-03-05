@@ -24,9 +24,8 @@ router.get('/:referenceCode', async (req, res) => {
 
     const user = req.session?.user;
 
-    // staff or admin (TEMPORARY FOR NOW NEED TO CHANGE LATER STAFF AND ADMIN MIGHT HAVE DIFFERENT ROUTES)
     if (user && ['staff', 'admin'].includes(user.role)) {
-      return res.redirect(`/staff/bookings/${referenceCode}`);
+      return res.redirect(`/staff/scan/${referenceCode}`);
     }
 
     // guest or no auth public tracking page

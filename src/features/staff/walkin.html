@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walk-in Booking — Herco Detailing Garage</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/staff/staff.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+
+        <a href="/staff/dashboard" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing Garage
+          </span>
+        </a>
+
+        <div class="flex items-center gap-3">
+          <a href="/staff/dashboard"
+            class="flex items-center gap-1.5 text-xs text-white/40 hover:text-white border border-white/10 hover:border-white/20 px-4 py-2 rounded-xl transition-all duration-200">
+            <i class="ph ph-arrow-left text-sm"></i>
+            Dashboard
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-8 animate-fadeUp">
+      <p class="text-white/30 text-xs uppercase tracking-[0.2em] mb-1">Staff Portal</p>
+      <h1 class="text-5xl font-bold tracking-wide" style="font-family:'Bebas Neue',sans-serif;">Walk-in Booking</h1>
+    </div>
+
+    <div class="bg-[#111] border border-white/6 rounded-2xl p-6 animate-fadeUp">
+
+      <!-- SERVICE + DATE -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-1.5 h-5 bg-red-500 rounded-full"></div>
+          <h2 class="text-sm font-semibold text-white uppercase tracking-widest">Service & Date</h2>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Service</label>
+            <select id="service-select"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200">
+              <option value="">Loading services…</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Variant / Size</label>
+            <select id="variant-select"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200 disabled:opacity-40"
+              disabled>
+              <option value="">Select a service first</option>
+            </select>
+          </div>
+
+          <!-- today capacity badge -->
+          <div id="capacity-badge" class="hidden items-center gap-2 bg-white/3 rounded-xl px-4 py-2.5 text-xs">
+            <i id="capacity-icon" class="ph ph-info text-white/40 text-sm flex-shrink-0"></i>
+            <span id="capacity-text" class="text-white/50 text-xs"></span>
+          </div>
+
+          <!-- future date picker — shown when today is full -->
+          <div id="future-date-section" class="hidden flex-col gap-3">
+            <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
+              <i class="ph ph-calendar-x text-red-400 text-sm flex-shrink-0"></i>
+              <p class="text-red-300 text-xs">Today is full. Select a future date to book on the customer's behalf.</p>
+            </div>
+            <div>
+              <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Future Date <span
+                  class="text-red-500">*</span></label>
+              <input type="date" id="future-date-input"
+                class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200" />
+            </div>
+            <div id="future-capacity-badge" class="hidden items-center gap-2 rounded-xl px-4 py-2.5 text-xs">
+              <i class="ph ph-info text-white/40 text-sm flex-shrink-0"></i>
+              <span id="future-capacity-text" class="text-xs"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="border-t border-white/5 mb-6"></div>
+
+      <!-- CUSTOMER INFO -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-1.5 h-5 bg-red-500 rounded-full"></div>
+          <h2 class="text-sm font-semibold text-white uppercase tracking-widest">Customer Info</h2>
+        </div>
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Full Name <span
+                class="text-red-500">*</span></label>
+            <input id="guest-name" type="text"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200"
+              placeholder="Customer's full name" />
+            <p id="err-name" class="hidden text-red-400 text-xs mt-1"></p>
+          </div>
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Phone</label>
+            <input id="guest-phone" type="tel" maxlength="11"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200"
+              placeholder="09XXXXXXXXX (optional)" />
+          </div>
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Email</label>
+            <p class="text-white/20 text-xs mb-2">Optional — skip for non-techy customers.</p>
+            <input id="guest-email" type="email"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200"
+              placeholder="customer@email.com (optional)" />
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-white/5 mb-6"></div>
+
+      <!-- MOTORCYCLE INFO -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-1.5 h-5 bg-red-500 rounded-full"></div>
+          <h2 class="text-sm font-semibold text-white uppercase tracking-widest">Motorcycle</h2>
+        </div>
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Plate Number <span
+                class="text-red-500">*</span></label>
+            <input id="moto-plate" type="text"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm uppercase transition-colors duration-200"
+              placeholder="ABC 1234" />
+            <p id="err-plate" class="hidden text-red-400 text-xs mt-1"></p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Model</label>
+              <input id="moto-model" type="text"
+                class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200"
+                placeholder="Honda Click" />
+            </div>
+            <div>
+              <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Color</label>
+              <input id="moto-color" type="text"
+                class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200"
+                placeholder="Black" />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-white/40 uppercase tracking-widest mb-2 block">Description</label>
+            <textarea id="moto-desc" rows="2"
+              class="w-full bg-white/4 border border-white/8 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white text-sm transition-colors duration-200 resize-none"
+              placeholder="Any notes about the motorcycle (optional)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <p id="form-error"
+        class="hidden text-red-400 text-xs mb-4 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2"></p>
+
+      <button id="btn-submit"
+        class="w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white text-sm font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+        <i class="ph ph-plus-circle text-base" id="submit-icon"></i>
+        <span id="submit-text">Create Walk-in Booking</span>
+      </button>
+
+    </div>
+  </main>
+
+  <!-- SUCCESS MODAL -->
+  <div id="modal-success"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-[#111] border border-white/10 rounded-2xl w-full max-w-sm animate-fadeUp p-6 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-green-500/15 flex items-center justify-center mx-auto mb-4">
+        <i class="ph ph-check-circle text-green-400 text-3xl"></i>
+      </div>
+      <h3 class="text-white font-bold text-lg mb-1" style="font-family:'Bebas Neue',sans-serif;">Booking Created</h3>
+      <p class="text-white/40 text-xs mb-5">Walk-in booking confirmed. Payment collected.</p>
+
+      <div class="bg-white/3 rounded-xl px-4 py-3 mb-5 text-left space-y-2 text-xs">
+        <div class="flex justify-between"><span class="text-white/40">Reference</span><span id="s-ref"
+            class="text-white font-semibold"></span></div>
+        <div class="flex justify-between"><span class="text-white/40">Queue No.</span><span id="s-queue"
+            class="text-white font-bold text-base" style="font-family:'Bebas Neue',sans-serif;"></span></div>
+        <div class="flex justify-between"><span class="text-white/40">Service</span><span id="s-service"
+            class="text-white"></span></div>
+        <div class="flex justify-between"><span class="text-white/40">Date</span><span id="s-date"
+            class="text-white"></span></div>
+        <div class="flex justify-between"><span class="text-white/40">Customer</span><span id="s-name"
+            class="text-white"></span></div>
+        <div class="flex justify-between"><span class="text-white/40">Plate</span><span id="s-plate"
+            class="text-white"></span></div>
+      </div>
+
+      <div class="flex gap-3">
+        <a id="btn-download-slip" href="#" target="_blank"
+          class="w-1/2 border border-white/10 hover:border-white/20 text-white/60 hover:text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+          <i class="ph ph-download-simple text-sm"></i>
+          Download Slip
+        </a>
+        <button id="btn-new-walkin"
+          class="w-1/2 bg-red-600 hover:bg-red-700 active:scale-95 text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-200 cursor-pointer">
+          New Walk-in
+        </button>
+      </div>
+      <a href="/staff/dashboard" class="block mt-3 text-xs text-white/30 hover:text-white/60 transition-colors">Back to
+        Dashboard</a>
+    </div>
+  </div>
+
+  <script src="/staff/walkin.js"></script>
+</body>
+</html>
