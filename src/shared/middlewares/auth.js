@@ -27,7 +27,7 @@ const isAdmin = (req, res, next) => {
 
 const isCustomer = (req, res, next) => {
   if (!req.session?.user || req.session.user.role !== 'customer') {
-    if (req.accepts('html')) return res.redirect('/auth/customer-login');
+    if (req.accepts('html')) return res.redirect('/customer/login');
     return res.status(403).json({ success: false, message: 'Forbidden' });
   }
   next();

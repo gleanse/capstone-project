@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — Herco Detailing Garage</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white flex items-center justify-center">
+  <p class="text-white/40 text-sm">Account page coming soon.</p>
+  <button onclick="fetch('/api/customer/logout', { method: 'POST' }).then(r => r.json()).then(d => window.location.href = d.redirect)" 
+  class="text-red-400 text-sm">
+  Logout
+</button>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Herco Detailing Garage</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+  <link rel="stylesheet" href="/customer/customer.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing Garage
+          </span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-7">
+          <a href="/services"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Services</a>
+          <a href="/track"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Track
+            Booking</a>
+          <a href="/customer/login" class="nav-link active text-sm tracking-wide">Sign In</a>
+        </nav>
+
+        <a href="/services"
+          class="hidden md:flex book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors duration-200 items-center gap-2">
+          <i class="ph ph-calendar-plus text-base"></i>
+          Book Now
+        </a>
+
+        <button id="menu-toggle"
+          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
+          <span class="w-5 h-px bg-white/60" id="bar1"></span>
+          <span class="w-5 h-px bg-white/60" id="bar2"></span>
+          <span class="w-5 h-px bg-white/60" id="bar3"></span>
+        </button>
+
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden border-t border-white/5 bg-[#0d0d0d]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
+        <a href="/services"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Services</a>
+        <a href="/track"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Track
+          Booking</a>
+        <a href="/customer/login" class="text-sm text-white py-3 border-b border-white/5">Sign In</a>
+        <a href="/services"
+          class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-3 rounded-xl text-center transition-colors">
+          Book Now
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
+
+    <div class="auth-card animate-fadeUp">
+
+      <!-- HEADER -->
+      <div class="text-center mb-8">
+        <div
+          class="w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center mx-auto mb-5 shadow-[0_0_32px_rgba(229,53,53,0.3)]"
+          style="transform:rotate(-3deg)">
+          <i class="ph ph-motorcycle text-white text-2xl"></i>
+        </div>
+        <span
+          class="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold tracking-[0.15em] uppercase px-3 py-1 rounded-full mb-4">
+          <i class="ph ph-user-circle text-sm"></i>
+          Customer Account
+        </span>
+        <h1 class="text-2xl font-semibold text-white mt-3 mb-1">Welcome back</h1>
+        <p class="text-white/40 text-sm">Sign in to access your bookings and account</p>
+      </div>
+
+      <!-- FORM -->
+      <div class="flex flex-col gap-5">
+
+        <!-- Email -->
+        <div>
+          <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+            <i class="ph ph-envelope text-red-500 text-sm"></i>
+            Email Address
+          </label>
+          <input id="input-email" type="email" placeholder="juan@email.com" autocomplete="email" class="input-field" />
+          <p id="error-email" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+            <i class="ph ph-warning-circle"></i>
+            <span></span>
+          </p>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+            <i class="ph ph-lock text-red-500 text-sm"></i>
+            Password
+          </label>
+          <div class="pw-wrap">
+            <input id="input-password" type="password" placeholder="Enter your password" autocomplete="current-password"
+              class="input-field pr-11" />
+            <button type="button" class="pw-toggle" id="toggle-pw">
+              <i class="ph ph-eye" id="pw-icon"></i>
+            </button>
+          </div>
+          <p id="error-password" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+            <i class="ph ph-warning-circle"></i>
+            <span></span>
+          </p>
+        </div>
+
+        <!-- Form error -->
+        <div id="form-error"
+          class="hidden items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+          <i class="ph ph-warning-circle text-lg flex-shrink-0"></i>
+          <span id="form-error-text"></span>
+        </div>
+
+        <!-- Submit -->
+        <button id="btn-submit"
+          class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 mt-1">
+          <i class="ph ph-sign-in text-base" id="btn-icon"></i>
+          <span id="btn-text">Sign In</span>
+        </button>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="mt-8 pt-6 border-t border-white/5 flex flex-col items-center gap-3">
+        <p class="text-white/30 text-sm">
+          Don't have an account?
+          <a href="/customer/register"
+            class="text-red-400 hover:text-red-300 font-medium transition-colors duration-200 ml-1">Create one</a>
+        </p>
+        <a href="/services"
+          class="inline-flex items-center gap-1.5 text-white/20 hover:text-white/40 text-xs transition-colors duration-200">
+          <i class="ph ph-arrow-left text-sm"></i>
+          Continue as guest
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    let menuOpen = false;
+    toggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      menu.classList.toggle('open', menuOpen);
+      bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
+      bar2.style.opacity = menuOpen ? '0' : '';
+      bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
+    });
+  </script>
+  <script src="/customer/customer-auth.js"></script>
+</body>
+</html>

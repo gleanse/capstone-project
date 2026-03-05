@@ -1,0 +1,118 @@
+/* AUTH CARD */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 28px 20px;
+  }
+}
+
+/* INPUT STATES */
+.input-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #f0f0f0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.input-field:focus {
+  border-color: #e53535;
+  background: rgba(229, 53, 53, 0.04);
+  box-shadow: 0 0 0 3px rgba(229, 53, 53, 0.08);
+}
+
+.input-field.is-error {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.input-field.is-valid {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* PASSWORD TOGGLE */
+.pw-wrap {
+  position: relative;
+}
+
+.pw-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.pw-toggle:hover {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* STRENGTH BAR */
+.strength-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.strength-fill.weak {
+  width: 33%;
+  background: #ef4444;
+}
+.strength-fill.medium {
+  width: 66%;
+  background: #f59e0b;
+}
+.strength-fill.strong {
+  width: 100%;
+  background: #10b981;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+@media (min-width: 768px) {
+  .auth-card {
+    max-width: 560px;
+    padding: 48px 56px;
+  }
+}

@@ -12,6 +12,7 @@ const bookingRoutes = require('../features/bookings/routes');
 const adminRoutes = require('../features/admin/admin.routes'); // JSON API only
 const adminPages = require('../features/admin/admin.pages'); // HTML pages only
 const trackRoutes = require('../features/track/track.routes');
+const customerRoutes = require('../features/customer/routes');
 
 // PAGE router serves HTML pages
 const pagesRouter = express.Router();
@@ -23,8 +24,8 @@ pagesRouter.use('/services', servicesRoutes);
 pagesRouter.use('/auth', authRoutes);
 pagesRouter.use('/booking', bookingRoutes);
 pagesRouter.use('/admin', isAdmin, adminPages);
-pagesRouter.use('/track', trackRoutes); // PUBLIC routes
-// NOTE: temporary might delete later or edit since this is not official routes or will be
+pagesRouter.use('/track', trackRoutes);
+pagesRouter.use('/customer', customerRoutes);
 pagesRouter.get('/staff/bookings/:referenceCode', (req, res) => {
   res.send('Staff page coming soon');
 });
@@ -35,6 +36,7 @@ apiRouter.use('/services', servicesRoutes);
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/booking', bookingRoutes);
 apiRouter.use('/admin', isAdmin, adminRoutes);
+apiRouter.use('/customer', customerRoutes);
 // TODO: uncomment once built
 // apiRouter.use('/staff', isStaff, staffRoutes);
 // apiRouter.use('/account', isCustomer, accountRoutes);
