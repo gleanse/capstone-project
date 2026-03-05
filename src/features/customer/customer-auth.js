@@ -276,6 +276,31 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   }
 });
 
+if (isLoginPage) {
+  const passwordInput = document.getElementById('input-password');
+  if (passwordInput) {
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent any default form behavior
+        document.getElementById('btn-submit').click();
+      }
+    });
+  }
+} else {
+  // For register page - submit on Enter in confirm password field
+  const confirmPasswordInput = document.getElementById(
+    'input-confirm-password'
+  );
+  if (confirmPasswordInput) {
+    confirmPasswordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-submit').click();
+      }
+    });
+  }
+}
+
 // FORGOT PASSWORD
 if (isLoginPage) {
   const sectionLogin = document.getElementById('section-login');
