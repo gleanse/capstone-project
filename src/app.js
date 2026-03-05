@@ -11,14 +11,14 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// SESSION - before static
+// SESSION
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'herco-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 8,
     },
