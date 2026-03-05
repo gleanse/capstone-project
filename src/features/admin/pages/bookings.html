@@ -13,6 +13,98 @@
     body { display: flex; }
     .layout-wrapper { display: flex; width: 100%; }
     #app { display: contents; }
+
+    /* ── Ref Confirmation Step ── */
+    .ref-confirm-step {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border, #e5e7eb);
+    }
+
+    .ref-confirm-step label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted, #6b7280);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .ref-confirm-step .ref-hint {
+      font-size: 12px;
+      color: var(--text-muted, #9ca3af);
+      margin-bottom: 8px;
+    }
+
+    .ref-input-wrap {
+      position: relative;
+    }
+
+    .ref-input-wrap input {
+      width: 100%;
+      padding: 10px 40px 10px 14px;
+      border: 2px solid var(--border, #e5e7eb);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: var(--bg-input);
+      color: var(--text, #111827);
+      box-sizing: border-box;
+    }
+
+    .ref-input-wrap input:focus {
+      outline: none;
+      border-color: var(--primary, #3b82f6);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+
+    .ref-input-wrap input.ref-error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+
+    .ref-input-wrap input.ref-success {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+    }
+
+    .ref-input-wrap .ref-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      pointer-events: none;
+      display: none;
+    }
+
+    .ref-input-wrap.is-error .ref-icon.icon-error { display: block; color: #ef4444; }
+    .ref-input-wrap.is-success .ref-icon.icon-success { display: block; color: #22c55e; }
+
+    .ref-error-msg {
+      font-size: 12px;
+      color: #ef4444;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .ref-input-wrap.is-error ~ .ref-error-msg {
+      display: block;
+    }
+
+    /* Shake animation on wrong ref */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-6px); }
+      40%       { transform: translateX(6px); }
+      60%       { transform: translateX(-4px); }
+      80%       { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.35s ease; }
   </style>
 </head>
 <body>
@@ -65,10 +157,28 @@
     <div class="modal-body">
       <p>Select new status for this booking:</p>
       <div class="status-options" id="statusOptions"></div>
+
+      <!-- ── Ref Confirmation Step ── -->
+      <div class="ref-confirm-step" id="refConfirmStep" style="display:none;">
+        <label>Confirm Reference Number</label>
+        <p class="ref-hint">Type the booking reference number to confirm this update.</p>
+        <div class="ref-input-wrap" id="refInputWrap">
+          <input
+            type="text"
+            id="refConfirmInput"
+            placeholder="e.g. HRC-20240001"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <i class="fas fa-times-circle ref-icon icon-error"></i>
+          <i class="fas fa-check-circle ref-icon icon-success"></i>
+        </div>
+        <p class="ref-error-msg" id="refErrorMsg">Reference number doesn't match. Please check and try again.</p>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" id="modalCancel">Cancel</button>
-      <button class="btn-primary" id="modalConfirm">Confirm</button>
+      <button class="btn-primary" id="modalConfirm" disabled>Confirm</button>
     </div>
   </div>
 </div>
@@ -79,8 +189,11 @@
 
   const { statusBadge, formatCurrency, formatDate } = AdminLayout;
 
-  // ── Status Modal ──────────────────────────────────────
-  let currentBookingId = null, selectedStatus = null;
+  // ── State ─────────────────────────────────────────────
+  let currentBookingId  = null;
+  let selectedStatus    = null;
+  let currentRefCode    = null;   // <-- stores the ref of the booking being updated
+
   const statusFlow = {
     pending:     [{ value: 'in_progress', label: 'Mark In Progress', icon: 'fas fa-tools' }],
     in_progress: [{ value: 'done',        label: 'Mark Done',        icon: 'fas fa-check-circle' }],
@@ -88,11 +201,23 @@
     picked_up:   [],
   };
 
+  // ── Open Modal ────────────────────────────────────────
   function openStatusModal(bookingId, currentStatus, refCode) {
-    currentBookingId = bookingId; selectedStatus = null;
+    currentBookingId = bookingId;
+    selectedStatus   = null;
+    currentRefCode   = refCode;
+
     document.getElementById('modalTitle').textContent = `Update: ${refCode}`;
+
     const options    = document.getElementById('statusOptions');
     const confirmBtn = document.getElementById('modalConfirm');
+    const refStep    = document.getElementById('refConfirmStep');
+
+    // Reset ref confirmation
+    resetRefInput();
+    refStep.style.display = 'none';
+    confirmBtn.disabled   = true;
+
     const nextStatuses = statusFlow[currentStatus] || [];
     if (!nextStatuses.length) {
       options.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">No further updates available.</p>';
@@ -104,31 +229,109 @@
           <i class="${s.icon}"></i> ${s.label}
         </div>`).join('');
     }
+
     document.getElementById('statusModal').style.display = 'flex';
   }
 
+  // ── Select Status → show ref input ───────────────────
   function selectStatus(el, value) {
     document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected'); selectedStatus = value;
+    el.classList.add('selected');
+    selectedStatus = value;
+
+    // Show the ref confirmation step
+    const refStep = document.getElementById('refConfirmStep');
+    refStep.style.display = 'block';
+    resetRefInput();
+    document.getElementById('refConfirmInput').focus();
   }
 
-  const closeModal = () => document.getElementById('statusModal').style.display = 'none';
-  document.getElementById('modalClose')?.addEventListener('click', closeModal);
-  document.getElementById('modalCancel')?.addEventListener('click', closeModal);
-  document.getElementById('statusModal')?.addEventListener('click', e => { if (e.target.id === 'statusModal') closeModal(); });
+  // ── Ref Input Validation ──────────────────────────────
+  function resetRefInput() {
+    const input   = document.getElementById('refConfirmInput');
+    const wrap    = document.getElementById('refInputWrap');
+    const errMsg  = document.getElementById('refErrorMsg');
+    const confirm = document.getElementById('modalConfirm');
 
-  document.getElementById('modalConfirm')?.addEventListener('click', async () => {
-    if (!selectedStatus || !currentBookingId) { alert('Select a status first.'); return; }
-    const res  = await fetch(`/api/admin/bookings/${currentBookingId}/status`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: selectedStatus }),
-    });
-    const data = await res.json();
-    if (data.success) { closeModal(); loadBookings(); }
-    else alert('Failed: ' + (data.message || 'Unknown error'));
+    if (input)   { input.value = ''; input.className = ''; }
+    if (wrap)    { wrap.className = 'ref-input-wrap'; }
+    if (errMsg)  { errMsg.style.display = 'none'; }
+    if (confirm) { confirm.disabled = true; }
+  }
+
+  document.getElementById('refConfirmInput')?.addEventListener('input', function () {
+    const typed   = this.value.trim().toUpperCase();
+    const target  = (currentRefCode || '').trim().toUpperCase();
+    const wrap    = document.getElementById('refInputWrap');
+    const errMsg  = document.getElementById('refErrorMsg');
+    const confirm = document.getElementById('modalConfirm');
+
+    if (!typed) {
+      wrap.className    = 'ref-input-wrap';
+      errMsg.style.display = 'none';
+      confirm.disabled  = true;
+      return;
+    }
+
+    if (typed === target) {
+      wrap.className       = 'ref-input-wrap is-success';
+      errMsg.style.display = 'none';
+      confirm.disabled     = false;
+    } else {
+      wrap.className       = 'ref-input-wrap is-error';
+      errMsg.style.display = 'block';
+      confirm.disabled     = true;
+    }
   });
 
-  // ── Load ──────────────────────────────────────────────
+  // ── Close Modal ───────────────────────────────────────
+  const closeModal = () => {
+    document.getElementById('statusModal').style.display = 'none';
+    resetRefInput();
+  };
+
+  document.getElementById('modalClose')?.addEventListener('click', closeModal);
+  document.getElementById('modalCancel')?.addEventListener('click', closeModal);
+  document.getElementById('statusModal')?.addEventListener('click', e => {
+    if (e.target.id === 'statusModal') closeModal();
+  });
+
+  // ── Confirm Update ────────────────────────────────────
+  document.getElementById('modalConfirm')?.addEventListener('click', async () => {
+    if (!selectedStatus || !currentBookingId) { alert('Select a status first.'); return; }
+
+    // Double-check ref before firing API (safety net)
+    const typed  = (document.getElementById('refConfirmInput')?.value || '').trim().toUpperCase();
+    const target = (currentRefCode || '').trim().toUpperCase();
+    if (typed !== target) {
+      const wrap = document.getElementById('refInputWrap');
+      wrap.classList.add('shake');
+      wrap.addEventListener('animationend', () => wrap.classList.remove('shake'), { once: true });
+      return;
+    }
+
+    const confirmBtn = document.getElementById('modalConfirm');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+    try {
+      const res  = await fetch(`/api/admin/bookings/${currentBookingId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: selectedStatus }),
+      });
+      const data = await res.json();
+      if (data.success) { closeModal(); loadBookings(); }
+      else alert('Failed: ' + (data.message || 'Unknown error'));
+    } catch (err) {
+      alert('Network error. Please try again.');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = 'Confirm';
+    }
+  });
+
+  // ── Load Bookings ─────────────────────────────────────
   async function loadBookings() {
     const status = document.getElementById('bookingStatusFilter')?.value || '';
     const search = document.getElementById('bookingSearch')?.value || '';
@@ -157,8 +360,11 @@
             ? '<span class="status-badge status-staff">Cash</span>'
             : '<span class="status-badge status-info">Online</span>'}</td>
           <td>${statusBadge(b.status)}</td>
-          <td><button class="action-btn" onclick="openStatusModal('${b.id}','${b.status}','${b.reference_code}')">
-            <i class="fas fa-edit"></i> Update</button></td>
+          <td>
+            <button class="action-btn" onclick="openStatusModal('${b.id}','${b.status}','${b.reference_code}')">
+              <i class="fas fa-edit"></i> Update
+            </button>
+          </td>
         </tr>`).join('');
     } catch (err) {
       console.error('Load bookings error:', err);
