@@ -1,5 +1,5 @@
 -- ========================================
--- COMPLETE SEED DATA FOR HERCO DATABASE
+-- COMPLETE SEED DATA FOR HERCO DATABASE (FIXED)
 -- ========================================
 
 -- 1. USERS SEED (all use password = 'password')
@@ -52,18 +52,15 @@ INSERT INTO availability (id, service_id, date, capacity, is_open)
 SELECT 
   gen_random_uuid(),
   s.id,
-  d.date,
+  (CURRENT_DATE + offsets.days_offset)::DATE AS date,
   3,
   true
 FROM services s
 CROSS JOIN (
   SELECT generate_series(1, 30) AS days_offset
 ) offsets
-CROSS JOIN LATERAL (
-  SELECT (CURRENT_DATE + offsets.days_offset)::DATE AS date
-) d
 WHERE 
-  EXTRACT(DOW FROM d.date) NOT IN (0, 6)  -- exclude weekends
+  EXTRACT(DOW FROM (CURRENT_DATE + offsets.days_offset)::DATE) NOT IN (0, 6)  -- exclude weekends
   AND s.is_active = true
 ON CONFLICT (service_id, date) DO NOTHING;
 
@@ -107,13 +104,13 @@ BEGIN
   SELECT id INTO powder_medium_id FROM service_variants WHERE name = 'Medium Mags' AND service_id = powder_service_id;
   SELECT id INTO detailing_std_id FROM service_variants WHERE name = 'Standard' AND service_id = detailing_service_id;
   
-  -- Get availability IDs
+  -- Get availability IDs (FIXED: added INTERVAL)
   SELECT id INTO avail_today_id FROM availability WHERE date = CURRENT_DATE AND service_id = ceramic_service_id LIMIT 1;
-  SELECT id INTO avail_tomorrow_id FROM availability WHERE date = CURRENT_DATE + 1 AND service_id = powder_service_id LIMIT 1;
-  SELECT id INTO avail_nextweek_id FROM availability WHERE date = CURRENT_DATE + 7 AND service_id = detailing_service_id LIMIT 1;
-  SELECT id INTO avail_future_id FROM availability WHERE date = CURRENT_DATE + 14 AND service_id = ceramic_service_id LIMIT 1;
+  SELECT id INTO avail_tomorrow_id FROM availability WHERE date = CURRENT_DATE + INTERVAL '1 day' AND service_id = powder_service_id LIMIT 1;
+  SELECT id INTO avail_nextweek_id FROM availability WHERE date = CURRENT_DATE + INTERVAL '7 days' AND service_id = detailing_service_id LIMIT 1;
+  SELECT id INTO avail_future_id FROM availability WHERE date = CURRENT_DATE + INTERVAL '14 days' AND service_id = ceramic_service_id LIMIT 1;
   
-  -- BOOKINGS SEED
+  -- BOOKINGS SEED (FIXED: all NOW() +/- numbers replaced with INTERVAL)
   INSERT INTO bookings (
     id, user_id, service_id, variant_id, availability_id,
     reference_code, queue_number, motorcycle_plate, motorcycle_model, motorcycle_color, motorcycle_description,
@@ -134,24 +131,24 @@ BEGIN
     'in_progress', 'confirmed', 'online', false,
     NOW() + INTERVAL '1 hour', NOW() - INTERVAL '1 day'
   ),
-  -- Walk-in customer (no user_id) for tomorrow
+  -- Walk-in customer (no user_id) for tomorrow (FIXED: NOW() + 1 → NOW() + INTERVAL '1 day')
   (
     gen_random_uuid(), NULL, detailing_service_id, detailing_std_id, avail_tomorrow_id,
-    'HRC-' || TO_CHAR(NOW() + 1, 'YYMMDD') || '-001', 1, 'WALK001', 'Suzuki Raider', 'Black', 'Modified exhaust',
+    'HRC-' || TO_CHAR(NOW() + INTERVAL '1 day', 'YYMMDD') || '-001', 1, 'WALK001', 'Suzuki Raider', 'Black', 'Modified exhaust',
     'pending', 'confirmed', 'cash', true,
     NOW() + INTERVAL '1 hour' + INTERVAL '1 day', NOW()
   ),
-  -- Completed booking (for history) - from last week
+  -- Completed booking (for history) - from last week (FIXED: NOW() - 7 → NOW() - INTERVAL '7 days')
   (
     gen_random_uuid(), customer1_id, ceramic_service_id, ceramic_std_id, avail_future_id,
-    'HRC-' || TO_CHAR(NOW() - 7, 'YYMMDD') || '-001', 1, 'DONE123', 'Kawasaki Ninja', 'Green', 'Full fairing',
+    'HRC-' || TO_CHAR(NOW() - INTERVAL '7 days', 'YYMMDD') || '-001', 1, 'DONE123', 'Kawasaki Ninja', 'Green', 'Full fairing',
     'done', 'confirmed', 'online', false,
     NOW() - INTERVAL '7 days' + INTERVAL '1 hour', NOW() - INTERVAL '8 days'
   ),
-  -- Another pending booking for next week
+  -- Another pending booking for next week (FIXED: NOW() + 7 → NOW() + INTERVAL '7 days')
   (
     gen_random_uuid(), customer2_id, powder_service_id, powder_medium_id, avail_nextweek_id,
-    'HRC-' || TO_CHAR(NOW() + 7, 'YYMMDD') || '-001', 1, 'PEND456', 'Honda Beat', 'White', 'Stock',
+    'HRC-' || TO_CHAR(NOW() + INTERVAL '7 days', 'YYMMDD') || '-001', 1, 'PEND456', 'Honda Beat', 'White', 'Stock',
     'pending', 'confirmed', 'online', false,
     NOW() + INTERVAL '7 days' + INTERVAL '1 hour', NOW() - INTERVAL '1 day'
   );
@@ -230,10 +227,7 @@ BEGIN
     END,
     CASE 
       WHEN b.motorcycle_plate IN ('ABC123', 'XYZ789', 'WALK001', 'DONE123') THEN 
-        CASE 
-          WHEN b.motorcycle_plate = 'DONE123' THEN b.created_at + INTERVAL '10 minutes'
-          ELSE b.created_at + INTERVAL '10 minutes'
-        END
+        b.created_at + INTERVAL '10 minutes'
       ELSE NULL
     END,
     1
