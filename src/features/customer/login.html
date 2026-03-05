@@ -71,94 +71,271 @@
   <main class="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
 
     <div class="auth-card animate-fadeUp">
-
-      <!-- HEADER -->
-      <div class="text-center mb-8">
-        <div
-          class="w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center mx-auto mb-5 shadow-[0_0_32px_rgba(229,53,53,0.3)]"
-          style="transform:rotate(-3deg)">
-          <i class="ph ph-motorcycle text-white text-2xl"></i>
-        </div>
-        <span
-          class="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold tracking-[0.15em] uppercase px-3 py-1 rounded-full mb-4">
-          <i class="ph ph-user-circle text-sm"></i>
-          Customer Account
-        </span>
-        <h1 class="text-2xl font-semibold text-white mt-3 mb-1">Welcome back</h1>
-        <p class="text-white/40 text-sm">Sign in to access your bookings and account</p>
-      </div>
-
-      <!-- FORM -->
-      <div class="flex flex-col gap-5">
-
-        <!-- Email -->
-        <div>
-          <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
-            <i class="ph ph-envelope text-red-500 text-sm"></i>
-            Email Address
-          </label>
-          <input id="input-email" type="email" placeholder="juan@email.com" autocomplete="email" class="input-field" />
-          <p id="error-email" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
-            <i class="ph ph-warning-circle"></i>
-            <span></span>
-          </p>
+      <div id="section-login">
+        <!-- HEADER -->
+        <div class="text-center mb-8">
+          <div
+            class="w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center mx-auto mb-5 shadow-[0_0_32px_rgba(229,53,53,0.3)]"
+            style="transform:rotate(-3deg)">
+            <i class="ph ph-motorcycle text-white text-2xl"></i>
+          </div>
+          <span
+            class="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold tracking-[0.15em] uppercase px-3 py-1 rounded-full mb-4">
+            <i class="ph ph-user-circle text-sm"></i>
+            Customer Account
+          </span>
+          <h1 class="text-2xl font-semibold text-white mt-3 mb-1">Welcome back</h1>
+          <p class="text-white/40 text-sm">Sign in to access your bookings and account</p>
         </div>
 
-        <!-- Password -->
-        <div>
-          <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
-            <i class="ph ph-lock text-red-500 text-sm"></i>
-            Password
-          </label>
-          <div class="pw-wrap">
-            <input id="input-password" type="password" placeholder="Enter your password" autocomplete="current-password"
-              class="input-field pr-11" />
-            <button type="button" class="pw-toggle" id="toggle-pw">
-              <i class="ph ph-eye" id="pw-icon"></i>
+        <!-- FORM -->
+        <div class="flex flex-col gap-5">
+
+          <!-- Email -->
+          <div>
+            <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+              <i class="ph ph-envelope text-red-500 text-sm"></i>
+              Email Address
+            </label>
+            <input id="input-email" type="email" placeholder="juan@email.com" autocomplete="email"
+              class="input-field" />
+            <p id="error-email" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+              <i class="ph ph-warning-circle"></i>
+              <span></span>
+            </p>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+              <i class="ph ph-lock text-red-500 text-sm"></i>
+              Password
+            </label>
+            <div class="pw-wrap">
+              <input id="input-password" type="password" placeholder="Enter your password"
+                autocomplete="current-password" class="input-field pr-11" />
+              <button type="button" class="pw-toggle" id="toggle-pw">
+                <i class="ph ph-eye" id="pw-icon"></i>
+              </button>
+            </div>
+            <p id="error-password" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+              <i class="ph ph-warning-circle"></i>
+              <span></span>
+            </p>
+            <button type="button" id="btn-forgot-password"
+              class="mt-2 text-xs text-white/30 hover:text-red-400 transition-colors duration-200 text-left cursor-pointer">
+              Forgot password?
             </button>
           </div>
-          <p id="error-password" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
-            <i class="ph ph-warning-circle"></i>
-            <span></span>
+
+          <!-- Remember Me -->
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="remember-me" class="w-4 h-4 rounded accent-red-500 cursor-pointer" />
+            <label for="remember-me" class="text-white/40 text-sm cursor-pointer select-none">
+              Remember me for 30 days
+            </label>
+          </div>
+
+          <!-- Form error -->
+          <div id="form-error"
+            class="hidden items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+            <i class="ph ph-warning-circle text-lg flex-shrink-0"></i>
+            <span id="form-error-text"></span>
+          </div>
+
+          <!-- Submit -->
+          <button id="btn-submit"
+            class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 mt-1">
+            <i class="ph ph-sign-in text-base" id="btn-icon"></i>
+            <span id="btn-text">Sign In</span>
+          </button>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="mt-8 pt-6 border-t border-white/5 flex flex-col items-center gap-3">
+          <p class="text-white/30 text-sm">
+            Don't have an account?
+            <a href="/customer/register"
+              class="text-red-400 hover:text-red-300 font-medium transition-colors duration-200 ml-1">Create one</a>
           </p>
+          <a href="/services"
+            class="inline-flex items-center gap-1.5 text-white/20 hover:text-white/40 text-xs transition-colors duration-200">
+            <i class="ph ph-arrow-left text-sm"></i>
+            Continue as guest
+          </a>
         </div>
-
-        <!-- Remember Me -->
-        <div class="flex items-center gap-3">
-          <input type="checkbox" id="remember-me" class="w-4 h-4 rounded accent-red-500 cursor-pointer" />
-          <label for="remember-me" class="text-white/40 text-sm cursor-pointer select-none">
-            Remember me for 30 days
-          </label>
-        </div>
-
-        <!-- Form error -->
-        <div id="form-error"
-          class="hidden items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
-          <i class="ph ph-warning-circle text-lg flex-shrink-0"></i>
-          <span id="form-error-text"></span>
-        </div>
-
-        <!-- Submit -->
-        <button id="btn-submit"
-          class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 mt-1">
-          <i class="ph ph-sign-in text-base" id="btn-icon"></i>
-          <span id="btn-text">Sign In</span>
-        </button>
 
       </div>
 
-      <!-- FOOTER -->
-      <div class="mt-8 pt-6 border-t border-white/5 flex flex-col items-center gap-3">
-        <p class="text-white/30 text-sm">
-          Don't have an account?
-          <a href="/customer/register"
-            class="text-red-400 hover:text-red-300 font-medium transition-colors duration-200 ml-1">Create one</a>
-        </p>
-        <a href="/services"
-          class="inline-flex items-center gap-1.5 text-white/20 hover:text-white/40 text-xs transition-colors duration-200">
-          <i class="ph ph-arrow-left text-sm"></i>
-          Continue as guest
-        </a>
+      <!-- FORGOT PASSWORD STEP 1: enter email -->
+      <div id="section-forgot" class="hidden">
+
+        <div class="text-center mb-8">
+          <div
+            class="w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center mx-auto mb-5 shadow-[0_0_32px_rgba(229,53,53,0.3)]"
+            style="transform:rotate(-3deg)">
+            <i class="ph ph-key text-white text-2xl"></i>
+          </div>
+          <span
+            class="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold tracking-[0.15em] uppercase px-3 py-1 rounded-full mb-4">
+            <i class="ph ph-lock-key-open text-sm"></i>
+            Password Reset
+          </span>
+          <h1 class="text-2xl font-semibold text-white mt-3 mb-1">Forgot your password?</h1>
+          <p class="text-white/40 text-sm">Enter your email and we'll send you a reset code.</p>
+        </div>
+
+        <div class="flex flex-col gap-5">
+
+          <div>
+            <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+              <i class="ph ph-envelope text-red-500 text-sm"></i>
+              Email Address
+            </label>
+            <input id="forgot-email" type="email" placeholder="juan@email.com" autocomplete="email"
+              class="input-field" />
+            <p id="error-forgot-email" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+              <i class="ph ph-warning-circle"></i>
+              <span></span>
+            </p>
+          </div>
+
+          <div id="forgot-form-error"
+            class="hidden items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+            <i class="ph ph-warning-circle text-lg flex-shrink-0"></i>
+            <span id="forgot-form-error-text"></span>
+          </div>
+
+          <button id="btn-send-otp"
+            class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 mt-1">
+            <i class="ph ph-paper-plane-tilt text-base" id="send-otp-icon"></i>
+            <span id="send-otp-text">Send Reset Code</span>
+          </button>
+
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-white/5 flex justify-center">
+          <button type="button" id="btn-back-to-login"
+            class="inline-flex items-center gap-1.5 text-white/20 hover:text-white/40 text-xs transition-colors duration-200">
+            <i class="ph ph-arrow-left text-sm"></i>
+            Back to sign in
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FORGOT PASSWORD STEP 2: enter OTP + new password -->
+      <div id="section-reset" class="hidden">
+
+        <div class="text-center mb-8">
+          <div
+            class="w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center mx-auto mb-5 shadow-[0_0_32px_rgba(229,53,53,0.3)]"
+            style="transform:rotate(-3deg)">
+            <i class="ph ph-shield-check text-white text-2xl"></i>
+          </div>
+          <span
+            class="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold tracking-[0.15em] uppercase px-3 py-1 rounded-full mb-4">
+            <i class="ph ph-lock-key-open text-sm"></i>
+            Password Reset
+          </span>
+          <h1 class="text-2xl font-semibold text-white mt-3 mb-1">Set new password</h1>
+          <p class="text-white/40 text-sm">Enter the code sent to your email and choose a new password.</p>
+        </div>
+
+        <div class="flex flex-col gap-5">
+
+          <div>
+            <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+              <i class="ph ph-hash text-red-500 text-sm"></i>
+              Reset Code
+            </label>
+            <input id="reset-otp" type="text" placeholder="Enter 6-digit code" maxlength="6"
+              class="input-field tracking-widest" />
+            <p id="error-reset-otp" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+              <i class="ph ph-warning-circle"></i>
+              <span></span>
+            </p>
+          </div>
+
+          <button id="btn-verify-otp"
+            class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+            <i class="ph ph-shield-check text-base" id="verify-otp-icon"></i>
+            <span id="verify-otp-text">Verify Code</span>
+          </button>
+
+          <!-- hidden until OTP verified -->
+          <div id="new-password-fields" class="hidden flex-col gap-5">
+
+            <div>
+              <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+                <i class="ph ph-lock text-red-500 text-sm"></i>
+                New Password
+              </label>
+              <div class="pw-wrap">
+                <input id="reset-password" type="password" placeholder="At least 8 characters"
+                  class="input-field pr-11" />
+                <button type="button" class="pw-toggle" id="toggle-reset-pw">
+                  <i class="ph ph-eye" id="reset-pw-icon"></i>
+                </button>
+              </div>
+              <p id="error-reset-password" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+                <i class="ph ph-warning-circle"></i>
+                <span></span>
+              </p>
+            </div>
+
+            <div>
+              <label class="flex items-center gap-2 text-xs text-white/40 uppercase tracking-widest mb-2">
+                <i class="ph ph-lock text-red-500 text-sm"></i>
+                Confirm New Password
+              </label>
+              <div class="pw-wrap">
+                <input id="reset-confirm-password" type="password" placeholder="Repeat new password"
+                  class="input-field pr-11" />
+                <button type="button" class="pw-toggle" id="toggle-reset-confirm-pw">
+                  <i class="ph ph-eye" id="reset-confirm-pw-icon"></i>
+                </button>
+              </div>
+              <p id="error-reset-confirm-password" class="hidden text-red-400 text-xs mt-1.5 items-center gap-1">
+                <i class="ph ph-warning-circle"></i>
+                <span></span>
+              </p>
+            </div>
+
+            <button id="btn-reset-password"
+              class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 mt-1">
+              <i class="ph ph-check text-base" id="reset-btn-icon"></i>
+              <span id="reset-btn-text">Reset Password</span>
+            </button>
+
+          </div>
+
+          <div id="reset-form-error"
+            class="hidden items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+            <i class="ph ph-warning-circle text-lg flex-shrink-0"></i>
+            <span id="reset-form-error-text"></span>
+          </div>
+
+          <p class="text-center text-xs text-white/30">
+            Didn't receive the code?
+            <button type="button" id="btn-resend-otp"
+              class="text-red-400 hover:text-red-300 transition-colors duration-200 ml-1 disabled:opacity-40 disabled:cursor-not-allowed">
+              Resend
+            </button>
+            <span id="resend-countdown" class="text-white/20 ml-1 hidden"></span>
+          </p>
+
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-white/5 flex justify-center">
+          <button type="button" id="btn-back-to-forgot"
+            class="inline-flex items-center gap-1.5 text-white/20 hover:text-white/40 text-xs transition-colors duration-200">
+            <i class="ph ph-arrow-left text-sm"></i>
+            Back
+          </button>
+        </div>
+
       </div>
 
     </div>

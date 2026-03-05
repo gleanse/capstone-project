@@ -10,6 +10,9 @@ const {
   login,
   logout,
   getMe,
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
 } = require('./controller');
 const {
   getAccountPage,
@@ -52,5 +55,8 @@ router.patch('/email', isCustomer, requestEmailChange);
 router.post('/email/verify', isCustomer, verifyEmailChange);
 router.get('/last-booking', isCustomer, getLastBooking);
 router.patch('/password', isCustomer, changePassword);
+router.post('/password/forgot', forgotPassword);
+router.post('/password/verify-otp', verifyOtp);
+router.post('/password/reset', resetPassword);
 
 module.exports = router;

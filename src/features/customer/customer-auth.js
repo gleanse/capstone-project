@@ -275,3 +275,349 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     }
   }
 });
+
+// FORGOT PASSWORD
+if (isLoginPage) {
+  const sectionLogin = document.getElementById('section-login');
+  const sectionForgot = document.getElementById('section-forgot');
+  const sectionReset = document.getElementById('section-reset');
+
+  let forgotEmail = '';
+
+  function showSection(section) {
+    sectionLogin.classList.add('hidden');
+    sectionForgot.classList.add('hidden');
+    sectionReset.classList.add('hidden');
+    section.classList.remove('hidden');
+  }
+
+  document
+    .getElementById('btn-forgot-password')
+    .addEventListener('click', () => {
+      showSection(sectionForgot);
+    });
+
+  document.getElementById('btn-back-to-login').addEventListener('click', () => {
+    showSection(sectionLogin);
+  });
+
+  document
+    .getElementById('btn-back-to-forgot')
+    .addEventListener('click', () => {
+      showSection(sectionForgot);
+    });
+
+  const toggleResetPw = document.getElementById('toggle-reset-pw');
+  const resetPwIcon = document.getElementById('reset-pw-icon');
+  const resetPwInput = document.getElementById('reset-password');
+
+  toggleResetPw.addEventListener('click', () => {
+    const isHidden = resetPwInput.type === 'password';
+    resetPwInput.type = isHidden ? 'text' : 'password';
+    resetPwIcon.className = isHidden ? 'ph ph-eye-slash' : 'ph ph-eye';
+  });
+
+  const toggleResetConfirmPw = document.getElementById(
+    'toggle-reset-confirm-pw'
+  );
+  const resetConfirmPwIcon = document.getElementById('reset-confirm-pw-icon');
+  const resetConfirmPwInput = document.getElementById('reset-confirm-password');
+
+  toggleResetConfirmPw.addEventListener('click', () => {
+    const isHidden = resetConfirmPwInput.type === 'password';
+    resetConfirmPwInput.type = isHidden ? 'text' : 'password';
+    resetConfirmPwIcon.className = isHidden ? 'ph ph-eye-slash' : 'ph ph-eye';
+  });
+
+  function showForgotError(message) {
+    const el = document.getElementById('forgot-form-error');
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+    document.getElementById('forgot-form-error-text').textContent = message;
+  }
+
+  function hideForgotError() {
+    const el = document.getElementById('forgot-form-error');
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+  }
+
+  function showResetError(message) {
+    const el = document.getElementById('reset-form-error');
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+    document.getElementById('reset-form-error-text').textContent = message;
+  }
+
+  function hideResetError() {
+    const el = document.getElementById('reset-form-error');
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+  }
+
+  function showForgotFieldError(id, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+    el.querySelector('span').textContent = message;
+  }
+
+  function clearForgotFieldError(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+  }
+
+  document.getElementById('forgot-email').addEventListener('input', () => {
+    clearForgotFieldError('error-forgot-email');
+    hideForgotError();
+  });
+
+  document.getElementById('reset-otp').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btn-verify-otp').click();
+  });
+  document.getElementById('forgot-email').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btn-send-otp').click();
+  });
+
+  ['reset-otp', 'reset-password', 'reset-confirm-password'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      clearForgotFieldError(`error-${id}`);
+      hideResetError();
+    });
+  });
+
+  let resendTimer = null;
+
+  function startResendCooldown() {
+    const btn = document.getElementById('btn-resend-otp');
+    const countdown = document.getElementById('resend-countdown');
+    let seconds = 60;
+    btn.disabled = true;
+    countdown.classList.remove('hidden');
+    countdown.textContent = `(${seconds}s)`;
+    resendTimer = setInterval(() => {
+      seconds--;
+      countdown.textContent = `(${seconds}s)`;
+      if (seconds <= 0) {
+        clearInterval(resendTimer);
+        btn.disabled = false;
+        countdown.classList.add('hidden');
+      }
+    }, 1000);
+  }
+
+  async function sendOtp(email) {
+    const res = await fetch('/api/customer/password/forgot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    return res.json();
+  }
+
+  document
+    .getElementById('btn-send-otp')
+    .addEventListener('click', async () => {
+      hideForgotError();
+      const email = document.getElementById('forgot-email').value.trim();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showForgotFieldError(
+          'error-forgot-email',
+          !email ? 'Email is required.' : 'Enter a valid email address.'
+        );
+        return;
+      }
+
+      const btn = document.getElementById('btn-send-otp');
+      const icon = document.getElementById('send-otp-icon');
+      const text = document.getElementById('send-otp-text');
+      btn.disabled = true;
+      icon.className = 'ph ph-spinner animate-spin text-base';
+      text.textContent = 'Sending...';
+
+      try {
+        const json = await sendOtp(email);
+        if (json.success) {
+          forgotEmail = email;
+          showSection(sectionReset);
+          startResendCooldown();
+        } else {
+          showForgotError(
+            json.message || 'Could not send reset code. Please try again.'
+          );
+        }
+      } catch {
+        showForgotError('Something went wrong. Please try again.');
+      } finally {
+        btn.disabled = false;
+        icon.className = 'ph ph-paper-plane-tilt text-base';
+        text.textContent = 'Send Reset Code';
+      }
+    });
+
+  document
+    .getElementById('btn-resend-otp')
+    .addEventListener('click', async () => {
+      hideResetError();
+      try {
+        const json = await sendOtp(forgotEmail);
+        if (json.success) {
+          startResendCooldown();
+        } else {
+          showResetError(
+            json.message || 'Could not resend code. Please try again.'
+          );
+        }
+      } catch {
+        showResetError('Something went wrong. Please try again.');
+      }
+    });
+
+  document
+    .getElementById('btn-verify-otp')
+    .addEventListener('click', async () => {
+      hideResetError();
+
+      const otp = document.getElementById('reset-otp').value.trim();
+
+      if (!otp || !/^\d{6}$/.test(otp)) {
+        showForgotFieldError(
+          'error-reset-otp',
+          !otp
+            ? 'Reset code is required.'
+            : 'Enter the 6-digit code from your email.'
+        );
+        return;
+      }
+
+      const btn = document.getElementById('btn-verify-otp');
+      const icon = document.getElementById('verify-otp-icon');
+      const text = document.getElementById('verify-otp-text');
+      btn.disabled = true;
+      icon.className = 'ph ph-spinner animate-spin text-base';
+      text.textContent = 'Verifying...';
+
+      try {
+        const res = await fetch('/api/customer/password/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotEmail, otp }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          btn.classList.add('hidden');
+          document.getElementById('reset-otp').disabled = true;
+          const fields = document.getElementById('new-password-fields');
+          fields.classList.remove('hidden');
+          fields.classList.add('flex');
+        } else {
+          showResetError(json.message || 'Invalid or expired code.');
+        }
+      } catch {
+        showResetError('Something went wrong. Please try again.');
+      } finally {
+        btn.disabled = false;
+        icon.className = 'ph ph-shield-check text-base';
+        text.textContent = 'Verify Code';
+      }
+    });
+
+  document
+    .getElementById('btn-reset-password')
+    .addEventListener('click', async () => {
+      hideResetError();
+
+      const otp = document.getElementById('reset-otp').value.trim();
+      const password = document.getElementById('reset-password').value;
+      const confirmPassword = document.getElementById(
+        'reset-confirm-password'
+      ).value;
+      let valid = true;
+
+      if (!otp || !/^\d{6}$/.test(otp)) {
+        showForgotFieldError(
+          'error-reset-otp',
+          !otp
+            ? 'Reset code is required.'
+            : 'Enter the 6-digit code from your email.'
+        );
+        valid = false;
+      } else clearForgotFieldError('error-reset-otp');
+
+      if (!password || password.length < 8) {
+        showForgotFieldError(
+          'error-reset-password',
+          !password
+            ? 'Password is required.'
+            : 'Password must be at least 8 characters.'
+        );
+        valid = false;
+      } else clearForgotFieldError('error-reset-password');
+
+      if (!confirmPassword) {
+        showForgotFieldError(
+          'error-reset-confirm-password',
+          'Please confirm your password.'
+        );
+        valid = false;
+      } else if (confirmPassword !== password) {
+        showForgotFieldError(
+          'error-reset-confirm-password',
+          'Passwords do not match.'
+        );
+        valid = false;
+      } else clearForgotFieldError('error-reset-confirm-password');
+
+      if (!valid) return;
+
+      const btn = document.getElementById('btn-reset-password');
+      const icon = document.getElementById('reset-btn-icon');
+      const text = document.getElementById('reset-btn-text');
+      btn.disabled = true;
+      icon.className = 'ph ph-spinner animate-spin text-base';
+      text.textContent = 'Resetting...';
+
+      try {
+        const res = await fetch('/api/customer/password/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotEmail, otp, password }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          showSection(sectionLogin);
+          const el = document.getElementById('form-error');
+          el.classList.remove(
+            'hidden',
+            'border-red-500/20',
+            'bg-red-500/10',
+            'text-red-400'
+          );
+          el.classList.add(
+            'flex',
+            'border-green-500/20',
+            'bg-green-500/10',
+            'text-green-400'
+          );
+          document.getElementById('form-error-text').textContent =
+            'Password reset successfully. You can now sign in.';
+        } else {
+          showResetError(
+            json.message || 'Could not reset password. Please try again.'
+          );
+        }
+      } catch {
+        showResetError('Something went wrong. Please try again.');
+      } finally {
+        btn.disabled = false;
+        icon.className = 'ph ph-check text-base';
+        text.textContent = 'Reset Password';
+      }
+    });
+}
