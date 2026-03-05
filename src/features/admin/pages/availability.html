@@ -105,10 +105,28 @@
     .modal-msg.success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:var(--success); display:flex; }
     .modal-msg.error   { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:var(--danger); display:flex; }
 
+    /* ── Warning Banner (inline, inside capacity modal) ── */
+    .warn-banner {
+      display: none;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #f59e0b;
+      line-height: 1.5;
+    }
+    .warn-banner.visible { display: flex; }
+    .warn-banner i { margin-top: 1px; flex-shrink: 0; font-size: 14px; }
+    .warn-banner p { margin: 0; }
+
     /* ── Confirm Modal ── */
     .confirm-modal {
       background: var(--dark-2); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius); width: 100%; max-width: 380px;
+      border-radius: var(--radius); width: 100%; max-width: 400px;
       padding: 26px; animation: slideIn 0.2s ease; text-align: center;
     }
     .confirm-icon {
@@ -116,11 +134,24 @@
       display: flex; align-items: center; justify-content: center;
       border-radius: 50%; margin: 0 auto 14px;
     }
-    .confirm-icon.danger { background: rgba(239,68,68,0.1); }
-    .confirm-icon.danger i { font-size: 22px; color: var(--danger); }
+    .confirm-icon.danger  { background: rgba(239,68,68,0.1); }
+    .confirm-icon.warning { background: rgba(245,158,11,0.1); }
+    .confirm-icon.danger  i { font-size: 22px; color: var(--danger); }
+    .confirm-icon.warning i { font-size: 22px; color: #f59e0b; }
     .confirm-modal h4 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
     .confirm-modal p  { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.55; }
     .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+
+    /* warn button */
+    .btn-warning {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; border: none;
+      background: rgba(245,158,11,0.15); color: #f59e0b;
+      border: 1px solid rgba(245,158,11,0.3);
+    }
+    .btn-warning:hover { background: rgba(245,158,11,0.22); }
 
     /* ── Toggle for Closure Type ── */
     .type-toggle {
@@ -141,6 +172,15 @@
     /* ── Conditional fields ── */
     .cond-field { display: none; }
     .cond-field.visible { display: block; }
+
+    /* ── Warning chips on the table row ── */
+    .warn-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(245,158,11,0.1); color: #f59e0b;
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 10px; font-size: 10px; font-weight: 600;
+      padding: 2px 8px; white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -207,6 +247,12 @@
       <button class="modal-close" id="capacityModalClose"><i class="fas fa-times"></i></button>
     </div>
     <div class="gen-modal-body">
+      <!-- Inline warning banner (shown when API returns a soft warning) -->
+      <div class="warn-banner" id="capacityWarnBanner">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p id="capacityWarnText"></p>
+      </div>
+
       <div class="modal-msg" id="capacityModalMsg"></div>
 
       <div class="m-field" id="capacityServiceField">
@@ -238,6 +284,10 @@
     </div>
     <div class="gen-modal-footer">
       <button class="btn-secondary" id="capacityModalCancel">Cancel</button>
+      <!-- Shown only when a warning is pending confirmation -->
+      <button class="btn-warning hidden" id="capacityModalProceed">
+        <i class="fas fa-exclamation-triangle"></i> Proceed Anyway
+      </button>
       <button class="btn-primary" id="capacityModalSave">
         <i class="fas fa-save"></i> <span id="capacityModalSaveLabel">Save Capacity</span>
       </button>
@@ -271,7 +321,6 @@
         <input type="hidden" id="closure_type" value="recurring">
       </div>
 
-      <!-- Recurring: day of week -->
       <div class="m-field cond-field visible" id="field_dow">
         <label><i class="fas fa-calendar-week"></i> Day of Week <span style="color:var(--red)">*</span></label>
         <select id="closure_dow">
@@ -285,7 +334,6 @@
         </select>
       </div>
 
-      <!-- Specific: date picker -->
       <div class="m-field cond-field" id="field_date">
         <label><i class="fas fa-calendar"></i> Specific Date <span style="color:var(--red)">*</span></label>
         <input type="date" id="closure_date">
@@ -300,6 +348,24 @@
       <button class="btn-secondary" id="closureModalCancel">Cancel</button>
       <button class="btn-danger" id="closureModalSave">
         <i class="fas fa-plus"></i> Add Closure
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     WARNING CONFIRM MODAL (soft warnings)
+══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="warnModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+    <h4 id="warnModalTitle">Warning</h4>
+    <p id="warnModalMsg"></p>
+    <div class="confirm-btns">
+      <button class="btn-secondary" id="warnModalCancel">Cancel</button>
+      <button class="btn-warning" id="warnModalConfirm">
+        <i class="fas fa-exclamation-triangle"></i> Proceed Anyway
       </button>
     </div>
   </div>
@@ -340,6 +406,28 @@
   }
   function hideMsg(msgId) { document.getElementById(msgId).className = 'modal-msg'; }
 
+  // ── Warning banner inside capacity modal ─────────────────
+  function showCapacityWarn(text) {
+    document.getElementById('capacityWarnText').textContent = text;
+    document.getElementById('capacityWarnBanner').classList.add('visible');
+    document.getElementById('capacityModalProceed').classList.remove('hidden');
+    document.getElementById('capacityModalSave').classList.add('hidden');
+  }
+  function hideCapacityWarn() {
+    document.getElementById('capacityWarnBanner').classList.remove('visible');
+    document.getElementById('capacityModalProceed').classList.add('hidden');
+    document.getElementById('capacityModalSave').classList.remove('hidden');
+  }
+
+  // ── Warning codes with friendly titles ───────────────────
+  const WARN_TITLES = {
+    NO_STAFF:             'No Staff Accounts',
+    LOW_STAFF:            'Limited Staff',
+    EXCEEDS_HOURS:        'Exceeds Working Hours',
+    TODAY_DATE:           'Modifying Today\'s Capacity',
+    VARIANT_DURATION_EXCEEDS: 'Variant Duration Warning',
+  };
+
   // ── Load All Data ─────────────────────────────────────────
   async function loadAvailability() {
     try {
@@ -355,30 +443,69 @@
   }
 
   // ── Render Capacity Table ─────────────────────────────────
-  function renderCapacity(rows) {
+  async function renderCapacity(rows) {
     const tbody = document.getElementById('capacityTableBody');
     if (!rows.length) {
       tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>No capacity set yet. Click "Set Capacity" to add.</p></div></td></tr>`;
       return;
     }
-    tbody.innerHTML = rows.map(r => `
+
+    // Fetch staff count once for row-level warnings
+    let staffCount = 0;
+    try {
+      const sr = await fetch('/api/admin/staff');
+      const sd = await sr.json();
+      staffCount = sd.success ? sd.data.length : 0;
+    } catch (_) {}
+
+    tbody.innerHTML = rows.map(r => {
+      const booked    = parseInt(r.bookings_count) || 0;
+      const cap       = parseInt(r.capacity);
+      const rowDate   = new Date(r.date + 'T00:00:00');
+      const today     = new Date(); today.setHours(0,0,0,0);
+      const isPast    = rowDate < today;
+      const isToday   = rowDate.getTime() === today.getTime();
+
+      // Build inline warning chips
+      let chips = '';
+      if (isPast) {
+        chips += `<span class="warn-chip" title="Past date"><i class="fas fa-history"></i> Past</span> `;
+      }
+      if (isToday) {
+        chips += `<span class="warn-chip" title="Active today"><i class="fas fa-clock"></i> Today</span> `;
+      }
+      if (staffCount === 0) {
+        chips += `<span class="warn-chip" title="No staff accounts"><i class="fas fa-user-slash"></i> No Staff</span> `;
+      } else if (staffCount === 1 && cap > 3) {
+        chips += `<span class="warn-chip" title="High capacity for 1 staff"><i class="fas fa-user-friends"></i> 1 Staff</span> `;
+      }
+      if (booked > cap) {
+        chips += `<span class="warn-chip" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" title="Overbooked!"><i class="fas fa-exclamation-circle"></i> Overbooked</span> `;
+      }
+
+      return `
       <tr>
-        <td>${formatDate(r.date)}</td>
+        <td>
+          ${formatDate(r.date)}
+          ${chips ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px;">${chips}</div>` : ''}
+        </td>
         <td>${r.service_name || '—'}</td>
         <td><strong>${r.capacity}</strong></td>
-        <td>${r.bookings_count || 0}</td>
+        <td>${booked}</td>
         <td>${r.is_open
           ? '<span class="status-badge status-confirmed">Open</span>'
           : '<span class="status-badge status-expired">Closed</span>'}</td>
         <td>
+          ${!isPast ? `
           <button class="action-btn" onclick="openEditCapacity(${JSON.stringify(r).split('"').join('&quot;')})">
             <i class="fas fa-edit"></i> Edit
-          </button>
+          </button>` : ''}
           <button class="action-btn danger" onclick="openDeleteCapacity('${r.id}', '${r.service_name}', '${r.date}')">
             <i class="fas fa-trash"></i>
           </button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   }
 
   // ── Render Closed Dates Table ─────────────────────────────
@@ -406,9 +533,9 @@
   // ══════════════════════════════════════════
   // SET CAPACITY MODAL
   // ══════════════════════════════════════════
-  let editingCapacityId = null;
+  let editingCapacityId   = null;
+  let pendingWarnCallback = null; // fn to call if user clicks Proceed Anyway
 
-  // Load services into dropdown
   async function loadServicesDropdown() {
     const select = document.getElementById('cap_service');
     try {
@@ -428,7 +555,6 @@
     }
   }
 
-  // Open "Add" mode
   document.getElementById('addCapacityBtn').addEventListener('click', async () => {
     editingCapacityId = null;
     document.getElementById('capacityModalTitle').innerHTML = '<i class="fas fa-calendar-alt"></i> Set Capacity';
@@ -438,88 +564,112 @@
     document.getElementById('cap_is_open').value  = 'true';
     document.getElementById('capacityServiceField').style.display = 'block';
     hideMsg('capacityModalMsg');
+    hideCapacityWarn();
     await loadServicesDropdown();
-    // Set min date to today
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('cap_date').min = today;
+    document.getElementById('cap_date').min = today; // block past dates in picker
     openOverlay('capacityModal');
     document.getElementById('cap_service').focus();
   });
 
-  // Open "Edit" mode — called with row data
   function openEditCapacity(row) {
     editingCapacityId = row.id;
     document.getElementById('capacityModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Capacity';
     document.getElementById('capacityModalSaveLabel').textContent = 'Update Capacity';
-    // Hide service selector (can't change service when editing)
     document.getElementById('capacityServiceField').style.display = 'none';
-    // Set existing values
     const dateStr = row.date ? row.date.split('T')[0] : '';
     document.getElementById('cap_date').value     = dateStr;
     document.getElementById('cap_capacity').value = row.capacity;
     document.getElementById('cap_is_open').value  = row.is_open ? 'true' : 'false';
     hideMsg('capacityModalMsg');
+    hideCapacityWarn();
     openOverlay('capacityModal');
     document.getElementById('cap_capacity').focus();
   }
 
-  // Close
   ['capacityModalClose','capacityModalCancel'].forEach(id => {
-    document.getElementById(id).addEventListener('click', () => closeOverlay('capacityModal'));
+    document.getElementById(id).addEventListener('click', () => {
+      closeOverlay('capacityModal');
+      hideCapacityWarn();
+    });
   });
   document.getElementById('capacityModal').addEventListener('click', e => {
-    if (e.target.id === 'capacityModal') closeOverlay('capacityModal');
+    if (e.target.id === 'capacityModal') { closeOverlay('capacityModal'); hideCapacityWarn(); }
   });
 
-  // Save
-  document.getElementById('capacityModalSave').addEventListener('click', async () => {
+  // "Proceed Anyway" inside the capacity modal — resend with force=true
+  document.getElementById('capacityModalProceed').addEventListener('click', () => {
+    if (pendingWarnCallback) pendingWarnCallback(true);
+  });
+
+  // Main save handler
+  document.getElementById('capacityModalSave').addEventListener('click', () => saveCapacity(false));
+
+  async function saveCapacity(force) {
     const service  = document.getElementById('cap_service').value;
     const date     = document.getElementById('cap_date').value;
     const capacity = document.getElementById('cap_capacity').value;
     const is_open  = document.getElementById('cap_is_open').value;
 
-    if (!date) { showMsg('capacityModalMsg', 'error', 'Please select a date.'); return; }
-    if (!capacity || parseInt(capacity) < 1) { showMsg('capacityModalMsg', 'error', 'Capacity must be at least 1.'); return; }
-    if (!editingCapacityId && !service) { showMsg('capacityModalMsg', 'error', 'Please select a service.'); return; }
+    if (!date)                              { showMsg('capacityModalMsg', 'error', 'Please select a date.');        return; }
+    if (!capacity || parseInt(capacity) < 1){ showMsg('capacityModalMsg', 'error', 'Capacity must be at least 1.'); return; }
+    if (!editingCapacityId && !service)    { showMsg('capacityModalMsg', 'error', 'Please select a service.');      return; }
 
-    const btn = document.getElementById('capacityModalSave');
+    const btn = document.getElementById(force ? 'capacityModalProceed' : 'capacityModalSave');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
       let res, data;
-
       if (editingCapacityId) {
-        // PATCH / PUT existing capacity
         res  = await fetch(`/api/admin/availability/${editingCapacityId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ capacity: parseInt(capacity), is_open: is_open === 'true', date }),
+          body: JSON.stringify({ capacity: parseInt(capacity), is_open: is_open === 'true', date, force }),
         });
-        data = await res.json();
       } else {
-        // POST new capacity
         res  = await fetch('/api/admin/availability', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ service_id: service, date, capacity: parseInt(capacity), is_open: is_open === 'true' }),
+          body: JSON.stringify({ service_id: service, date, capacity: parseInt(capacity), is_open: is_open === 'true', force }),
         });
-        data = await res.json();
+      }
+      data = await res.json();
+
+      // ── Hard error (blocked) ────────────────────────────────────────
+      if (!data.success && !data.warning) {
+        hideCapacityWarn();
+        showMsg('capacityModalMsg', 'error', data.message || 'Failed to save.');
+        return;
       }
 
+      // ── Soft warning → show inline banner + Proceed button ──────────
+      if (!data.success && data.warning) {
+        hideMsg('capacityModalMsg');
+        showCapacityWarn(data.message);
+        pendingWarnCallback = (f) => saveCapacity(f); // retry with force=true
+        return;
+      }
+
+      // ── Success ─────────────────────────────────────────────────────
       if (data.success) {
         showMsg('capacityModalMsg', 'success', data.message || 'Saved successfully!');
+        hideCapacityWarn();
+        pendingWarnCallback = null;
         setTimeout(() => { closeOverlay('capacityModal'); loadAvailability(); }, 800);
-      } else {
-        showMsg('capacityModalMsg', 'error', data.message || 'Failed to save.');
       }
     } catch (err) {
       showMsg('capacityModalMsg', 'error', 'Network error. Please try again.');
     } finally {
       btn.disabled = false;
-      btn.innerHTML = `<i class="fas fa-save"></i> <span id="capacityModalSaveLabel">${editingCapacityId ? 'Update Capacity' : 'Save Capacity'}</span>`;
+      const label = editingCapacityId ? 'Update Capacity' : 'Save Capacity';
+      if (force) {
+        btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Proceed Anyway`;
+      } else {
+        btn.innerHTML = `<i class="fas fa-save"></i> <span id="capacityModalSaveLabel">${label}</span>`;
+      }
     }
-  });
+  }
 
 
   // ══════════════════════════════════════════
@@ -535,13 +685,11 @@
   }
 
   document.getElementById('addClosedBtn').addEventListener('click', () => {
-    // Reset
     setClosureType('recurring');
     document.getElementById('closure_dow').value    = '0';
     document.getElementById('closure_date').value   = '';
     document.getElementById('closure_reason').value = '';
     hideMsg('closureModalMsg');
-    // Set min date
     document.getElementById('closure_date').min = new Date().toISOString().split('T')[0];
     openOverlay('closureModal');
   });
@@ -596,9 +744,39 @@
 
 
   // ══════════════════════════════════════════
+  // WARNING CONFIRM MODAL (generic soft warn)
+  // ══════════════════════════════════════════
+  let warnResolve = null;
+
+  function showWarnModal(title, message) {
+    return new Promise((resolve) => {
+      document.getElementById('warnModalTitle').textContent = title;
+      document.getElementById('warnModalMsg').textContent   = message;
+      warnResolve = resolve;
+      openOverlay('warnModal');
+    });
+  }
+
+  document.getElementById('warnModalCancel').addEventListener('click', () => {
+    closeOverlay('warnModal');
+    if (warnResolve) warnResolve(false);
+  });
+  document.getElementById('warnModalConfirm').addEventListener('click', () => {
+    closeOverlay('warnModal');
+    if (warnResolve) warnResolve(true);
+  });
+  document.getElementById('warnModal').addEventListener('click', e => {
+    if (e.target.id === 'warnModal') {
+      closeOverlay('warnModal');
+      if (warnResolve) warnResolve(false);
+    }
+  });
+
+
+  // ══════════════════════════════════════════
   // DELETE MODAL (shared for both)
   // ══════════════════════════════════════════
-  let deleteTarget = null; // { type: 'capacity' | 'closure', id }
+  let deleteTarget = null;
 
   function openDeleteCapacity(id, serviceName, date) {
     deleteTarget = { type: 'capacity', id };

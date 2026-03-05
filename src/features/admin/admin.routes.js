@@ -402,10 +402,27 @@ router.get('/services/:id/variants', async (req, res) => {
 router.post('/services/:id/variants', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, duration_hours } = req.body;
+    const { name, price, duration_hours, force } = req.body;
     if (!name || !price) {
       return res.status(400).json({ success: false, message: 'Name and price are required' });
     }
+
+    // ── WARN: variant duration exceeds base service duration ──────────
+    if (!force && duration_hours) {
+      const svcResult = await pool.query(
+        `SELECT duration_hours FROM services WHERE id = $1`, [id]
+      );
+      const baseDuration = svcResult.rows[0]?.duration_hours;
+      if (baseDuration && parseInt(duration_hours) > baseDuration) {
+        return res.status(200).json({
+          success: false,
+          code: 'VARIANT_DURATION_EXCEEDS',
+          warning: true,
+          message: `This variant's duration (${duration_hours}h) exceeds the base service duration (${baseDuration}h). Proceed anyway?`
+        });
+      }
+    }
+
     const result = await pool.query(
       `INSERT INTO service_variants (service_id,name,price,duration_hours,is_active)
        VALUES ($1,$2,$3,$4,true) RETURNING id,name,price,duration_hours`,
@@ -520,22 +537,95 @@ router.get('/audit-logs', async (req, res) => {
 // ===========================
 router.post('/availability', async (req, res) => {
   try {
-    const { service_id, date, capacity, is_open } = req.body;
+    const { service_id, date, capacity, is_open, force } = req.body;
 
     if (!service_id || !date || !capacity) {
       return res.status(400).json({ success: false, message: 'service_id, date, and capacity are required' });
     }
-    if (parseInt(capacity) < 1) {
-      return res.status(400).json({ success: false, message: 'Capacity must be at least 1' });
+
+    const cap = parseInt(capacity);
+
+    // ── BLOCK: capacity 0 ─────────────────────────────────────────────
+    if (cap < 1) {
+      return res.status(400).json({
+        success: false,
+        code: 'CAPACITY_ZERO',
+        message: 'Capacity cannot be set to 0. Use the Closed Dates feature to block a date instead.'
+      });
     }
 
+    // ── BLOCK: past date ──────────────────────────────────────────────
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetDate = new Date(date + 'T00:00:00');
+    if (targetDate < today) {
+      return res.status(400).json({
+        success: false,
+        code: 'PAST_DATE',
+        message: 'Cannot set availability for a past date.'
+      });
+    }
+
+    // ── WARN: no staff accounts (unless forced) ───────────────────────
+    if (!force) {
+      const staffCount = await pool.query(
+        `SELECT COUNT(*) AS count FROM users WHERE role IN ('admin','staff')`
+      );
+      if (parseInt(staffCount.rows[0].count) === 0) {
+        return res.status(200).json({
+          success: false,
+          code: 'NO_STAFF',
+          warning: true,
+          message: 'No staff accounts exist. Are you sure you want to set availability with no staff to handle bookings?'
+        });
+      }
+
+      // ── WARN: only 1 active staff ──────────────────────────────────
+      if (parseInt(staffCount.rows[0].count) === 1 && cap > 3) {
+        return res.status(200).json({
+          success: false,
+          code: 'LOW_STAFF',
+          warning: true,
+          message: `Only 1 staff account exists. A capacity of ${cap} may be difficult for one person to handle. Proceed anyway?`
+        });
+      }
+    }
+
+    // ── WARN: capacity × service duration exceeds 9 working hours ─────
+    if (!force) {
+      const svcResult = await pool.query(
+        `SELECT duration_hours FROM services WHERE id = $1`, [service_id]
+      );
+      const baseDuration = svcResult.rows[0]?.duration_hours || 0;
+      if (baseDuration > 0 && cap * baseDuration > 9) {
+        return res.status(200).json({
+          success: false,
+          code: 'EXCEEDS_HOURS',
+          warning: true,
+          message: `Setting capacity to ${cap} with a ${baseDuration}h service duration totals ${cap * baseDuration} hours — exceeding the 9-hour workday. Proceed anyway?`
+        });
+      }
+    }
+
+    // ── WARN: setting capacity on today's date ────────────────────────
+    const isToday = targetDate.getTime() === today.getTime();
+    if (!force && isToday) {
+      return res.status(200).json({
+        success: false,
+        code: 'TODAY_DATE',
+        warning: true,
+        message: 'You are setting availability for today. This may affect active operations. Proceed anyway?'
+      });
+    }
+
+    // ── SAVE ──────────────────────────────────────────────────────────
     const result = await pool.query(
       `INSERT INTO availability (service_id, date, capacity, is_open)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (service_id, date)
        DO UPDATE SET capacity = $3, is_open = $4
        RETURNING id, date, capacity, is_open`,
-      [service_id, date, parseInt(capacity), is_open !== false]
+      [service_id, date, cap, is_open !== false]
     );
 
     const staffId = req.session?.user?.id || null;
@@ -543,7 +633,7 @@ router.post('/availability', async (req, res) => {
       await pool.query(
         `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
          VALUES ($1, 'Set availability capacity', 'availability', $2, $3)`,
-        [staffId, result.rows[0].id, `Capacity ${capacity} set for date ${date}`]
+        [staffId, result.rows[0].id, `Capacity ${cap} set for date ${date}`]
       );
     }
 
@@ -560,23 +650,92 @@ router.post('/availability', async (req, res) => {
 router.put('/availability/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { capacity, is_open, date } = req.body;
+    const { capacity, is_open, date, force } = req.body;
 
-    if (!capacity || parseInt(capacity) < 1) {
-      return res.status(400).json({ success: false, message: 'Capacity must be at least 1' });
+    const cap = parseInt(capacity);
+
+    // ── BLOCK: capacity 0 ─────────────────────────────────────────────
+    if (!capacity || cap < 1) {
+      return res.status(400).json({
+        success: false,
+        code: 'CAPACITY_ZERO',
+        message: 'Capacity cannot be set to 0. Use the Closed Dates feature to block a date instead.'
+      });
     }
 
+    // Fetch existing row for checks
+    const existing = await pool.query(
+      `SELECT a.*, s.duration_hours AS service_duration, a.date AS avail_date
+       FROM availability a
+       LEFT JOIN services s ON s.id = a.service_id
+       WHERE a.id = $1`, [id]
+    );
+
+    if (!existing.rows.length) {
+      return res.status(404).json({ success: false, message: 'Availability entry not found' });
+    }
+
+    const row = existing.rows[0];
+    const targetDateStr = date || row.avail_date?.toISOString().split('T')[0];
+    const targetDate = new Date(targetDateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // ── BLOCK: past date ──────────────────────────────────────────────
+    if (targetDate < today) {
+      return res.status(400).json({
+        success: false,
+        code: 'PAST_DATE',
+        message: 'Cannot modify availability for a past date.'
+      });
+    }
+
+    // ── BLOCK: reducing below confirmed bookings ──────────────────────
+    const bookedResult = await pool.query(
+      `SELECT COUNT(*) AS count FROM bookings
+       WHERE availability_id = $1 AND booking_status = 'confirmed'`, [id]
+    );
+    const confirmedCount = parseInt(bookedResult.rows[0].count);
+    if (cap < confirmedCount) {
+      return res.status(400).json({
+        success: false,
+        code: 'BELOW_CONFIRMED',
+        message: `Cannot reduce capacity to ${cap}. There are already ${confirmedCount} confirmed booking(s) for this date/service.`
+      });
+    }
+
+    if (!force) {
+      // ── WARN: exceeds working hours ───────────────────────────────
+      const baseDuration = row.service_duration || 0;
+      if (baseDuration > 0 && cap * baseDuration > 9) {
+        return res.status(200).json({
+          success: false,
+          code: 'EXCEEDS_HOURS',
+          warning: true,
+          message: `Setting capacity to ${cap} with a ${baseDuration}h service duration totals ${cap * baseDuration} hours — exceeding the 9-hour workday. Proceed anyway?`
+        });
+      }
+
+      // ── WARN: today's date ─────────────────────────────────────────
+      const isToday = targetDate.getTime() === today.getTime();
+      if (isToday) {
+        return res.status(200).json({
+          success: false,
+          code: 'TODAY_DATE',
+          warning: true,
+          message: 'You are modifying capacity for today. This may affect active operations. Proceed anyway?'
+        });
+      }
+    }
+
+    // ── SAVE ──────────────────────────────────────────────────────────
     const result = await pool.query(
       `UPDATE availability
        SET capacity = $1, is_open = $2, date = COALESCE($3, date)
        WHERE id = $4
        RETURNING id, date, capacity, is_open`,
-      [parseInt(capacity), is_open !== false, date || null, id]
+      [cap, is_open !== false, date || null, id]
     );
-
-    if (!result.rows.length) {
-      return res.status(404).json({ success: false, message: 'Availability entry not found' });
-    }
 
     res.json({ success: true, data: result.rows[0], message: 'Capacity updated successfully' });
   } catch (err) {
