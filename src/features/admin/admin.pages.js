@@ -17,5 +17,6 @@ router.get('/availability', (req, res) => res.sendFile(path.join(PAGES_DIR, 'ava
 router.get('/staff',        (req, res) => res.sendFile(path.join(PAGES_DIR, 'staff.html')));
 router.get('/payments',     (req, res) => res.sendFile(path.join(PAGES_DIR, 'payments.html')));
 router.get('/audit',        (req, res) => res.sendFile(path.join(PAGES_DIR, 'audit.html')));
+router.get('/reschedule',   (req, res) => res.sendFile(path.join(PAGES_DIR, 'reschedule.html')));
 
 module.exports = router;

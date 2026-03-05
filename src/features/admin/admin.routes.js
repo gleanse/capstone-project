@@ -1,5 +1,6 @@
 // admin.routes.js — JSON API ONLY (used by apiRouter)
 const express = require('express');
+const bcrypt = require('bcrypt');
 const router  = express.Router();
 const path    = require('path');
 const fs      = require('fs');
@@ -46,6 +47,39 @@ function saveBase64Image(base64String, oldImageUrl) {
     return null;
   }
 }
+
+router.get('/bookings/by-date', async (req, res) => {
+  try {
+    const { date, service_id, status = 'confirmed' } = req.query;
+    if (!date || !service_id) {
+      return res.status(400).json({ success: false, message: 'date and service_id are required' });
+    }
+
+    const result = await pool.query(
+      `SELECT
+         b.id, b.reference_code, b.status, b.booking_status, b.queue_number,
+         b.guest_name, b.guest_email, b.guest_phone,
+         a.date AS booking_date,
+         s.name  AS service_name,
+         sv.name AS variant_name
+       FROM bookings b
+       LEFT JOIN availability a      ON a.id  = b.availability_id
+       LEFT JOIN services s          ON s.id  = b.service_id
+       LEFT JOIN service_variants sv ON sv.id = b.variant_id
+       WHERE a.date       = $1
+         AND b.service_id = $2
+         AND b.status     = $3
+         AND b.booking_status = 'confirmed'
+       ORDER BY b.queue_number ASC NULLS LAST`,
+      [date, service_id, status]
+    );
+
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('GET /bookings/by-date error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 // ===========================
 // GET /api/admin/stats/today
@@ -154,25 +188,83 @@ router.get('/bookings', async (req, res) => {
 // ===========================
 router.patch('/bookings/:id/status', async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id }     = req.params;
     const { status } = req.body;
-    const updatedBy = req.session?.user?.id || null;
-    const allowed = ['in_progress', 'done', 'picked_up'];
+
+    const allowed = ['confirmed', 'in_progress', 'done', 'picked_up', 'cancelled'];
     if (!allowed.includes(status)) {
-      return res.status(400).json({ success: false, message: 'Invalid status' });
+      return res.status(400).json({ success: false, message: `Invalid status: ${status}` });
     }
-    await pool.query(
-      `UPDATE bookings SET status=$1, updated_by=$2, updated_at=NOW() WHERE id=$3`,
-      [status, updatedBy, id]
+
+    // Fetch current booking (need email, name, ref for notification)
+    const current = await pool.query(
+      `SELECT b.id, b.status, b.reference_code, b.booking_date,
+              b.guest_name, b.guest_email, b.queue_number,
+              s.name AS service_name, sv.name AS variant_name
+       FROM bookings b
+       LEFT JOIN services s  ON s.id = b.service_id
+       LEFT JOIN service_variants sv ON sv.id = b.variant_id
+       WHERE b.id = $1`,
+      [id]
     );
-    if (updatedBy) {
-      await pool.query(
-        `INSERT INTO audit_logs (user_id,action,target_table,target_id,details) VALUES ($1,$2,'bookings',$3,$4)`,
-        [updatedBy, `Updated booking status to ${status}`, id, `Status changed to ${status}`]
-      );
+
+    if (!current.rows.length) {
+      return res.status(404).json({ success: false, message: 'Booking not found.' });
     }
-    res.json({ success: true, message: 'Status updated' });
+
+    const booking = current.rows[0];
+
+    // Update status
+    await pool.query(
+      `UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2`,
+      [status, id]
+    );
+
+    // Audit log
+    await pool.query(
+      `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
+       VALUES ($1, $2, 'bookings', $3, $4)`,
+      [
+        req.session?.user?.id || null,
+        `Status updated: ${booking.status} → ${status}`,
+        id,
+        `Ref: ${booking.reference_code}`,
+      ]
+    );
+
+    // ── Send "Done" email notification ──
+    if (status === 'done' && booking.guest_email) {
+      try {
+        const { sendEmail } = require('../../config/email');
+        const dateDisp = new Date(booking.booking_date + 'T00:00:00')
+          .toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        await sendEmail({
+          to:      booking.guest_email,
+          subject: `Your Motorcycle is Ready for Pickup! — Ref ${booking.reference_code}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;">
+              <h2 style="color:#dc2626;">Herco Detailing Garage</h2>
+              <p>Hi <strong>${booking.guest_name}</strong>,</p>
+              <p>Great news! Your motorcycle service is <strong style="color:#16a34a;">complete</strong> and ready for pickup.</p>
+              <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Reference</td><td style="padding:8px;border:1px solid #e5e7eb;font-weight:700;">${booking.reference_code}</td></tr>
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Service</td><td style="padding:8px;border:1px solid #e5e7eb;">${booking.service_name}${booking.variant_name ? ` — ${booking.variant_name}` : ''}</td></tr>
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Date</td><td style="padding:8px;border:1px solid #e5e7eb;">${dateDisp}</td></tr>
+              </table>
+              <p>Please come to the garage to pick up your motorcycle at your earliest convenience.</p>
+              <p style="color:#6b7280;font-size:13px;">— Herco Detailing Garage Team</p>
+            </div>`,
+        });
+      } catch (emailErr) {
+        console.error('Done email notification error:', emailErr);
+        // Don't fail the status update — email is best-effort
+      }
+    }
+
+    res.json({ success: true, message: `Status updated to ${status}.` });
   } catch (err) {
+    console.error('PATCH /bookings/:id/status error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -181,59 +273,325 @@ router.patch('/bookings/:id/status', async (req, res) => {
 // POST /api/admin/bookings/walkin
 // ===========================
 router.post('/bookings/walkin', async (req, res) => {
+  const client = await pool.connect();
   try {
-    const { guest_name, guest_email, guest_phone, service_id, variant_id,
-            motorcycle_plate, motorcycle_description } = req.body;
+    await client.query('BEGIN');
 
-    if (!guest_name || !guest_phone || !service_id || !variant_id) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    const {
+      guest_name, guest_email, guest_phone,
+      service_id, variant_id,
+      booking_date,         // "YYYY-MM-DD" — galing sa frontend
+      motorcycle_plate, motorcycle_color, motorcycle_model, motorcycle_description,
+      payment_method = 'cash',
+      is_future_date = false,
+    } = req.body;
+
+    if (!guest_name || !guest_phone || !service_id || !variant_id || !booking_date) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'Missing required fields.' });
     }
 
-    const variantResult = await pool.query('SELECT price FROM service_variants WHERE id=$1', [variant_id]);
-    if (!variantResult.rows.length) {
-      return res.status(400).json({ success: false, message: 'Variant not found' });
+    // ── Find availability row for this date + service ──
+    // Ginagamit ang `availability` table (hindi availability_calendar)
+    const avResult = await client.query(
+      `SELECT a.id, a.capacity, a.is_open,
+              COUNT(b.id) FILTER (WHERE b.booking_status IN ('locked','confirmed')) AS booked
+       FROM availability a
+       LEFT JOIN bookings b ON b.availability_id = a.id
+       WHERE a.date = $1 AND a.service_id = $2 AND a.is_open = true
+       GROUP BY a.id, a.capacity, a.is_open`,
+      [booking_date, service_id]
+    );
+
+    if (!avResult.rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        message: 'No availability slot configured for this date and service.',
+      });
     }
-    const price   = variantResult.rows[0].price;
-    const refCode = 'WI-' + Date.now().toString(36).toUpperCase();
 
-    const availResult = await pool.query(
-      `SELECT id FROM availability WHERE service_id=$1 AND date=CURRENT_DATE AND is_open=true LIMIT 1`,
-      [service_id]
+    const av        = avResult.rows[0];
+    const booked    = parseInt(av.booked);
+    const remaining = av.capacity - booked;
+
+    if (remaining <= 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        message: `This date is at full capacity (${booked}/${av.capacity}). Please select a future date.`,
+      });
+    }
+
+    // ── Next queue number for this availability slot ──
+    const queueResult = await client.query(
+      `SELECT COALESCE(MAX(queue_number), 0) + 1 AS next_queue
+       FROM bookings
+       WHERE availability_id = $1`,
+      [av.id]
     );
-    const availabilityId = availResult.rows[0]?.id || null;
+    const queue_number = queueResult.rows[0].next_queue;
 
-    const queueResult = await pool.query(
-      `SELECT COALESCE(MAX(queue_number),0)+1 AS next_queue FROM bookings WHERE DATE(created_at)=CURRENT_DATE`
+    // ── Generate reference code ──
+    const refCode = 'WI-' + Date.now().toString(36).toUpperCase().slice(-6) +
+                    Math.random().toString(36).toUpperCase().slice(-3);
+
+    // ── Insert booking ──
+    // Ginagamit ang availability_id, at ang columns na nasa actual schema
+    const insertResult = await client.query(
+      `INSERT INTO bookings (
+         reference_code,
+         availability_id,
+         service_id, variant_id,
+         status, booking_status,
+         queue_number,
+         guest_name, guest_email, guest_phone,
+         motorcycle_plate, motorcycle_color, motorcycle_model, motorcycle_description,
+         payment_method,
+         is_walkin
+       ) VALUES (
+         $1, $2, $3, $4,
+         'pending', 'confirmed',
+         $5,
+         $6, $7, $8,
+         $9, $10, $11, $12,
+         $13,
+         true
+       ) RETURNING id, reference_code, queue_number`,
+      [
+        refCode,
+        av.id,
+        service_id, variant_id,
+        queue_number,
+        guest_name, guest_email || null, guest_phone,
+        motorcycle_plate || null, motorcycle_color || null,
+        motorcycle_model || null, motorcycle_description || null,
+        payment_method,
+      ]
     );
-    const queueNumber = queueResult.rows[0].next_queue;
 
-    const bookingResult = await pool.query(
-      `INSERT INTO bookings (availability_id,service_id,variant_id,guest_name,guest_email,guest_phone,
-        reference_code,queue_number,motorcycle_plate,motorcycle_description,
-        is_walkin,payment_method,status,booking_status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true,'cash','pending','confirmed')
-       RETURNING id,reference_code,queue_number`,
-      [availabilityId, service_id, variant_id, guest_name, guest_email||null, guest_phone,
-       refCode, queueNumber, motorcycle_plate||null, motorcycle_description||null]
-    );
-    const booking = bookingResult.rows[0];
+    await client.query('COMMIT');
 
-    await pool.query(
-      `INSERT INTO payments (booking_id,amount,amount_paid,remaining_balance,payment_type,is_fully_paid,status,paid_at)
-       VALUES ($1,$2,$2,0,'full',true,'paid',NOW())`,
-      [booking.id, price]
-    );
+    const booking = insertResult.rows[0];
 
+    // ── Audit log ──
     const staffId = req.session?.user?.id || null;
     if (staffId) {
-      await pool.query(
-        `INSERT INTO audit_logs (user_id,action,target_table,target_id,details) VALUES ($1,'Created walk-in booking','bookings',$2,$3)`,
-        [staffId, booking.id, `Walk-in for ${guest_name}, ref: ${refCode}`]
-      );
+      pool.query(
+        `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
+         VALUES ($1, 'Walk-in booking created', 'bookings', $2, $3)`,
+        [staffId, booking.id, `Walk-in Ref: ${booking.reference_code}`]
+      ).catch(e => console.error('Audit log error:', e));
     }
 
-    res.json({ success: true, booking_id: booking.id, reference_code: booking.reference_code, queue_number: booking.queue_number });
+    // ── Optional: confirmation email ──
+    if (guest_email) {
+      try {
+        const { sendEmail } = require('../../config/email');
+        const dateDisp = new Date(booking_date + 'T00:00:00')
+          .toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        await sendEmail({
+          to:      guest_email,
+          subject: `Walk-in Booking Confirmed — Ref ${booking.reference_code}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;">
+              <h2 style="color:#dc2626;">Herco Detailing Garage</h2>
+              <p>Hi <strong>${guest_name}</strong>,</p>
+              <p>Your walk-in booking has been confirmed${is_future_date ? ' for a future date' : ''}.</p>
+              <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Reference</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;font-weight:700;">${booking.reference_code}</td></tr>
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Queue #</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;font-weight:700;">${booking.queue_number}</td></tr>
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Date</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;">${dateDisp}</td></tr>
+              </table>
+              <p style="color:#6b7280;font-size:13px;">Please bring this reference number when you arrive.</p>
+              <p style="color:#6b7280;font-size:13px;">— Herco Detailing Garage Team</p>
+            </div>`,
+        });
+      } catch (emailErr) {
+        console.error('Walk-in email error:', emailErr);
+        // Hindi i-fail ang booking kahit may email error
+      }
+    }
+
+    res.json({
+      success:        true,
+      booking_id:     booking.id,
+      reference_code: booking.reference_code,
+      queue_number:   booking.queue_number,
+      message:        'Walk-in booking confirmed.',
+    });
+
   } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('POST /bookings/walkin error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  } finally {
+    client.release();
+  }
+});
+
+
+router.post('/bookings/reschedule', async (req, res) => {
+  try {
+    // ── Admin-only ──
+    if (req.session?.user?.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Only admins can reschedule bookings.' });
+    }
+
+    const { booking_ids, new_date, from_date, service_id, password } = req.body;
+
+    if (!booking_ids?.length || !new_date || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'booking_ids, new_date, and password are required.',
+      });
+    }
+
+    // ── Verify admin password ──
+    const userResult = await pool.query(
+      `SELECT password_hash FROM users WHERE id = $1`,
+      [req.session.user.id]
+    );
+    if (!userResult.rows.length) {
+      return res.status(401).json({ success: false, message: 'Session invalid. Please log in again.' });
+    }
+    const passwordMatch = await bcrypt.compare(password, userResult.rows[0].password_hash);
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect password.' });
+    }
+
+    // ── Find availability row for new_date + service ──
+    const avResult = await pool.query(
+      `SELECT a.id, a.capacity, a.is_open,
+              COUNT(b.id) FILTER (WHERE b.booking_status IN ('locked','confirmed')) AS booked
+       FROM availability a
+       LEFT JOIN bookings b ON b.availability_id = a.id
+       WHERE a.date = $1 AND a.service_id = $2 AND a.is_open = true
+       GROUP BY a.id, a.capacity, a.is_open`,
+      [new_date, service_id]
+    );
+
+    if (!avResult.rows.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'No availability slot configured for the new date and service.',
+      });
+    }
+
+    const av        = avResult.rows[0];
+    const booked    = parseInt(av.booked);
+    const available = av.capacity - booked;
+
+    if (available < booking_ids.length) {
+      return res.status(400).json({
+        success: false,
+        message: `New date only has ${available} slot(s) available, but ${booking_ids.length} booking(s) selected.`,
+      });
+    }
+
+    // ── Fetch the actual bookings (verify booking_status = confirmed) ──
+    const bkResult = await pool.query(
+      `SELECT b.id, b.reference_code, b.guest_name, b.guest_email,
+              s.name AS service_name
+       FROM bookings b
+       LEFT JOIN services s ON s.id = b.service_id
+       WHERE b.id = ANY($1::uuid[])
+         AND b.booking_status = 'confirmed'
+         AND b.status NOT IN ('cancelled', 'picked_up')`,
+      [booking_ids]
+    );
+
+    if (!bkResult.rows.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid confirmed bookings found with the given IDs.',
+      });
+    }
+
+    const bookings = bkResult.rows;
+
+    // ── Move bookings: update availability_id to new slot ──
+    await pool.query(
+      `UPDATE bookings
+       SET availability_id = $1, updated_at = NOW()
+       WHERE id = ANY($2::uuid[])`,
+      [av.id, booking_ids]
+    );
+
+    // ── Audit log ──
+    await pool.query(
+      `INSERT INTO audit_logs (user_id, action, target_table, details)
+       VALUES ($1, 'Bulk reschedule', 'bookings', $2)`,
+      [
+        req.session.user.id,
+        `Moved ${bookings.length} booking(s) from ${from_date} to ${new_date}`,
+      ]
+    );
+
+    // ── Email affected customers ──
+    let notified = 0;
+    try {
+      const { sendEmail } = require('../../config/email');
+      const oldDateDisp = new Date(from_date + 'T00:00:00')
+        .toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const newDateDisp = new Date(new_date + 'T00:00:00')
+        .toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      for (const b of bookings) {
+        if (!b.guest_email) continue;
+        try {
+          await sendEmail({
+            to:      b.guest_email,
+            subject: `Your Booking Has Been Rescheduled — Ref ${b.reference_code}`,
+            html: `
+              <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;">
+                <h2 style="color:#dc2626;">Herco Detailing Garage</h2>
+                <p>Hi <strong>${b.guest_name}</strong>,</p>
+                <p>Your booking has been rescheduled by our team.</p>
+                <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+                  <tr>
+                    <td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Reference</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;font-weight:700;">${b.reference_code}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Service</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;">${b.service_name}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px;border:1px solid #e5e7eb;color:#ef4444;text-decoration:line-through;">Previous Date</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;color:#ef4444;text-decoration:line-through;">${oldDateDisp}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px;border:1px solid #e5e7eb;color:#16a34a;font-weight:700;">New Date</td>
+                    <td style="padding:8px;border:1px solid #e5e7eb;color:#16a34a;font-weight:700;">${newDateDisp}</td>
+                  </tr>
+                </table>
+                <p>If you have any questions, please contact us directly.</p>
+                <p style="color:#6b7280;font-size:13px;">— Herco Detailing Garage Team</p>
+              </div>`,
+          });
+          notified++;
+        } catch (emailErr) {
+          console.error(`Reschedule email error for ${b.guest_email}:`, emailErr);
+        }
+      }
+    } catch (emailModuleErr) {
+      console.error('Email module load error:', emailModuleErr);
+    }
+
+    res.json({
+      success:     true,
+      rescheduled: bookings.length,
+      notified,
+      message:     `${bookings.length} booking(s) rescheduled. ${notified} customer(s) notified.`,
+    });
+
+  } catch (err) {
+    console.error('POST /bookings/reschedule error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
