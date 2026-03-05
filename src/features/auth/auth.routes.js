@@ -9,6 +9,10 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/signup', (req, res) => {
+  // Check if user is logged in AND is admin
+  if (!req.session?.user || req.session.user.role !== 'admin') {
+    return res.redirect('/auth/login?error=Signup+is+disabled');
+  }
   res.sendFile(path.join(__dirname, 'signup.html'));
 });
 
@@ -30,7 +34,9 @@ router.post('/signup', async (req, res) => {
 
     // basic validation
     if (!name || !email || !role || !password) {
-      return res.status(400).json({ success: false, message: 'All fields are required' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'All fields are required' });
     }
 
     if (!['admin', 'staff'].includes(role)) {
@@ -38,13 +44,22 @@ router.post('/signup', async (req, res) => {
     }
 
     if (password.length < 8) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: 'Password must be at least 8 characters',
+        });
     }
 
     // check if email already exists
-    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [
+      email,
+    ]);
     if (existing.rows.length > 0) {
-      return res.status(400).json({ success: false, message: 'Email already in use' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Email already in use' });
     }
 
     // hash password
@@ -63,12 +78,18 @@ router.post('/signup', async (req, res) => {
     res.json({
       success: true,
       message: 'Account created successfully',
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
-
   } catch (err) {
     console.error('Signup error:', err);
-    res.status(500).json({ success: false, message: 'Server error: ' + err.message });
+    res
+      .status(500)
+      .json({ success: false, message: 'Server error: ' + err.message });
   }
 });
 
@@ -80,7 +101,9 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Email and password are required' });
     }
 
     // find user
@@ -90,7 +113,9 @@ router.post('/login', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res
+        .status(401)
+        .json({ success: false, message: 'Invalid email or password' });
     }
 
     const user = result.rows[0];
@@ -103,32 +128,35 @@ router.post('/login', async (req, res) => {
     // check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res
+        .status(401)
+        .json({ success: false, message: 'Invalid email or password' });
     }
 
     // save session
     req.session.user = {
-      id:    user.id,
-      name:  user.name,
+      id: user.id,
+      name: user.name,
       email: user.email,
-      role:  user.role,
+      role: user.role,
     };
 
     res.json({
-      success:  true,
-      message:  'Login successful',
+      success: true,
+      message: 'Login successful',
       redirect: user.role === 'admin' ? '/admin' : '/staff',
       user: {
-        id:    user.id,
-        name:  user.name,
+        id: user.id,
+        name: user.name,
         email: user.email,
-        role:  user.role,
+        role: user.role,
       },
     });
-
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ success: false, message: 'Server error: ' + err.message });
+    res
+      .status(500)
+      .json({ success: false, message: 'Server error: ' + err.message });
   }
 });
 
@@ -137,7 +165,9 @@ router.post('/login', async (req, res) => {
 // ===========================
 router.get('/me', (req, res) => {
   if (!req.session?.user) {
-    return res.status(401).json({ success: false, message: 'Not authenticated' });
+    return res
+      .status(401)
+      .json({ success: false, message: 'Not authenticated' });
   }
   res.json({ success: true, user: req.session.user });
 });
