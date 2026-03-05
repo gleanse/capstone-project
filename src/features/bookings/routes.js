@@ -1,3 +1,4 @@
+// BOOKING ROUTES
 const express = require('express');
 const path = require('path');
 const router = express.Router();
@@ -13,6 +14,7 @@ const {
   getBookingDetails,
   getPublicTrackingPage,
   getPublicBookingDetails,
+  getBookingSession,
 } = require('./controller');
 
 // STATIC assets
@@ -38,10 +40,12 @@ router.get('/public/:referenceCode', getPublicTrackingPage);
 
 // API routes
 router.get('/public/:referenceCode/details', getPublicBookingDetails);
+router.get('/session/:bookingId', getBookingSession);
 router.get('/service/:serviceId', getServiceDetails);
 router.get('/availability/:serviceId', getAvailability);
 router.post('/lock', lockBookingSlot);
 router.patch('/release', releaseBookingSlot);
+router.post('/release', releaseBookingSlot);
 router.post('/pay', createInvoice);
 router.post('/webhook', handleWebhook);
 router.patch('/:bookingId', updateBooking);

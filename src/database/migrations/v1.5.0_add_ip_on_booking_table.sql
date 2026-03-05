@@ -1,0 +1,1 @@
+ALTER TABLE bookings ADD COLUMN ip_address VARCHAR(45);

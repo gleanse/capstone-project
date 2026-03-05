@@ -391,23 +391,6 @@
     </div>
   </div>
 
-  <script>
-    // Mobile menu
-    const toggle = document.getElementById('menu-toggle');
-    const menu = document.getElementById('mobile-menu');
-    const bar1 = document.getElementById('bar1');
-    const bar2 = document.getElementById('bar2');
-    const bar3 = document.getElementById('bar3');
-    let menuOpen = false;
-    toggle.addEventListener('click', () => {
-      menuOpen = !menuOpen;
-      menu.classList.toggle('open', menuOpen);
-      bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
-      bar2.style.opacity = menuOpen ? '0' : '';
-      bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
-    });
-  </script>
-
   <script src="/booking/booking.js"></script>
 
 </body>

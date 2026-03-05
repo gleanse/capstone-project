@@ -1,3 +1,4 @@
+// BOOKING QUERIES
 const pool = require('../../config/database');
 const cloudinary = require('../../config/cloudinary');
 const QRCode = require('qrcode');
@@ -66,7 +67,13 @@ const getAvailableDates = async (serviceId) => {
   return result.rows;
 };
 
-const lockSlot = async ({ availabilityId, serviceId, variantId, userId }) => {
+const lockSlot = async ({
+  availabilityId,
+  serviceId,
+  variantId,
+  userId,
+  ipAddress,
+}) => {
   const result = await pool.query(
     `
     INSERT INTO bookings (
@@ -74,12 +81,19 @@ const lockSlot = async ({ availabilityId, serviceId, variantId, userId }) => {
       service_id,
       variant_id,
       user_id,
+      ip_address,
       booking_status,
       expires_at
-    ) VALUES ($1, $2, $3, $4, 'locked', NOW() + INTERVAL '15 minutes')
+    ) VALUES ($1, $2, $3, $4, $5, 'locked', NOW() + INTERVAL '10 minutes')
     RETURNING *
   `,
-    [availabilityId, serviceId, variantId || null, userId || null]
+    [
+      availabilityId,
+      serviceId,
+      variantId || null,
+      userId || null,
+      ipAddress || null,
+    ]
   );
   return result.rows[0];
 };
@@ -91,7 +105,7 @@ const releaseSlot = async (bookingId) => {
     SET booking_status = 'expired'
     WHERE id = $1
     AND booking_status = 'locked'
-    RETURNING *
+    RETURNING id, ip_address, user_id
   `,
     [bookingId]
   );

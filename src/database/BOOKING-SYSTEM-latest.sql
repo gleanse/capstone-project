@@ -79,6 +79,7 @@ CREATE TABLE bookings (
   booking_status VARCHAR(50) DEFAULT 'locked', -- locked, confirmed, expired
   qr_code TEXT,
   expires_at TIMESTAMP,
+  ip_address VARCHAR(45),
   updated_by UUID REFERENCES users(id) NULL,
   updated_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT NOW()

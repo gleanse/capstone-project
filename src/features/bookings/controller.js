@@ -1,6 +1,9 @@
+// BOOKING CONTROLLER
 const path = require('path');
 const pool = require('../../config/database');
 const { xenditInvoiceClient } = require('../../config/xendit');
+const redis = require('../../config/redis');
+const { incrementAbuseCounter } = require('../../shared/utils/cron');
 const { sendBookingConfirmationEmail } = require('../../shared/utils/email');
 const {
   getServiceById,
@@ -54,6 +57,9 @@ const lockBookingSlot = async (req, res) => {
   try {
     const { availabilityId, serviceId, variantId } = req.body;
     const userId = req.session?.user?.id || null;
+    const ipAddress =
+      req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+      req.socket.remoteAddress;
 
     if (!availabilityId || !serviceId) {
       return res
@@ -61,11 +67,38 @@ const lockBookingSlot = async (req, res) => {
         .json({ success: false, message: 'Missing required fields' });
     }
 
+    // check if IP is blocked
+    const ipBlocked = await redis.get(`block:ip:${ipAddress}`);
+    if (ipBlocked) {
+      const ttl = await redis.ttl(`block:ip:${ipAddress}`);
+      const minutes = Math.ceil(ttl / 60);
+      return res.status(429).json({
+        success: false,
+        blocked: true,
+        message: `Too many cancelled bookings. You are blocked for ${minutes} more minute(s).`,
+      });
+    }
+
+    // check if logged in user is blocked
+    if (userId) {
+      const userBlocked = await redis.get(`block:user:${userId}`);
+      if (userBlocked) {
+        const ttl = await redis.ttl(`block:user:${userId}`);
+        const minutes = Math.ceil(ttl / 60);
+        return res.status(429).json({
+          success: false,
+          blocked: true,
+          message: `Too many cancelled bookings. You are blocked for ${minutes} more minute(s).`,
+        });
+      }
+    }
+
     const booking = await lockSlot({
       availabilityId,
       serviceId,
       variantId,
       userId,
+      ipAddress,
     });
     res.json({ success: true, data: booking });
   } catch (error) {
@@ -93,7 +126,17 @@ const releaseBookingSlot = async (req, res) => {
       });
     }
 
-    res.json({ success: true, data: booking });
+    await incrementAbuseCounter(booking.ip_address, booking.user_id);
+
+    // get current abuse count to warn user
+    const ipKey = `abuse:ip:${booking.ip_address}`;
+    const currentCount = await redis.get(ipKey);
+
+    res.json({
+      success: true,
+      data: booking,
+      abuseCount: parseInt(currentCount) || 0,
+    });
   } catch (error) {
     console.error('Release slot error:', error);
     res.status(500).json({ success: false, message: error.message });
@@ -317,6 +360,27 @@ const getPublicBookingDetails = async (req, res) => {
   }
 };
 
+const getBookingSession = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const result = await pool.query(
+      `SELECT booking_status, expires_at FROM bookings WHERE id = $1`,
+      [bookingId]
+    );
+
+    if (!result.rows.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Booking not found' });
+    }
+
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Get booking session error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getBookingPage,
   getServiceDetails,
@@ -329,4 +393,5 @@ module.exports = {
   getBookingDetails,
   getPublicTrackingPage,
   getPublicBookingDetails,
+  getBookingSession,
 };

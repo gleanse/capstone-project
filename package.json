@@ -17,6 +17,7 @@
     "@getbrevo/brevo": "^4.0.1",
     "@phosphor-icons/web": "^2.1.2",
     "@tailwindcss/cli": "^4.2.1",
+    "@upstash/redis": "^1.36.3",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",

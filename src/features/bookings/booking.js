@@ -1,15 +1,55 @@
-// State
+// BOOKING JAVASCRIPT FOR THE HTML PAGE
 const serviceId = window.location.pathname.split('/').pop();
+
 let state = {
   service: null,
   selectedVariant: null,
   selectedDate: null,
   availabilityId: null,
   bookingId: null,
+  expiresAt: null,
   timerInterval: null,
-  timerSeconds: 15 * 60,
+  timerSeconds: 10 * 60,
   currentStep: 1,
 };
+
+const SESSION_KEY = 'hrc_booking_state';
+
+// Session storage
+function saveSession() {
+  sessionStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify({
+      bookingId: state.bookingId,
+      expiresAt: state.expiresAt,
+      currentStep: state.currentStep,
+      selectedVariant: state.selectedVariant,
+      selectedDate: state.selectedDate,
+      availabilityId: state.availabilityId,
+      serviceId,
+    })
+  );
+}
+
+function clearSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.serviceId !== serviceId) {
+      clearSession();
+      return null;
+    }
+    return parsed;
+  } catch {
+    clearSession();
+    return null;
+  }
+}
 
 // Utils
 function showStep(step) {
@@ -19,6 +59,7 @@ function showStep(step) {
   document.getElementById(`step-${step}`).classList.remove('hidden');
   state.currentStep = step;
   updateStepIndicator(step);
+  saveSession();
 }
 
 function updateStepIndicator(activeStep) {
@@ -57,7 +98,7 @@ function updateStepIndicator(activeStep) {
 
 function showModal(title, message, onConfirm, confirmLabel = 'Yes, go back') {
   document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-message').textContent = message;
+  document.getElementById('modal-message').innerHTML = message;
   document.getElementById('modal-confirm-btn').textContent = confirmLabel;
   const modal = document.getElementById('modal-confirm');
   modal.classList.remove('hidden');
@@ -97,8 +138,7 @@ function formatPrice(price) {
   );
 }
 
-// ─── FIELD VALIDATION HELPERS ───────────────────────────────────────────────
-
+// Field validation helpers
 function setFieldError(inputEl, message) {
   const errorEl = inputEl.parentElement.querySelector('.field-error');
   inputEl.classList.add('border-red-500/60');
@@ -143,7 +183,6 @@ function clearAllFields() {
   });
 }
 
-// Validation rules
 const validators = {
   name: (v) => {
     if (!v) return 'Full name is required.';
@@ -199,7 +238,6 @@ function validateStep3() {
   return results.every(Boolean);
 }
 
-// Clear error on input
 [
   'input-name',
   'input-email',
@@ -218,7 +256,6 @@ function validateStep3() {
     'input-color': 'color',
   };
   el.addEventListener('input', () => {
-    // strip non-numeric for phone
     if (id === 'input-phone') {
       el.value = el.value.replace(/[^0-9]/g, '');
     }
@@ -236,26 +273,42 @@ function validateStep3() {
   });
 });
 
-// ────────────────────────────────────────────────────────────────────────────
-
 // Timer
-function startTimer() {
-  state.timerSeconds = 15 * 60;
+function startTimerFromSeconds(seconds) {
+  stopTimer();
+  state.timerSeconds = seconds;
+  const endTime = Date.now() + seconds * 1000;
   state.timerInterval = setInterval(() => {
-    state.timerSeconds--;
-    const m = String(Math.floor(state.timerSeconds / 60)).padStart(2, '0');
-    const s = String(state.timerSeconds % 60).padStart(2, '0');
+    const remaining = Math.floor((endTime - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(state.timerInterval);
+      document.getElementById('timer-display').textContent = '00:00';
+      document.getElementById('timer-display-2').textContent = '00:00';
+      handleTimerExpired();
+      return;
+    }
+    const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+    const s = String(remaining % 60).padStart(2, '0');
     const display = `${m}:${s}`;
     document.getElementById('timer-display').textContent = display;
     document.getElementById('timer-display-2').textContent = display;
-    if (state.timerSeconds <= 0) {
-      clearInterval(state.timerInterval);
-      handleTimerExpired();
-    }
+    state.timerSeconds = remaining;
   }, 1000);
 }
 
+function startTimer() {
+  startTimerFromSeconds(10 * 60);
+}
+
+function stopTimer() {
+  if (state.timerInterval) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+}
+
 function handleTimerExpired() {
+  clearSession();
   showModal(
     'Time Expired',
     'Your slot reservation has expired. You will be redirected to select a new date.',
@@ -265,16 +318,98 @@ function handleTimerExpired() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bookingId: state.bookingId }),
       });
+      state.bookingId = null;
+      state.expiresAt = null;
       showStep(2);
       loadDates();
     }
   );
 }
 
-function stopTimer() {
-  if (state.timerInterval) {
-    clearInterval(state.timerInterval);
-    state.timerInterval = null;
+// Beacon release for browser close, refresh, back
+function beaconRelease(bookingId) {
+  const blob = new Blob([JSON.stringify({ bookingId })], {
+    type: 'application/json',
+  });
+  navigator.sendBeacon('/api/booking/release', blob);
+}
+
+// beforeunload fires on tab close, refresh, and browser back
+window.addEventListener('beforeunload', (e) => {
+  if (state.bookingId && state.currentStep >= 3) {
+    beaconRelease(state.bookingId);
+    clearSession();
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// verify slot is still locked when page becomes visible again after a refresh cancel
+document.addEventListener('visibilitychange', async () => {
+  if (
+    document.visibilityState === 'visible' &&
+    state.bookingId &&
+    state.currentStep >= 3
+  ) {
+    try {
+      const res = await fetch(`/api/booking/session/${state.bookingId}`);
+      if (!res.ok) return; // don't do anything on network errors
+      const json = await res.json();
+      if (!json.success) return; // don't do anything if request failed
+      if (json.data.booking_status === 'expired') {
+        stopTimer();
+        clearSession();
+        state.bookingId = null;
+        state.expiresAt = null;
+        showModal(
+          'Slot No Longer Available',
+          'Your reserved slot was released. Please select a new date.',
+          () => {
+            showStep(2);
+            loadDates();
+          },
+          'Okay'
+        );
+      }
+    } catch {
+      // fail silently, cron will clean up anyway
+    }
+  }
+});
+
+// Session restore on page load
+async function tryRestoreSession() {
+  const saved = loadSession();
+  if (!saved || !saved.bookingId) return false;
+
+  try {
+    const res = await fetch(`/api/booking/session/${saved.bookingId}`);
+    const json = await res.json();
+
+    if (!json.success || json.data.booking_status !== 'locked') {
+      clearSession();
+      return false;
+    }
+
+    const expiresAt = new Date(json.data.expires_at);
+    const now = new Date();
+    const remainingSeconds = Math.floor((expiresAt - now) / 1000);
+
+    if (remainingSeconds <= 0) {
+      clearSession();
+      return false;
+    }
+
+    state.bookingId = saved.bookingId;
+    state.expiresAt = saved.expiresAt;
+    state.selectedVariant = saved.selectedVariant;
+    state.selectedDate = saved.selectedDate;
+    state.availabilityId = saved.availabilityId;
+
+    return { remainingSeconds, step: saved.currentStep };
+  } catch {
+    clearSession();
+    return false;
   }
 }
 
@@ -289,7 +424,39 @@ async function loadService() {
   document.getElementById('service-heading').classList.remove('hidden');
   document.getElementById('service-name').textContent = state.service.name;
 
-  renderVariants(state.service.variants);
+  const restored = await tryRestoreSession();
+
+  if (restored) {
+    renderVariants(state.service.variants);
+
+    if (state.selectedVariant) {
+      const cards = document.querySelectorAll('.variant-card');
+      cards.forEach((card) => {
+        if (
+          card.dataset.id === state.selectedVariant.id ||
+          (!card.dataset.id && !state.selectedVariant.id)
+        ) {
+          selectVariant(card, state.selectedVariant);
+        }
+      });
+    }
+
+    showStep(restored.step);
+
+    if (restored.step >= 3) {
+      startTimerFromSeconds(restored.remainingSeconds);
+    }
+
+    if (restored.step === 2 || restored.step >= 3) {
+      await loadDates();
+    }
+
+    if (restored.step === 4) {
+      populateSummary();
+    }
+  } else {
+    renderVariants(state.service.variants);
+  }
 }
 
 // Step 1 - Variants
@@ -301,7 +468,7 @@ function renderVariants(variants) {
     const card = document.createElement('div');
     card.className =
       'variant-card cursor-pointer flex items-center justify-between bg-white/5 border-2 border-red-500 rounded-xl px-5 py-4 transition-all duration-200 selected';
-    card.innerHTML = /* html */ `
+    card.innerHTML = `
       <div class="flex items-center gap-3">
         <i class="ph ph-check-circle text-red-500 text-xl"></i>
         <span class="text-white font-medium">Standard</span>
@@ -327,7 +494,7 @@ function renderVariants(variants) {
     card.dataset.id = v.id;
     card.dataset.name = v.name;
     card.dataset.price = v.price;
-    card.innerHTML = /* html */ `
+    card.innerHTML = `
       <div class="flex items-center gap-3">
         <i class="ph ph-circle text-white/20 text-xl variant-icon"></i>
         <span class="text-white/70 font-medium variant-name">${v.name}</span>
@@ -343,17 +510,25 @@ function selectVariant(card, variant) {
   document.querySelectorAll('.variant-card').forEach((c) => {
     c.classList.remove('border-red-500');
     c.classList.add('border-white/10');
-    c.querySelector('.variant-icon').className =
-      'ph ph-circle text-white/20 text-xl variant-icon';
-    c.querySelector('.variant-name').classList.remove('text-white');
-    c.querySelector('.variant-name').classList.add('text-white/70');
+    if (c.querySelector('.variant-icon')) {
+      c.querySelector('.variant-icon').className =
+        'ph ph-circle text-white/20 text-xl variant-icon';
+    }
+    if (c.querySelector('.variant-name')) {
+      c.querySelector('.variant-name').classList.remove('text-white');
+      c.querySelector('.variant-name').classList.add('text-white/70');
+    }
   });
   card.classList.add('border-red-500');
   card.classList.remove('border-white/10');
-  card.querySelector('.variant-icon').className =
-    'ph ph-check-circle text-red-500 text-xl variant-icon';
-  card.querySelector('.variant-name').classList.add('text-white');
-  card.querySelector('.variant-name').classList.remove('text-white/70');
+  if (card.querySelector('.variant-icon')) {
+    card.querySelector('.variant-icon').className =
+      'ph ph-check-circle text-red-500 text-xl variant-icon';
+  }
+  if (card.querySelector('.variant-name')) {
+    card.querySelector('.variant-name').classList.add('text-white');
+    card.querySelector('.variant-name').classList.remove('text-white/70');
+  }
   state.selectedVariant = variant;
   document.getElementById('btn-step1-next').disabled = false;
 }
@@ -367,8 +542,12 @@ async function loadDates() {
   document.getElementById('dates-empty').classList.add('hidden');
   document.getElementById('btn-step2-next').disabled = true;
   document.getElementById('selected-date-display').classList.add('hidden');
-  state.selectedDate = null;
-  state.availabilityId = null;
+
+  if (!state.bookingId) {
+    state.selectedDate = null;
+    state.availabilityId = null;
+  }
+
   calendarData = {};
 
   const grid = document.getElementById('cal-grid');
@@ -389,6 +568,29 @@ async function loadDates() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  // restore selected date display if coming back from a saved session
+  if (state.selectedDate && state.availabilityId) {
+    const dateStr = state.selectedDate.split('T')[0];
+    const slot = calendarData[dateStr];
+    if (slot) {
+      const [y, m, d] = dateStr.split('-');
+      const label = new Date(y, m - 1, d).toLocaleDateString('en-PH', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      document.getElementById('btn-step2-next').disabled = false;
+      const display = document.getElementById('selected-date-display');
+      display.classList.remove('hidden');
+      display.classList.add('flex');
+      document.getElementById('selected-date-text').textContent = `${label} — ${
+        slot.remaining
+      } slot${slot.remaining > 1 ? 's' : ''} left`;
+    }
+  }
+
   renderCalendar();
 }
 
@@ -529,10 +731,19 @@ async function lockSlot() {
     }),
   });
   const json = await res.json();
+
+  if (json.blocked) {
+    showModal('Booking Temporarily Blocked', json.message, () => {}, 'Okay');
+    return false;
+  }
+
   if (json.success) {
     state.bookingId = json.data.id;
+    state.expiresAt = json.data.expires_at;
+    saveSession();
     startTimer();
   }
+
   return json.success;
 }
 
@@ -567,20 +778,53 @@ document.querySelectorAll('.payment-option').forEach((opt) => {
   });
 });
 
-// Navigation
+// Release helper used by UI buttons
+async function releaseAndReset() {
+  stopTimer();
+  const res = await fetch('/api/booking/release', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ bookingId: state.bookingId }),
+  });
+  const json = await res.json();
+  state.bookingId = null;
+  state.expiresAt = null;
+  clearSession();
+  return json.abuseCount || 0;
+}
+
+// Intercept nav links when slot is locked
+document.querySelectorAll('nav a, #mobile-menu a').forEach((link) => {
+  const href = link.getAttribute('href');
+  if (href) {
+    link.addEventListener('click', (e) => {
+      if (state.bookingId && state.currentStep >= 3) {
+        e.preventDefault();
+        showModal(
+          'Cancel Booking?',
+          'Leaving this page will release your reserved slot and it may be taken by someone else.<br><br><span class="text-yellow-400 font-semibold">Note: Cancelling reservations 3 times within an hour will temporarily block you from booking for 2 hours.</span><br><br>Are you sure?',
+          async () => {
+            await releaseAndReset();
+            window.location.href = href;
+          }
+        );
+      }
+    });
+  }
+});
+
 document.getElementById('btn-back-services').addEventListener('click', () => {
-  if (state.currentStep === 1) {
+  if (state.bookingId && state.currentStep >= 3) {
     showModal(
-      'Leave Booking?',
-      'Are you sure you want to go back? Your variant selection will be lost.',
-      () => (window.location.href = '/services')
+      'Cancel Booking?',
+      'Going back to services will release your reserved slot and it may be taken by someone else.<br><br><span class="text-yellow-400 font-semibold">Note: Cancelling reservations 3 times within an hour will temporarily block you from booking for 2 hours.</span><br><br>Are you sure?',
+      async () => {
+        await releaseAndReset();
+        window.location.href = '/services';
+      }
     );
   } else {
-    showModal(
-      'Leave Booking?',
-      'Are you sure you want to go back to services? Your progress will be lost.',
-      () => (window.location.href = '/services')
-    );
+    window.location.href = '/services';
   }
 });
 
@@ -613,21 +857,27 @@ document
 document.getElementById('btn-step3-back').addEventListener('click', () => {
   showModal(
     'Release Slot?',
-    'Going back will release your reserved slot and someone else may take it. Are you sure?',
+    'Going back will release your reserved slot and someone else may take it.<br><br><span class="text-yellow-400 font-semibold">Note: Cancelling reservations 3 times within an hour will temporarily block you from booking for 2 hours.</span><br><br>Are you sure?',
     async () => {
-      stopTimer();
-      const res = await fetch('/api/booking/release', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId: state.bookingId }),
-      });
-      const json = await res.json();
-      if (!json.success) {
-        startTimer();
-        return;
+      const abuseCount = await releaseAndReset();
+      const btn = document.getElementById('btn-step2-next');
+      btn.disabled = true;
+      btn.innerHTML = 'Continue <i class="ph ph-arrow-right"></i>';
+
+      if (abuseCount === 2) {
+        showModal(
+          'Warning',
+          'You have cancelled 2 reservations. <span class="text-red-400 font-semibold">One more cancellation within this hour will block you from booking for 2 hours.</span>',
+          () => {
+            showStep(2);
+            loadDates();
+          },
+          'Understood'
+        );
+      } else {
+        showStep(2);
+        loadDates();
       }
-      showStep(2);
-      loadDates();
     }
   );
 });
@@ -729,11 +979,27 @@ document.getElementById('btn-pay').addEventListener('click', async () => {
 
   const json = await res.json();
   if (json.success) {
+    clearSession();
     window.location.href = json.invoiceUrl;
   } else {
     btn.disabled = false;
     btn.innerHTML = '<i class="ph ph-lock"></i> Proceed to Payment';
   }
+});
+
+// Mobile menu
+const toggle = document.getElementById('menu-toggle');
+const menu = document.getElementById('mobile-menu');
+const bar1 = document.getElementById('bar1');
+const bar2 = document.getElementById('bar2');
+const bar3 = document.getElementById('bar3');
+let menuOpen = false;
+toggle.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  menu.classList.toggle('open', menuOpen);
+  bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
+  bar2.style.opacity = menuOpen ? '0' : '';
+  bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
 });
 
 // Init
