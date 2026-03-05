@@ -3,23 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Services</title>
+  <title>Services — Herco Detailing Garage</title>
   <link rel="stylesheet" href="/css/output.css">
   <link rel="stylesheet" href="/styles/custom.css">
   <link rel="stylesheet" href="/phosphor/regular/style.css">
 </head>
 <body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
 
-  <!-- Header -->
-  <header class="sticky top-0 z-50 border-b border-white/10 px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 animate-slideDown bg-[#0a0a0a]">
-    <h1
-      class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
-      style="font-family:'Bebas Neue',sans-serif;">
-      Herco Detailing Garage
-    </h1>
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing
+          </span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-7">
+          <a href="/services" class="nav-link active text-sm tracking-wide">Services</a>
+          <a href="/track"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Track
+            Booking</a>
+        </nav>
+
+        <a href="/services"
+          class="hidden md:flex book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors duration-200 items-center gap-2">
+          <i class="ph ph-calendar-plus text-base"></i>
+          Book Now
+        </a>
+
+        <button id="menu-toggle"
+          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
+          <span class="w-5 h-px bg-white/60" id="bar1"></span>
+          <span class="w-5 h-px bg-white/60" id="bar2"></span>
+          <span class="w-5 h-px bg-white/60" id="bar3"></span>
+        </button>
+
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden border-t border-white/5 bg-[#0d0d0d]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
+        <a href="/services" class="text-sm text-white py-3 border-b border-white/5">Services</a>
+        <a href="/track"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Track
+          Booking</a>
+        <a href="/services"
+          class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-3 rounded-xl text-center transition-colors">
+          Book Now
+        </a>
+      </div>
+    </div>
   </header>
 
-  <!-- Main -->
+  <!-- MAIN -->
   <main class="max-w-6xl mx-auto px-6 py-12 relative z-10">
 
     <div class="mb-10 animate-fadeUp">
@@ -58,6 +101,22 @@
   </main>
 
   <script>
+    // Mobile menu
+    const toggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    let menuOpen = false;
+    toggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      menu.classList.toggle('open', menuOpen);
+      bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
+      bar2.style.opacity = menuOpen ? '0' : '';
+      bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
+    });
+
+    // Services
     fetch('/api/services/list')
       .then(res => res.json())
       .then(data => {

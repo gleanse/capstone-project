@@ -47,7 +47,6 @@ function updateStepIndicator(activeStep) {
     }
   });
 
-  // Update connector lines
   for (let i = 1; i <= 3; i++) {
     const line = document.getElementById(`line-${i}`);
     line.className = `step-line flex-1 h-px mx-1 sm:mx-3 transition-colors duration-300 ${
@@ -97,6 +96,147 @@ function formatPrice(price) {
     parseFloat(price).toLocaleString('en-PH', { minimumFractionDigits: 2 })
   );
 }
+
+// ─── FIELD VALIDATION HELPERS ───────────────────────────────────────────────
+
+function setFieldError(inputEl, message) {
+  const errorEl = inputEl.parentElement.querySelector('.field-error');
+  inputEl.classList.add('border-red-500/60');
+  inputEl.classList.remove('border-white/10', 'border-green-500/40');
+  if (errorEl) {
+    errorEl.querySelector('span').textContent = message;
+    errorEl.classList.remove('hidden');
+    errorEl.classList.add('flex');
+  }
+}
+
+function setFieldSuccess(inputEl) {
+  const errorEl = inputEl.parentElement.querySelector('.field-error');
+  inputEl.classList.remove('border-red-500/60', 'border-white/10');
+  inputEl.classList.add('border-green-500/40');
+  if (errorEl) {
+    errorEl.classList.add('hidden');
+    errorEl.classList.remove('flex');
+  }
+}
+
+function clearField(inputEl) {
+  const errorEl = inputEl.parentElement.querySelector('.field-error');
+  inputEl.classList.remove('border-red-500/60', 'border-green-500/40');
+  inputEl.classList.add('border-white/10');
+  if (errorEl) {
+    errorEl.classList.add('hidden');
+    errorEl.classList.remove('flex');
+  }
+}
+
+function clearAllFields() {
+  [
+    'input-name',
+    'input-email',
+    'input-phone',
+    'input-plate',
+    'input-model',
+    'input-color',
+  ].forEach((id) => {
+    clearField(document.getElementById(id));
+  });
+}
+
+// Validation rules
+const validators = {
+  name: (v) => {
+    if (!v) return 'Full name is required.';
+    if (v.length < 2) return 'Name must be at least 2 characters.';
+    return null;
+  },
+  email: (v) => {
+    if (!v) return 'Email address is required.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))
+      return 'Enter a valid email address.';
+    return null;
+  },
+  phone: (v) => {
+    if (!v) return 'Phone number is required.';
+    if (!/^09\d{9}$/.test(v)) return 'Enter a valid PH number (09XXXXXXXXX).';
+    return null;
+  },
+  plate: (v) => {
+    if (!v) return 'Plate number is required.';
+    return null;
+  },
+  model: (v) => {
+    if (!v) return 'Motorcycle model is required.';
+    return null;
+  },
+  color: (v) => {
+    if (!v) return 'Motorcycle color is required.';
+    return null;
+  },
+};
+
+function validateField(id, rule) {
+  const el = document.getElementById(id);
+  const val = el.value.trim();
+  const error = validators[rule](val);
+  if (error) {
+    setFieldError(el, error);
+    return false;
+  }
+  setFieldSuccess(el);
+  return true;
+}
+
+function validateStep3() {
+  const results = [
+    validateField('input-name', 'name'),
+    validateField('input-email', 'email'),
+    validateField('input-phone', 'phone'),
+    validateField('input-plate', 'plate'),
+    validateField('input-model', 'model'),
+    validateField('input-color', 'color'),
+  ];
+  return results.every(Boolean);
+}
+
+// Clear error on input
+[
+  'input-name',
+  'input-email',
+  'input-phone',
+  'input-plate',
+  'input-model',
+  'input-color',
+].forEach((id) => {
+  const el = document.getElementById(id);
+  const ruleMap = {
+    'input-name': 'name',
+    'input-email': 'email',
+    'input-phone': 'phone',
+    'input-plate': 'plate',
+    'input-model': 'model',
+    'input-color': 'color',
+  };
+  el.addEventListener('input', () => {
+    // strip non-numeric for phone
+    if (id === 'input-phone') {
+      el.value = el.value.replace(/[^0-9]/g, '');
+    }
+    const val = el.value.trim();
+    if (!val) {
+      clearField(el);
+    } else {
+      const error = validators[ruleMap[id]](val);
+      if (error) {
+        setFieldError(el, error);
+      } else {
+        setFieldSuccess(el);
+      }
+    }
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 
 // Timer
 function startTimer() {
@@ -158,19 +298,18 @@ function renderVariants(variants) {
   container.innerHTML = '';
 
   if (!variants || variants.length === 0) {
-    // No variants — service uses base price
     const card = document.createElement('div');
     card.className =
       'variant-card cursor-pointer flex items-center justify-between bg-white/5 border-2 border-red-500 rounded-xl px-5 py-4 transition-all duration-200 selected';
     card.innerHTML = /* html */ `
-          <div class="flex items-center gap-3">
-            <i class="ph ph-check-circle text-red-500 text-xl"></i>
-            <span class="text-white font-medium">Standard</span>
-          </div>
-          <span class="text-white font-bold">${formatPrice(
-            state.service.price
-          )}</span>
-        `;
+      <div class="flex items-center gap-3">
+        <i class="ph ph-check-circle text-red-500 text-xl"></i>
+        <span class="text-white font-medium">Standard</span>
+      </div>
+      <span class="text-white font-bold">${formatPrice(
+        state.service.price
+      )}</span>
+    `;
     container.appendChild(card);
     state.selectedVariant = {
       id: null,
@@ -189,14 +328,12 @@ function renderVariants(variants) {
     card.dataset.name = v.name;
     card.dataset.price = v.price;
     card.innerHTML = /* html */ `
-          <div class="flex items-center gap-3">
-            <i class="ph ph-circle text-white/20 text-xl variant-icon"></i>
-            <span class="text-white/70 font-medium variant-name">${
-              v.name
-            }</span>
-          </div>
-          <span class="text-white font-bold">${formatPrice(v.price)}</span>
-        `;
+      <div class="flex items-center gap-3">
+        <i class="ph ph-circle text-white/20 text-xl variant-icon"></i>
+        <span class="text-white/70 font-medium variant-name">${v.name}</span>
+      </div>
+      <span class="text-white font-bold">${formatPrice(v.price)}</span>
+    `;
     card.addEventListener('click', () => selectVariant(card, v));
     container.appendChild(card);
   });
@@ -273,7 +410,6 @@ function renderCalendar() {
   const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   prevBtn.disabled = calendarMonth <= currentMonth;
 
-  // Render day headers
   const headersEl = document.getElementById('cal-day-headers');
   headersEl.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     .map(
@@ -341,7 +477,7 @@ function confirmSelectDate(slot, dateStr) {
     renderCalendar();
     return;
   }
-  
+
   const [y, m, d] = dateStr.split('-');
   const label = new Date(y, m - 1, d).toLocaleDateString('en-PH', {
     weekday: 'long',
@@ -466,11 +602,11 @@ document
       '<i class="ph ph-spinner animate-spin"></i> Reserving slot...';
     const success = await lockSlot();
     if (success) {
+      clearAllFields();
       showStep(3);
     } else {
       btn.disabled = false;
       btn.innerHTML = 'Continue <i class="ph ph-arrow-right"></i>';
-      alert('Failed to lock slot. Please try again.');
     }
   });
 
@@ -487,7 +623,6 @@ document.getElementById('btn-step3-back').addEventListener('click', () => {
       });
       const json = await res.json();
       if (!json.success) {
-        alert('Failed to release slot. Please try again.');
         startTimer();
         return;
       }
@@ -500,6 +635,22 @@ document.getElementById('btn-step3-back').addEventListener('click', () => {
 document
   .getElementById('btn-step3-next')
   .addEventListener('click', async () => {
+    // client-side validation first
+    const isValid = validateStep3();
+    if (!isValid) {
+      // scroll to first error
+      const firstError = document.querySelector(
+        '#step-3 .field-error:not(.hidden)'
+      );
+      if (firstError)
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const btn = document.getElementById('btn-step3-next');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Saving...';
+
     const name = document.getElementById('input-name').value.trim();
     const email = document.getElementById('input-email').value.trim();
     const phone = document.getElementById('input-phone').value.trim();
@@ -509,11 +660,6 @@ document
     const description = document
       .getElementById('input-description')
       .value.trim();
-
-    if (!name || !email || !phone || !plate || !model || !color) {
-      alert('Please fill in all required fields.');
-      return;
-    }
 
     const res = await fetch(`/api/booking/${state.bookingId}`, {
       method: 'PATCH',
@@ -528,9 +674,33 @@ document
         motorcycleDescription: description,
       }),
     });
+
     const json = await res.json();
+
+    btn.disabled = false;
+    btn.innerHTML = 'Continue <i class="ph ph-arrow-right"></i>';
+
     if (!json.success) {
-      alert('Failed to save details. Please try again.');
+      // handle server-side field errors
+      if (json.fields) {
+        Object.entries(json.fields).forEach(([field, message]) => {
+          const fieldMap = {
+            guestName: 'input-name',
+            guestEmail: 'input-email',
+            guestPhone: 'input-phone',
+            motorcyclePlate: 'input-plate',
+            motorcycleModel: 'input-model',
+            motorcycleColor: 'input-color',
+          };
+          const el = document.getElementById(fieldMap[field]);
+          if (el) setFieldError(el, message);
+        });
+        const firstError = document.querySelector(
+          '#step-3 .field-error:not(.hidden)'
+        );
+        if (firstError)
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 
@@ -554,17 +724,13 @@ document.getElementById('btn-pay').addEventListener('click', async () => {
   const res = await fetch('/api/booking/pay', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      bookingId: state.bookingId,
-      paymentType,
-    }),
+    body: JSON.stringify({ bookingId: state.bookingId, paymentType }),
   });
 
   const json = await res.json();
   if (json.success) {
     window.location.href = json.invoiceUrl;
   } else {
-    alert('Failed to create payment. Please try again.');
     btn.disabled = false;
     btn.innerHTML = '<i class="ph ph-lock"></i> Proceed to Payment';
   }

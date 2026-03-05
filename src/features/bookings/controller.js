@@ -113,18 +113,45 @@ const updateBooking = async (req, res) => {
       motorcycleDescription,
     } = req.body;
 
-    if (
-      !bookingId ||
-      !guestName ||
-      !guestEmail ||
-      !guestPhone ||
-      !motorcyclePlate ||
-      !motorcycleModel ||
-      !motorcycleColor
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Missing required fields' });
+    // server-side field validation
+    const fieldErrors = {};
+
+    if (!guestName || guestName.trim().length < 2) {
+      fieldErrors.guestName = !guestName
+        ? 'Full name is required.'
+        : 'Name must be at least 2 characters.';
+    }
+
+    if (!guestEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.trim())) {
+      fieldErrors.guestEmail = !guestEmail
+        ? 'Email address is required.'
+        : 'Enter a valid email address.';
+    }
+
+    if (!guestPhone) {
+      fieldErrors.guestPhone = 'Phone number is required.';
+    } else if (!/^09\d{9}$/.test(guestPhone.trim())) {
+      fieldErrors.guestPhone = 'Enter a valid PH number (09XXXXXXXXX).';
+    }
+
+    if (!motorcyclePlate || !motorcyclePlate.trim()) {
+      fieldErrors.motorcyclePlate = 'Plate number is required.';
+    }
+
+    if (!motorcycleModel || !motorcycleModel.trim()) {
+      fieldErrors.motorcycleModel = 'Motorcycle model is required.';
+    }
+
+    if (!motorcycleColor || !motorcycleColor.trim()) {
+      fieldErrors.motorcycleColor = 'Motorcycle color is required.';
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        fields: fieldErrors,
+      });
     }
 
     const booking = await updateBookingDetails(bookingId, {

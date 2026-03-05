@@ -1,1 +1,286 @@
-<!-- page where customer can input their booking reference number inorder to track or see their booking details -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Booking — Herco Detailing Garage</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing
+          </span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-7">
+          <a href="/services"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Services</a>
+          <a href="/track" class="nav-link active text-sm tracking-wide">Track Booking</a>
+        </nav>
+
+        <a href="/services"
+          class="hidden md:flex book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors duration-200 items-center gap-2">
+          <i class="ph ph-calendar-plus text-base"></i>
+          Book Now
+        </a>
+
+        <button id="menu-toggle"
+          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
+          <span class="w-5 h-px bg-white/60" id="bar1"></span>
+          <span class="w-5 h-px bg-white/60" id="bar2"></span>
+          <span class="w-5 h-px bg-white/60" id="bar3"></span>
+        </button>
+
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden border-t border-white/5 bg-[#0d0d0d]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
+        <a href="/services"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Services</a>
+        <a href="/track" class="text-sm text-white py-3 border-b border-white/5">Track Booking</a>
+        <a href="/services"
+          class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-3 rounded-xl text-center transition-colors">
+          Book Now
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-6 relative z-10">
+
+    <!-- HERO -->
+    <div class="flex flex-col items-center text-center pt-16 pb-10 animate-fadeUp">
+      <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-5">
+        <i class="ph ph-magnifying-glass text-red-400 text-2xl"></i>
+      </div>
+      <p class="text-red-400 text-xs uppercase tracking-[0.2em] mb-2 font-medium">Booking Tracker</p>
+      <h2 class="text-5xl sm:text-6xl font-bold tracking-wide mb-3" style="font-family:'Bebas Neue',sans-serif;">
+        Track Your Booking
+      </h2>
+      <p class="text-white/40 text-sm leading-relaxed max-w-sm">
+        Enter your reference code to check your booking status and details.
+      </p>
+    </div>
+
+    <!-- INPUT CARD -->
+    <div class="max-w-md mx-auto animate-card card-1">
+      <div class="track-card bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+
+        <p class="card-title text-xs text-white/30 uppercase tracking-widest mb-5">Reference Code</p>
+
+        <!-- Input -->
+        <div class="relative mb-3">
+          <i class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-base"></i>
+          <input id="ref-input" type="text" placeholder="HRC-XXXXXXXX" maxlength="12" autocomplete="off"
+            spellcheck="false"
+            class="w-full bg-white/5 border border-white/10 focus:border-red-500/50 outline-none rounded-xl pl-10 pr-4 py-3.5 text-white placeholder-white/15 text-sm font-mono tracking-widest uppercase transition-colors duration-200" />
+        </div>
+
+        <!-- Inline error message -->
+        <p id="error-msg" class="hidden text-red-400 text-xs mb-3 items-center gap-1.5">
+          <i class="ph ph-warning-circle"></i>
+          <span id="error-text">Please enter a reference code.</span>
+        </p>
+
+        <!-- Submit -->
+        <button id="btn-track"
+          class="book-now-btn w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-1">
+          <i class="ph ph-magnifying-glass"></i>
+          Track Booking
+        </button>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-3 my-5">
+          <div class="flex-1 h-px bg-white/5"></div>
+          <span class="text-white/15 text-xs">or</span>
+          <div class="flex-1 h-px bg-white/5"></div>
+        </div>
+
+        <!-- Check email hint -->
+        <div class="flex items-start gap-3 bg-white/[0.02] border border-white/[0.05] rounded-xl p-4">
+          <i class="ph ph-envelope text-white/20 text-base mt-0.5 flex-shrink-0"></i>
+          <p class="text-white/25 text-xs leading-relaxed">
+            Can't find your reference code? Check the confirmation email sent after your booking was completed.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NOT FOUND UI -->
+    <div id="not-found-card" class="hidden max-w-md mx-auto mt-4 animate-fadeUp">
+      <div class="bg-red-500/[0.05] border border-red-500/20 rounded-2xl p-6 text-center">
+        <div
+          class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+          <i class="ph ph-x-circle text-red-400 text-2xl"></i>
+        </div>
+        <p class="text-red-400 text-xs uppercase tracking-widest mb-1 font-medium">Not Found</p>
+        <h3 class="text-white font-bold text-lg mb-2">Booking Not Found</h3>
+        <p class="text-white/40 text-sm leading-relaxed mb-1">No booking matched <span id="not-found-code"
+            class="text-white/70 font-mono font-bold"></span></p>
+        <p class="text-white/30 text-xs leading-relaxed">Double-check your reference code or check your confirmation
+          email.</p>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex items-center justify-center gap-3 mt-16 mb-2">
+      <div class="h-px flex-1 max-w-20 bg-white/5"></div>
+      <p class="text-white/10 text-xs tracking-widest uppercase">Herco Detailing Garage</p>
+      <div class="h-px flex-1 max-w-20 bg-white/5"></div>
+    </div>
+    <p class="text-center text-white/10 text-xs pb-8">For concerns, contact us directly.</p>
+
+  </main>
+
+  <script>
+    // Mobile menu
+    const toggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    let menuOpen = false;
+    toggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      menu.classList.toggle('open', menuOpen);
+      bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
+      bar2.style.opacity = menuOpen ? '0' : '';
+      bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
+    });
+
+    // Track logic
+    const input = document.getElementById('ref-input');
+    const btn = document.getElementById('btn-track');
+    const errorMsg = document.getElementById('error-msg');
+    const errorText = document.getElementById('error-text');
+
+    // Reference code pattern: HRC- followed by exactly 8 alphanumeric chars
+    const REF_PATTERN = /^HRC-[A-Z0-9]{8}$/;
+
+    function showError(msg) {
+      errorText.textContent = msg;
+      errorMsg.classList.remove('hidden');
+      errorMsg.classList.add('flex');
+      input.classList.add('border-red-500/50');
+      input.classList.remove('border-green-500/30');
+    }
+
+    function showSuccess() {
+      errorMsg.classList.add('hidden');
+      errorMsg.classList.remove('flex');
+      input.classList.remove('border-red-500/50');
+      input.classList.add('border-green-500/30');
+    }
+
+    function clearError() {
+      errorMsg.classList.add('hidden');
+      errorMsg.classList.remove('flex');
+      input.classList.remove('border-red-500/50');
+      input.classList.remove('border-green-500/30');
+    }
+
+    // Auto uppercase + auto hyphen after HRC + live validation
+    input.addEventListener('input', () => {
+      let val = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+
+      // auto insert hyphen after HRC
+      if (val.startsWith('HRC') && val.length >= 3 && !val.includes('-')) {
+        val = 'HRC-' + val.slice(3);
+      }
+
+      input.value = val;
+
+      const trimmed = val.trim();
+      if (!trimmed) {
+        clearError();
+      } else if (REF_PATTERN.test(trimmed)) {
+        showSuccess();
+      } else {
+        if (trimmed.length >= 4 && !trimmed.startsWith('HRC-')) {
+          showError('Reference code must start with HRC-');
+        } else if (trimmed.length === 12 && !REF_PATTERN.test(trimmed)) {
+          showError('Invalid format. Expected: HRC-XXXXXXXX');
+        } else {
+          clearError();
+        }
+      }
+
+      // hide not found card when user starts typing again
+      document.getElementById('not-found-card').classList.add('hidden');
+    });
+
+    // Submit on Enter
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btn.click();
+    });
+
+    btn.addEventListener('click', () => {
+      const code = input.value.trim();
+
+      if (!code) {
+        showError('Please enter your reference code.');
+        input.focus();
+        return;
+      }
+
+      if (!code.startsWith('HRC-')) {
+        showError('Reference code must start with HRC-');
+        input.focus();
+        return;
+      }
+
+      if (!REF_PATTERN.test(code)) {
+        showError('Invalid format. Expected: HRC-XXXXXXXX (8 characters after HRC-)');
+        input.focus();
+        return;
+      }
+
+      // Show loading state
+      btn.disabled = true;
+      btn.innerHTML = `<div class="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div> Searching...`;
+
+      // redirect — server handles existence check
+      window.location.href = `/track/${code}`;
+    });
+
+    // Handle server-side errors via query param
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === 'not_found') {
+      const code = params.get('code') || '';
+      if (code) {
+        input.value = code;
+        document.getElementById('not-found-code').textContent = code;
+      }
+      document.getElementById('not-found-card').classList.remove('hidden');
+      showError('No booking found with that reference code.');
+      input.focus();
+      window.history.replaceState({}, '', '/track');
+    }
+
+    if (params.get('error') === 'server') {
+      showError('Something went wrong. Please try again.');
+      input.focus();
+      window.history.replaceState({}, '', '/track');
+    }
+
+
+  </script>
+
+</body>
+</html>

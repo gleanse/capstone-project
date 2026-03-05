@@ -3,21 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book a Service</title>
+  <title>Book a Service — Herco Detailing Garage</title>
   <link rel="stylesheet" href="/css/output.css">
   <link rel="stylesheet" href="/styles/custom.css">
   <link rel="stylesheet" href="/phosphor/regular/style.css">
 </head>
 <body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
 
-  <!-- Header -->
+  <!-- NAVBAR -->
   <header
-    class="sticky top-0 z-50 border-b border-white/10 px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3 animate-slideDown bg-[#0a0a0a]">
-    <h1
-      class="text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"
-      style="font-family:'Bebas Neue',sans-serif;">
-      Herco Detailing Garage
-    </h1>
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing
+          </span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-7">
+          <a href="/services" class="nav-link active text-sm tracking-wide">Services</a>
+          <a href="/track"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Track
+            Booking</a>
+        </nav>
+
+        <a href="/services"
+          class="hidden md:flex book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors duration-200 items-center gap-2">
+          <i class="ph ph-calendar-plus text-base"></i>
+          Book Now
+        </a>
+
+        <button id="menu-toggle"
+          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
+          <span class="w-5 h-px bg-white/60" id="bar1"></span>
+          <span class="w-5 h-px bg-white/60" id="bar2"></span>
+          <span class="w-5 h-px bg-white/60" id="bar3"></span>
+        </button>
+
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden border-t border-white/5 bg-[#0d0d0d]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
+        <a href="/services" class="text-sm text-white py-3 border-b border-white/5">Services</a>
+        <a href="/track"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Track
+          Booking</a>
+        <a href="/services"
+          class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-3 rounded-xl text-center transition-colors">
+          Book Now
+        </a>
+      </div>
+    </div>
   </header>
 
   <!-- Main -->
@@ -45,7 +87,6 @@
 
     <!-- Step Indicator -->
     <div class="flex items-center gap-0 mb-10">
-      <!-- Step 1 -->
       <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="1">
         <div
           class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-red-500 bg-red-500 flex items-center justify-center text-xs font-bold transition-all duration-300">
@@ -53,7 +94,6 @@
         <span class="step-label text-xs sm:text-sm text-white font-medium transition-colors duration-300">Variant</span>
       </div>
       <div class="step-line flex-1 h-px bg-white/10 mx-1 sm:mx-3 transition-colors duration-300" id="line-1"></div>
-      <!-- Step 2 -->
       <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="2">
         <div
           class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
@@ -61,7 +101,6 @@
         <span class="step-label text-xs sm:text-sm text-white/40 transition-colors duration-300">Date</span>
       </div>
       <div class="step-line flex-1 h-px bg-white/10 mx-1 sm:mx-3 transition-colors duration-300" id="line-2"></div>
-      <!-- Step 3 -->
       <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="3">
         <div
           class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
@@ -69,7 +108,6 @@
         <span class="step-label text-xs sm:text-sm text-white/40 transition-colors duration-300">Details</span>
       </div>
       <div class="step-line flex-1 h-px bg-white/10 mx-1 sm:mx-3 transition-colors duration-300" id="line-3"></div>
-      <!-- Step 4 -->
       <div class="step-indicator flex items-center gap-1 sm:gap-2" data-step="4">
         <div
           class="step-dot w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-xs font-bold text-white/40 transition-all duration-300">
@@ -82,14 +120,11 @@
     <div id="step-1" class="step-content animate-fadeUp">
       <h3 class="text-2xl font-semibold mb-1">Choose a Variant</h3>
       <p class="text-white/40 text-sm mb-6">Select the size or type that fits your motorcycle</p>
-
       <div id="variants-container" class="flex flex-col gap-3">
-        <!-- Skeletons -->
         <div class="skeleton-line h-16 rounded-xl"></div>
         <div class="skeleton-line h-16 rounded-xl"></div>
         <div class="skeleton-line h-16 rounded-xl"></div>
       </div>
-
       <button id="btn-step1-next"
         class="cursor-pointer mt-8 w-full bg-red-600 hover:bg-red-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
         disabled>
@@ -102,11 +137,7 @@
     <div id="step-2" class="step-content hidden animate-fadeUp">
       <h3 class="text-2xl font-semibold mb-1">Choose a Date</h3>
       <p class="text-white/40 text-sm mb-6">Pick an available date for your booking</p>
-
-      <!-- Calendar -->
       <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-
-        <!-- Calendar Header -->
         <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
           <button id="cal-prev"
             class="cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors duration-200 text-white/60 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed">
@@ -120,18 +151,8 @@
             <i class="ph ph-caret-right"></i>
           </button>
         </div>
-
-        <!-- Day Headers -->
-        <div id="cal-day-headers" class="grid grid-cols-7 border-b border-white/10">
-          <!-- filled by JS -->
-        </div>
-
-        <!-- Calendar Grid -->
-        <div id="cal-grid" class="grid grid-cols-7 p-3 gap-1">
-          <!-- filled by JS -->
-        </div>
-
-        <!-- Legend -->
+        <div id="cal-day-headers" class="grid grid-cols-7 border-b border-white/10"></div>
+        <div id="cal-grid" class="grid grid-cols-7 p-3 gap-1"></div>
         <div class="flex items-center justify-center gap-6 px-5 py-4 border-t border-white/10">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-green-500"></div>
@@ -147,8 +168,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Selected Date Display -->
       <div id="selected-date-display"
         class="hidden mt-4 items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
         <i class="ph ph-calendar-check text-red-400 text-xl"></i>
@@ -157,13 +176,11 @@
           <p id="selected-date-text" class="text-white font-semibold text-sm"></p>
         </div>
       </div>
-
       <div id="dates-empty" class="hidden text-center py-8">
         <i class="ph ph-calendar-x text-4xl text-white/20 mb-3 block"></i>
         <p class="text-white/40 text-sm">No available dates this month.</p>
         <p class="text-white/20 text-xs mt-1">Try navigating to another month.</p>
       </div>
-
       <div class="flex gap-3 mt-6">
         <button id="btn-step2-back"
           class="cursor-pointer w-1/3 border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
@@ -182,7 +199,6 @@
     <!-- Step 3: Details Form -->
     <div id="step-3" class="step-content hidden animate-fadeUp">
 
-      <!-- Lock Timer -->
       <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-8">
         <i class="ph ph-timer text-red-400 text-xl"></i>
         <div>
@@ -198,21 +214,27 @@
       <!-- Personal Info -->
       <div class="mb-6">
         <p class="text-xs text-white/30 uppercase tracking-widest mb-3">Personal Information</p>
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-4">
           <div>
             <label class="text-sm text-white/60 mb-1 block">Full Name</label>
             <input id="input-name" type="text" placeholder="Juan dela Cruz"
               class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+            <p class="field-error hidden text-red-400 text-xs mt-1 items-center gap-1"><i
+                class="ph ph-warning-circle"></i><span></span></p>
           </div>
           <div>
             <label class="text-sm text-white/60 mb-1 block">Email Address</label>
             <input id="input-email" type="email" placeholder="juan@email.com"
               class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+            <p class="field-error hidden text-red-400 text-xs mt-1 items-center gap-1"><i
+                class="ph ph-warning-circle"></i><span></span></p>
           </div>
           <div>
             <label class="text-sm text-white/60 mb-1 block">Phone Number</label>
-            <input id="input-phone" type="tel" placeholder="09XX XXX XXXX"
+            <input id="input-phone" type="tel" placeholder="09XX XXX XXXX" maxlength="11"
               class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+            <p class="field-error hidden text-red-400 text-xs mt-1 items-center gap-1"><i
+                class="ph ph-warning-circle"></i><span></span></p>
           </div>
         </div>
       </div>
@@ -220,21 +242,27 @@
       <!-- Motorcycle Info -->
       <div class="mb-6">
         <p class="text-xs text-white/30 uppercase tracking-widest mb-3">Motorcycle Details</p>
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-4">
           <div>
             <label class="text-sm text-white/60 mb-1 block">Plate Number</label>
             <input id="input-plate" type="text" placeholder="ABC 1234"
               class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+            <p class="field-error hidden text-red-400 text-xs mt-1 items-center gap-1"><i
+                class="ph ph-warning-circle"></i><span></span></p>
           </div>
           <div>
             <label class="text-sm text-white/60 mb-1 block">Model</label>
             <input id="input-model" type="text" placeholder="Honda Click 125i"
               class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+            <p class="field-error hidden text-red-400 text-xs mt-1 items-center gap-1"><i
+                class="ph ph-warning-circle"></i><span></span></p>
           </div>
           <div>
             <label class="text-sm text-white/60 mb-1 block">Color</label>
             <input id="input-color" type="text" placeholder="Matte Black"
               class="w-full bg-white/5 border border-white/10 focus:border-red-500 outline-none rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm transition-colors duration-200" />
+            <p class="field-error hidden text-red-400 text-xs mt-1 items-center gap-1"><i
+                class="ph ph-warning-circle"></i><span></span></p>
           </div>
           <div>
             <label class="text-sm text-white/60 mb-1 block">Description <span
@@ -262,7 +290,6 @@
     <!-- Step 4: Payment -->
     <div id="step-4" class="step-content hidden animate-fadeUp">
 
-      <!-- Timer still showing -->
       <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-8">
         <i class="ph ph-timer text-red-400 text-xl"></i>
         <div>
@@ -275,7 +302,6 @@
       <h3 class="text-2xl font-semibold mb-1">Payment</h3>
       <p class="text-white/40 text-sm mb-6">Choose how you'd like to pay</p>
 
-      <!-- Booking Summary -->
       <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6">
         <p class="text-xs text-white/30 uppercase tracking-widest mb-4">Booking Summary</p>
         <div class="flex flex-col gap-2 text-sm">
@@ -298,7 +324,6 @@
         </div>
       </div>
 
-      <!-- Payment Type -->
       <p class="text-xs text-white/30 uppercase tracking-widest mb-3">Payment Type</p>
       <div class="flex flex-col gap-3 mb-8">
         <label id="opt-full"
@@ -313,7 +338,6 @@
           <span id="full-amount" class="text-white font-bold"></span>
           <input type="radio" name="payment_type" value="full" class="hidden" checked />
         </label>
-
         <label id="opt-down"
           class="payment-option cursor-pointer flex items-center justify-between bg-white/5 border-2 border-white/10 rounded-xl px-5 py-4 transition-all duration-200 hover:border-white/30">
           <div class="flex items-center gap-3">
@@ -366,6 +390,23 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Mobile menu
+    const toggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    let menuOpen = false;
+    toggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      menu.classList.toggle('open', menuOpen);
+      bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
+      bar2.style.opacity = menuOpen ? '0' : '';
+      bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
+    });
+  </script>
 
   <script src="/booking/booking.js"></script>
 
