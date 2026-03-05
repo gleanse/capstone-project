@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reschedule — Herco Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: flex; }
+    .layout-wrapper { display: flex; width: 100%; }
+    #app { display: contents; }
+
+    /* ── Access Denied ── */
+    .access-denied {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 60vh; text-align: center; gap: 14px;
+    }
+    .access-denied .ad-icon { font-size: 52px; color: var(--danger); opacity: 0.35; }
+    .access-denied h3 { font-size: 22px; font-weight: 600; color: var(--text); }
+    .access-denied p  { font-size: 14px; color: var(--text-muted); max-width: 320px; }
+
+    /* ── Grid layout ── */
+    .rs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .rs-grid { grid-template-columns: 1fr; } }
+
+    /* ── Step Cards ── */
+    .step-card {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .step-hdr {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      background: var(--dark-3);
+    }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--red); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-hdr-text .t { font-size: 14px; font-weight: 600; color: var(--text); }
+    .step-hdr-text .s { font-size: 11px; color: var(--text-muted); }
+    .step-body { padding: 18px; }
+
+    /* ── Fields ── */
+    .rs-field { margin-bottom: 14px; }
+    .rs-field label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .rs-field label i { color: var(--red); font-size: 11px; width: 12px; }
+    .rs-field input, .rs-field select {
+      width: 100%; padding: 10px 12px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: var(--font-body); font-size: 14px; outline: none;
+      transition: border-color 0.2s; -webkit-appearance: none;
+    }
+    .rs-field input:focus, .rs-field select:focus { border-color: var(--red); background: rgba(220,38,38,0.04); }
+    .rs-field select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 36px; background-color: var(--dark-3);
+    }
+    .rs-field select option { background: var(--dark-2); }
+    .rs-field .fhint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+    /* ── Bookings list ── */
+    .rs-select-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 14px; background: var(--dark-4); border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .rs-select-bar label {
+      display: flex; align-items: center; gap: 7px; cursor: pointer;
+      color: var(--text-muted); text-transform: none; font-weight: 400; margin: 0; font-size: 12px;
+    }
+    .rs-select-bar input[type="checkbox"] { accent-color: var(--red); width: 14px; height: 14px; }
+    .rs-count { font-weight: 700; color: var(--red); }
+
+    .rs-booking-list { max-height: 320px; overflow-y: auto; }
+    .rs-booking-list::-webkit-scrollbar { width: 4px; }
+    .rs-booking-list::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 4px; }
+
+    .rs-bk-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.15s; font-size: 13px;
+    }
+    .rs-bk-item:last-child { border-bottom: none; }
+    .rs-bk-item:hover { background: var(--dark-3); }
+    .rs-bk-item input[type="checkbox"] { accent-color: var(--red); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+    .rs-bk-info { flex: 1; min-width: 0; }
+    .rs-bk-name { font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rs-bk-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .rs-bk-ref  { font-size: 10px; color: var(--text-dim); font-family: monospace; }
+    .rs-email-icon { font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+
+    /* ── Capacity check ── */
+    .cap-check {
+      padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 13px; margin-top: 8px; display: none;
+      align-items: center; gap: 8px; line-height: 1.5;
+    }
+    .cap-check.ok   { background: rgba(16,185,129,0.09); border: 1px solid rgba(16,185,129,0.2); color: var(--success); display: flex; }
+    .cap-check.err  { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); display: flex; }
+    .cap-check.warn { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); color: #f59e0b; display: flex; }
+
+    /* ── Summary box ── */
+    .rs-summary-box {
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;
+    }
+    .rsb-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 7px; }
+    .rsb-row:last-child { margin-bottom: 0; }
+    .rsb-row span:first-child { color: var(--text-muted); }
+    .rsb-row span:last-child  { color: var(--text); font-weight: 600; }
+    .rsb-row.big span:last-child { color: var(--red); font-size: 16px; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+      z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.hidden { display: none !important; }
+    @keyframes slideIn {
+      from { opacity:0; transform: translateY(-14px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .rs-confirm-modal {
+      background: var(--dark-2); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius); width: 100%; max-width: 430px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: slideIn 0.22s ease; overflow: hidden;
+    }
+    .rs-cm-hdr {
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .rs-cm-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: rgba(245,158,11,0.1);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .rs-cm-icon i { color: #f59e0b; font-size: 20px; }
+    .rs-cm-hdr h3 { font-size: 15px; font-weight: 600; color: var(--text); }
+    .rs-cm-hdr p  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .rs-cm-body { padding: 20px 22px; }
+    .rs-cm-foot { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+    .rs-detail-box {
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; font-size: 13px;
+    }
+    .rsdb-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .rsdb-row:last-child { margin-bottom: 0; }
+    .rsdb-row span:first-child { color: var(--text-muted); }
+    .rsdb-row span:last-child  { color: var(--text); font-weight: 600; }
+
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 42px; }
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-dim);
+      cursor: pointer; font-size: 13px; padding: 4px;
+    }
+    .pw-toggle:hover { color: var(--text-muted); }
+
+    .modal-msg { padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; display: none; align-items: center; gap: 8px; }
+    .modal-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); display: flex; }
+    .modal-msg.error   { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); display: flex; }
+
+    .info-note {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 12px; color: var(--text-muted); line-height: 1.6;
+      padding: 10px 12px; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15);
+      border-radius: var(--radius-sm); margin-bottom: 14px;
+    }
+    .info-note i { color: #3b82f6; margin-top: 1px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="pageRoot"></div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     CONFIRM RESCHEDULE MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="confirmRescheduleModal">
+  <div class="rs-confirm-modal">
+    <div class="rs-cm-hdr">
+      <div class="rs-cm-icon"><i class="fas fa-calendar-alt"></i></div>
+      <div>
+        <h3>Confirm Reschedule</h3>
+        <p>Enter your password to proceed</p>
+      </div>
+    </div>
+    <div class="rs-cm-body">
+      <div class="modal-msg" id="rsConfirmMsg"></div>
+
+      <div class="rs-detail-box">
+        <div class="rsdb-row"><span>Service</span><span id="rs_confirm_service">—</span></div>
+        <div class="rsdb-row"><span>From</span><span id="rs_confirm_from">—</span></div>
+        <div class="rsdb-row"><span>To</span><span id="rs_confirm_to">—</span></div>
+        <div class="rsdb-row"><span>Bookings to Move</span><span id="rs_confirm_count">—</span></div>
+      </div>
+
+      <div class="info-note">
+        <i class="fas fa-envelope"></i>
+        Customers who have email addresses will automatically receive a reschedule notification.
+      </div>
+
+      <div class="rs-field">
+        <label><i class="fas fa-lock"></i> Re-enter your password to confirm <span style="color:var(--red)">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="rsConfirmPassword" placeholder="Your admin password" autocomplete="current-password">
+          <button type="button" class="pw-toggle" id="rsPwToggle">
+            <i class="fas fa-eye" id="rsPwIcon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="rs-cm-foot">
+      <button class="btn-secondary" id="rsCancelBtn">Cancel</button>
+      <button class="btn-primary" id="rsExecuteBtn">
+        <i class="fas fa-calendar-alt"></i> Execute Reschedule
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script src="/admin/admin-layout.js"></script>
+<script>
+  AdminLayout.init({ activePage: 'reschedule', breadcrumb: 'Reschedule' });
+
+  let currentUser = null;
+
+  // ── Access check ──────────────────────────────────────
+  async function boot() {
+    try {
+      const res  = await fetch('/api/auth/me');
+      const data = await res.json();
+      if (!data.success) { window.location.href = '/auth/login'; return; }
+      currentUser = data.user;
+      if (currentUser.role !== 'admin') {
+        document.getElementById('pageRoot').innerHTML = `
+          <div class="access-denied">
+            <i class="fas fa-shield-alt ad-icon"></i>
+            <h3>Admin Only</h3>
+            <p>Only administrators can reschedule bookings. Contact your admin if this is needed.</p>
+            <a href="/admin/dashboard" class="btn-secondary" style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+          </div>`;
+        return;
+      }
+      renderPage();
+    } catch (_) { window.location.href = '/auth/login'; }
+  }
+
+  // ── Render page ───────────────────────────────────────
+  function renderPage() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('pageRoot').innerHTML = `
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Reschedule</h1>
+          <p class="page-sub">Bulk move confirmed bookings to a new available date</p>
+        </div>
+      </div>
+
+      <div class="rs-grid">
+
+        <!-- Step 1: Select bookings -->
+        <div class="step-card">
+          <div class="step-hdr">
+            <div class="step-num">1</div>
+            <div class="step-hdr-text">
+              <div class="t">Select Bookings</div>
+              <div class="s">Choose source date and service, then pick bookings to move</div>
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="rs-field">
+              <label><i class="fas fa-spray-can"></i> Service <span style="color:var(--red)">*</span></label>
+              <select id="rs_service" onchange="loadSourceBookings()">
+                <option value="">-- Select service --</option>
+              </select>
+            </div>
+            <div class="rs-field">
+              <label><i class="fas fa-calendar"></i> Source Date <span style="color:var(--red)">*</span></label>
+              <input type="date" id="rs_from_date" onchange="loadSourceBookings()">
+              <p class="fhint">The date you want to move bookings FROM.</p>
+            </div>
+
+            <div id="rsBookingsWrap" style="display:none;">
+              <div class="rs-select-bar">
+                <label>
+                  <input type="checkbox" id="rsSelectAll" onchange="toggleAll(this)">
+                  Select all confirmed
+                </label>
+                <span><span class="rs-count" id="rsSelectedCount">0</span> selected</span>
+              </div>
+              <div class="rs-booking-list" id="rsBookingList"></div>
+            </div>
+            <div id="rsBookingsEmpty" class="empty-state" style="padding:24px;display:none;">
+              <i class="fas fa-calendar-times"></i>
+              <p>No confirmed bookings for this date and service</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 + 3 stacked -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Step 2: New date -->
+          <div class="step-card">
+            <div class="step-hdr">
+              <div class="step-num">2</div>
+              <div class="step-hdr-text">
+                <div class="t">Choose New Date</div>
+                <div class="s">Must have capacity for all selected bookings</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="rs-field">
+                <label><i class="fas fa-calendar-plus"></i> New Date <span style="color:var(--red)">*</span></label>
+                <input type="date" id="rs_to_date" min="${today}" onchange="checkNewDateCap()">
+              </div>
+              <div class="cap-check" id="rsCapCheck"></div>
+            </div>
+          </div>
+
+          <!-- Step 3: Review -->
+          <div class="step-card" id="rsSummaryCard" style="display:none;">
+            <div class="step-hdr">
+              <div class="step-num">3</div>
+              <div class="step-hdr-text">
+                <div class="t">Review & Confirm</div>
+                <div class="s">Double-check before executing</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="rs-summary-box">
+                <div class="rsb-row"><span>Service</span><span id="rsm_service">—</span></div>
+                <div class="rsb-row"><span>From</span><span id="rsm_from">—</span></div>
+                <div class="rsb-row"><span>To</span><span id="rsm_to">—</span></div>
+                <div class="rsb-row big"><span>Bookings to Move</span><span id="rsm_count">0</span></div>
+              </div>
+              <button class="btn-primary full-width" onclick="openConfirmModal()">
+                <i class="fas fa-calendar-alt"></i> Reschedule Bookings
+              </button>
+              <div id="rsPageMsg" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>`;
+
+    loadServicesDropdown();
+  }
+
+  // ── Load services ─────────────────────────────────────
+  async function loadServicesDropdown() {
+    try {
+      const res  = await fetch('/api/admin/services');
+      const data = await res.json();
+      const sel  = document.getElementById('rs_service');
+      if (!sel || !data.success) return;
+      data.data.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.textContent = s.name; sel.appendChild(opt);
+      });
+    } catch (_) {}
+  }
+
+  // ── Load source bookings ──────────────────────────────
+  async function loadSourceBookings() {
+    const svcId    = document.getElementById('rs_service')?.value;
+    const fromDate = document.getElementById('rs_from_date')?.value;
+    const wrap     = document.getElementById('rsBookingsWrap');
+    const emptyEl  = document.getElementById('rsBookingsEmpty');
+    const list     = document.getElementById('rsBookingList');
+
+    if (wrap)    wrap.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'none';
+    hideSummary();
+
+    if (!svcId || !fromDate) return;
+
+    if (list) list.innerHTML = `<div class="empty-state" style="padding:16px;"><i class="fas fa-spinner fa-spin"></i></div>`;
+    if (wrap) wrap.style.display = 'block';
+
+    try {
+      const params = new URLSearchParams({ service_id: svcId, date: fromDate, status: 'confirmed' });
+      const res  = await fetch('/api/admin/bookings/by-date?' + params.toString());
+      const data = await res.json();
+
+      if (!data.success || !data.data.length) {
+        wrap.style.display  = 'none';
+        emptyEl.style.display = 'flex';
+        return;
+      }
+
+      list.innerHTML = data.data.map(b => `
+        <div class="rs-bk-item" onclick="toggleBooking('${b.id}', this)">
+          <input type="checkbox" class="rs-cb" data-id="${b.id}" id="rscb_${b.id}"
+            onclick="event.stopPropagation(); onCbChange()">
+          <div class="rs-bk-info">
+            <div class="rs-bk-name">${b.guest_name || b.user_name || 'Guest'}</div>
+            <div class="rs-bk-meta">${b.service_name || ''}${b.variant_name ? ` · ${b.variant_name}` : ''}</div>
+            <div class="rs-bk-ref">${b.reference_code || ''}</div>
+          </div>
+          ${b.guest_email ? `<i class="fas fa-envelope rs-email-icon" title="Has email — will be notified"></i>` : ''}
+        </div>`).join('');
+
+      onCbChange();
+    } catch (_) {
+      if (list) list.innerHTML = `<div class="empty-state" style="padding:16px;"><i class="fas fa-exclamation-triangle"></i><p>Failed to load bookings</p></div>`;
+    }
+  }
+
+  function toggleBooking(id, row) {
+    const cb = document.getElementById('rscb_' + id);
+    if (cb) cb.checked = !cb.checked;
+    onCbChange();
+  }
+
+  function toggleAll(masterCb) {
+    document.querySelectorAll('.rs-cb').forEach(cb => { cb.checked = masterCb.checked; });
+    onCbChange();
+  }
+
+  function onCbChange() {
+    const selected  = getSelectedIds();
+    const allCbs    = document.querySelectorAll('.rs-cb');
+    const countEl   = document.getElementById('rsSelectedCount');
+    const masterCb  = document.getElementById('rsSelectAll');
+
+    if (countEl) countEl.textContent = selected.length;
+    if (masterCb && allCbs.length) {
+      masterCb.indeterminate = selected.length > 0 && selected.length < allCbs.length;
+      masterCb.checked = selected.length === allCbs.length && allCbs.length > 0;
+    }
+
+    checkSummaryReady();
+  }
+
+  function getSelectedIds() {
+    return [...document.querySelectorAll('.rs-cb:checked')].map(cb => cb.dataset.id);
+  }
+
+  // ── Check new date capacity ───────────────────────────
+  async function checkNewDateCap() {
+    const svcId  = document.getElementById('rs_service')?.value;
+    const toDate = document.getElementById('rs_to_date')?.value;
+    const capEl  = document.getElementById('rsCapCheck');
+    if (capEl) capEl.className = 'cap-check';
+
+    if (!svcId || !toDate) return;
+
+    const selected = getSelectedIds().length;
+
+    try {
+      const res  = await fetch('/api/admin/availability?date=' + toDate);
+      const data = await res.json();
+      const cap  = (data.data || []).find(c => c.service_id === svcId);
+
+      if (!cap) {
+        capEl.className = 'cap-check err';
+        capEl.innerHTML = `<i class="fas fa-times-circle"></i> No capacity configured for this service on this date. <a href="/admin/availability" style="color:var(--danger);text-decoration:underline;margin-left:4px;">Set it up →</a>`;
+        checkSummaryReady(); return;
+      }
+
+      const rem = cap.capacity - (parseInt(cap.bookings_count) || 0);
+
+      if (selected > 0 && rem < selected) {
+        capEl.className = 'cap-check err';
+        capEl.innerHTML = `<i class="fas fa-times-circle"></i> Not enough slots: <strong>${rem}</strong> available, <strong>${selected}</strong> bookings selected.`;
+      } else {
+        capEl.className = 'cap-check ok';
+        capEl.innerHTML = `<i class="fas fa-check-circle"></i> <strong>${rem}</strong> slot(s) available on this date — enough for <strong>${selected || 'selected'}</strong> booking(s).`;
+      }
+    } catch (_) {
+      capEl.className = 'cap-check warn';
+      capEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Could not verify capacity.';
+    }
+
+    checkSummaryReady();
+  }
+
+  function checkSummaryReady() {
+    const svcId    = document.getElementById('rs_service')?.value;
+    const fromDate = document.getElementById('rs_from_date')?.value;
+    const toDate   = document.getElementById('rs_to_date')?.value;
+    const count    = getSelectedIds().length;
+    const card     = document.getElementById('rsSummaryCard');
+    if (!card) return;
+
+    if (svcId && fromDate && toDate && count > 0) {
+      card.style.display = 'block';
+      const svcName  = document.getElementById('rs_service').options[document.getElementById('rs_service').selectedIndex]?.text || '—';
+      const fmtDate  = d => new Date(d + 'T00:00:00').toLocaleDateString('en-PH', {weekday:'short', month:'long', day:'numeric', year:'numeric'});
+      document.getElementById('rsm_service').textContent = svcName;
+      document.getElementById('rsm_from').textContent    = fmtDate(fromDate);
+      document.getElementById('rsm_to').textContent      = fmtDate(toDate);
+      document.getElementById('rsm_count').textContent   = count;
+    } else {
+      card.style.display = 'none';
+    }
+  }
+
+  function hideSummary() {
+    const card = document.getElementById('rsSummaryCard');
+    if (card) card.style.display = 'none';
+    const capEl = document.getElementById('rsCapCheck');
+    if (capEl) capEl.className = 'cap-check';
+  }
+
+  // ── Confirm Modal ─────────────────────────────────────
+  function openConfirmModal() {
+    const capEl = document.getElementById('rsCapCheck');
+    if (capEl.classList.contains('err')) {
+      alert('Resolve the capacity issue before proceeding.'); return;
+    }
+
+    const svcName  = document.getElementById('rs_service').options[document.getElementById('rs_service').selectedIndex]?.text || '—';
+    const fromDate = document.getElementById('rs_from_date').value;
+    const toDate   = document.getElementById('rs_to_date').value;
+    const count    = getSelectedIds().length;
+    const fmtDate  = d => new Date(d + 'T00:00:00').toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+    document.getElementById('rs_confirm_service').textContent = svcName;
+    document.getElementById('rs_confirm_from').textContent    = fmtDate(fromDate);
+    document.getElementById('rs_confirm_to').textContent      = fmtDate(toDate);
+    document.getElementById('rs_confirm_count').textContent   = `${count} booking(s)`;
+    document.getElementById('rsConfirmPassword').value = '';
+    document.getElementById('rsConfirmPassword').type  = 'password';
+    document.getElementById('rsPwIcon').className      = 'fas fa-eye';
+    document.getElementById('rsConfirmMsg').className  = 'modal-msg';
+    document.getElementById('confirmRescheduleModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('rsConfirmPassword').focus(), 100);
+  }
+
+  document.getElementById('rsCancelBtn').addEventListener('click', () => {
+    document.getElementById('confirmRescheduleModal').classList.add('hidden');
+  });
+  document.getElementById('confirmRescheduleModal').addEventListener('click', e => {
+    if (e.target.id === 'confirmRescheduleModal') document.getElementById('confirmRescheduleModal').classList.add('hidden');
+  });
+
+  document.getElementById('rsPwToggle').addEventListener('click', () => {
+    const inp  = document.getElementById('rsConfirmPassword');
+    const icon = document.getElementById('rsPwIcon');
+    const hide = inp.type === 'password';
+    inp.type       = hide ? 'text' : 'password';
+    icon.className = hide ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
+
+  document.getElementById('rsConfirmPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('rsExecuteBtn').click();
+  });
+
+  document.getElementById('rsExecuteBtn').addEventListener('click', async () => {
+    const password = document.getElementById('rsConfirmPassword').value;
+    if (!password) { showConfirmMsg('error', 'Please enter your password.'); return; }
+
+    const btn = document.getElementById('rsExecuteBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    try {
+      const res  = await fetch('/api/admin/bookings/reschedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          booking_ids: getSelectedIds(),
+          from_date:   document.getElementById('rs_from_date').value,
+          new_date:    document.getElementById('rs_to_date').value,
+          service_id:  document.getElementById('rs_service').value,
+          password,
+        }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showConfirmMsg('success', `✓ ${data.rescheduled} booking(s) moved. ${data.notified || 0} customer(s) notified.`);
+        setTimeout(() => {
+          document.getElementById('confirmRescheduleModal').classList.add('hidden');
+          // Reset
+          document.getElementById('rs_service').value   = '';
+          document.getElementById('rs_from_date').value = '';
+          document.getElementById('rs_to_date').value   = '';
+          document.getElementById('rsBookingsWrap').style.display = 'none';
+          hideSummary();
+        }, 1800);
+      } else {
+        showConfirmMsg('error', data.message || 'Reschedule failed.');
+      }
+    } catch (_) {
+      showConfirmMsg('error', 'Network error. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-calendar-alt"></i> Execute Reschedule';
+    }
+  });
+
+  function showConfirmMsg(type, text) {
+    const el = document.getElementById('rsConfirmMsg');
+    el.className = 'modal-msg ' + type;
+    el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${text}`;
+  }
+
+  boot();
+</script>
+</body>
+</html>

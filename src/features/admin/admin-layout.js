@@ -18,6 +18,7 @@ const AdminLayout = (() => {
         { page: 'services',     icon: 'fas fa-spray-can',      label: 'Services' },
         { page: 'availability', icon: 'fas fa-calendar-alt',   label: 'Availability' },
         { page: 'staff',        icon: 'fas fa-users',          label: 'Staff' },
+        { page: 'reschedule', icon: 'fas fa-calendar-alt', label: 'Reschedule' },
       ]
     },
     {
