@@ -272,4 +272,81 @@ const sendBookingConfirmationEmail = async (booking) => {
   return data;
 };
 
-module.exports = { sendBookingConfirmationEmail };
+const sendEmailVerificationEmail = async ({ email, name, otp }) => {
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your New Email</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:Arial,sans-serif;color:#ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+
+          <tr>
+            <td style="padding-bottom:32px;border-bottom:1px solid rgba(255,255,255,0.08);">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="width:3px;background-color:#e53535;border-radius:2px;">&nbsp;</td>
+                  <td style="padding-left:12px;font-size:20px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#ffffff;">
+                    Herco Detailing Garage
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:40px 0 24px;">
+              <p style="margin:0 0 4px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);">Email Verification</p>
+              <h1 style="margin:0;font-size:32px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ffffff;">Verify Your Email</h1>
+              <p style="margin:12px 0 0;font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;max-width:360px;">
+                Hi ${name}, enter the code below to verify your new email address. This code expires in 10 minutes.
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding-bottom:32px;">
+              <table cellpadding="0" cellspacing="0" style="background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px 48px;">
+                <tr>
+                  <td align="center">
+                    <p style="margin:0 0 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Your Verification Code</p>
+                    <p style="margin:0;font-size:40px;font-weight:700;letter-spacing:12px;color:#ffffff;">${otp}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);text-align:center;">
+              <p style="margin:0 0 4px;font-size:11px;color:rgba(255,255,255,0.2);">If you did not request this, you can safely ignore this email.</p>
+              <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.2);">This is an automated email from Herco Detailing Garage.</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  const data = await brevo.transactionalEmails.sendTransacEmail({
+    sender: { name: 'Herco Detailing Garage', email: 'devglensprt@gmail.com' },
+    to: [{ email, name }],
+    subject: 'Verify Your New Email Address',
+    htmlContent: html,
+  });
+
+  console.log('[EMAIL] Verification email sent:', data.messageId);
+  return data;
+};
+
+module.exports = { sendBookingConfirmationEmail, sendEmailVerificationEmail };

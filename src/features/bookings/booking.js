@@ -419,6 +419,8 @@ async function loadService() {
   const json = await res.json();
   if (!json.success) return;
   state.service = json.data;
+  // fetch user data in background for autofill and navbar
+  loadUserAutofill();
 
   document.getElementById('service-skeleton').classList.add('hidden');
   document.getElementById('service-heading').classList.remove('hidden');
@@ -1001,6 +1003,69 @@ toggle.addEventListener('click', () => {
   bar2.style.opacity = menuOpen ? '0' : '';
   bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
 });
+
+async function loadUserAutofill() {
+  try {
+    const [meRes, lastRes] = await Promise.all([
+      fetch('/api/customer/me'),
+      fetch('/api/customer/last-booking'),
+    ]);
+    const meJson = await meRes.json();
+    const lastJson = await lastRes.json();
+
+    if (meJson.success) {
+      const u = meJson.user;
+      if (u.name) document.getElementById('input-name').value = u.name;
+      if (u.email) document.getElementById('input-email').value = u.email;
+      if (u.phone) document.getElementById('input-phone').value = u.phone;
+
+      // update navbar for logged in state
+      updateNavForUser(u);
+    }
+
+    if (lastJson.success && lastJson.data) {
+      const b = lastJson.data;
+      if (b.motorcycle_plate)
+        document.getElementById('input-plate').value = b.motorcycle_plate;
+      if (b.motorcycle_model)
+        document.getElementById('input-model').value = b.motorcycle_model;
+      if (b.motorcycle_color)
+        document.getElementById('input-color').value = b.motorcycle_color;
+      if (b.motorcycle_description)
+        document.getElementById('input-description').value =
+          b.motorcycle_description;
+    }
+  } catch {
+    // fail silently, autofill is not critical
+  }
+}
+
+function updateNavForUser(user) {
+  // desktop nav
+  const desktopNav = document.querySelector('nav.hidden.md\\:flex');
+  if (desktopNav) {
+    const signInLink = desktopNav.querySelector('a[href="/customer/login"]');
+    if (signInLink) {
+      signInLink.href = '/customer/account';
+      signInLink.innerHTML = `<i class="ph ph-user-circle text-red-500 text-base"></i> ${
+        user.name.split(' ')[0]
+      }`;
+      signInLink.className =
+        'nav-link text-sm tracking-wide flex items-center gap-1.5';
+    }
+  }
+
+  // mobile menu
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (mobileMenu) {
+    const signInLink = mobileMenu.querySelector('a[href="/customer/login"]');
+    if (signInLink) {
+      signInLink.href = '/customer/account';
+      signInLink.textContent = `Hi, ${user.name.split(' ')[0]}`;
+      signInLink.className = 'text-sm text-white py-3 border-b border-white/5';
+    }
+  }
+}
 
 // Init
 loadService();

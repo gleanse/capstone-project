@@ -232,6 +232,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
         body: JSON.stringify({
           email: document.getElementById('input-email').value.trim(),
           password: document.getElementById('input-password').value,
+          rememberMe: document.getElementById('remember-me')?.checked || false,
         }),
       });
       const json = await res.json();

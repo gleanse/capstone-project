@@ -1,4 +1,4 @@
-// CONTROLLER OF CUSTOMER
+// CONTROLLER OF CUSTOMER AUTH
 const path = require('path');
 const pool = require('../../config/database');
 const bcrypt = require('bcrypt');
@@ -16,10 +16,6 @@ const getRegisterPage = (req, res) => {
     return res.redirect('/customer/account');
   }
   res.sendFile(path.join(__dirname, 'register.html'));
-};
-
-const getAccountPage = (req, res) => {
-  res.sendFile(path.join(__dirname, 'account.html'));
 };
 
 const register = async (req, res) => {
@@ -111,7 +107,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     if (!email || !password) {
       return res
@@ -132,7 +128,6 @@ const login = async (req, res) => {
 
     const user = result.rows[0];
 
-    // only customers can login here
     if (user.role !== 'customer') {
       return res
         .status(403)
@@ -153,6 +148,11 @@ const login = async (req, res) => {
       phone: user.phone,
       role: user.role,
     };
+
+    // remember me: 30 days, otherwise 8 hours
+    req.session.cookie.maxAge = rememberMe
+      ? 1000 * 60 * 60 * 24 * 30
+      : 1000 * 60 * 60 * 8;
 
     res.json({
       success: true,
@@ -196,7 +196,6 @@ const getMe = (req, res) => {
 module.exports = {
   getLoginPage,
   getRegisterPage,
-  getAccountPage,
   register,
   login,
   logout,

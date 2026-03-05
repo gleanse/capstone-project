@@ -29,11 +29,6 @@ router.get('/:referenceCode', async (req, res) => {
       return res.redirect(`/staff/bookings/${referenceCode}`);
     }
 
-    // customer with account their account booking details inside
-    if (user && user.role === 'customer') {
-      return res.redirect(`/account/bookings/${referenceCode}`);
-    }
-
     // guest or no auth public tracking page
     return res.redirect(`/booking/public/${referenceCode}`);
   } catch (err) {

@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const pool = require('./config/database');
+const redis = require('./config/redis');
 const { apiRouter, pagesRouter } = require('./routes/index');
 
 const app = express();
@@ -11,16 +12,50 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// custom session store using @upstash/redis
+class UpstashSessionStore extends session.Store {
+  async get(sid, cb) {
+    try {
+      const data = await redis.get(`sess:${sid}`);
+      if (!data) return cb(null, null);
+      cb(null, typeof data === 'string' ? JSON.parse(data) : data);
+    } catch (err) {
+      cb(err);
+    }
+  }
+
+  async set(sid, sessionData, cb) {
+    try {
+      const ttl = sessionData.cookie?.maxAge
+        ? Math.floor(sessionData.cookie.maxAge / 1000)
+        : 60 * 60 * 8;
+      await redis.set(`sess:${sid}`, JSON.stringify(sessionData), { ex: ttl });
+      cb(null);
+    } catch (err) {
+      cb(err);
+    }
+  }
+
+  async destroy(sid, cb) {
+    try {
+      await redis.del(`sess:${sid}`);
+      cb(null);
+    } catch (err) {
+      cb(err);
+    }
+  }
+}
+
 // SESSION
 app.use(
   session({
+    store: new UpstashSessionStore(),
     secret: process.env.SESSION_SECRET || 'herco-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 8,
     },
   })
 );
