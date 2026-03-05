@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Walk-ins — Herco Admin</title>
+  <title>Walk-in — Herco Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,6 +13,205 @@
     body { display: flex; }
     .layout-wrapper { display: flex; width: 100%; }
     #app { display: contents; }
+
+    /* ── Layout ── */
+    .wi-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 960px) { .wi-layout { grid-template-columns: 1fr; } }
+
+    /* ── Modal/Overlay shared ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(5px);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none !important; }
+    @keyframes slideIn {
+      from { opacity:0; transform: translateY(-14px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Capacity Alert Banner ── */
+    .cap-alert {
+      display: none;
+      padding: 12px 16px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      font-size: 13px; color: #f59e0b;
+      align-items: flex-start; gap: 10px; line-height: 1.55;
+    }
+    .cap-alert.show { display: flex; }
+    .cap-alert i { margin-top: 2px; flex-shrink: 0; }
+
+    /* ── Field Groups ── */
+    .wi-form { padding: 22px; }
+    .wi-field { margin-bottom: 16px; }
+    .wi-field label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .wi-field label i { color: var(--red); font-size: 11px; width: 12px; }
+    .wi-field input, .wi-field select {
+      width: 100%; padding: 10px 13px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: var(--font-body); font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .wi-field input::placeholder { color: var(--text-dim); }
+    .wi-field input:focus, .wi-field select:focus {
+      border-color: var(--red); background: rgba(220,38,38,0.04);
+    }
+    .wi-field input.err { border-color: var(--danger); }
+    .wi-field select {
+      cursor: pointer; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 36px; background-color: var(--dark-3);
+    }
+    .wi-field select option { background: var(--dark-2); }
+    .wi-field .ferr { font-size: 11px; color: var(--danger); margin-top: 4px; min-height: 14px; display: block; }
+    .wi-field .fhint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+    /* ── Two-col row ── */
+    .wi-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── Amount Summary ── */
+    .wi-summary {
+      display: none;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px;
+    }
+    .wi-summary.show { display: block; }
+    .ws-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: var(--text-muted); }
+    .ws-row:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid var(--border); }
+    .ws-row:last-child span { font-size: 15px; font-weight: 700; color: var(--text); }
+    .ws-row span:last-child { color: var(--text); font-weight: 500; }
+
+    /* ── Form message ── */
+    .wi-msg { display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 12px; align-items: center; gap: 8px; }
+    .wi-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); display: flex; }
+    .wi-msg.error   { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); display: flex; }
+
+    /* ── Capacity sidebar ── */
+    .cap-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .cap-item:last-child { border-bottom: none; }
+    .cap-name { color: var(--text); }
+    .cap-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+    .cap-badge.ok   { background: rgba(16,185,129,0.1); color: var(--success); }
+    .cap-badge.mid  { background: rgba(245,158,11,0.1); color: #f59e0b; }
+    .cap-badge.full { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+    /* ── Available future dates ── */
+    .fut-date-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.15s; font-size: 13px;
+    }
+    .fut-date-item:last-child { border-bottom: none; }
+    .fut-date-item:hover { background: var(--dark-3); }
+    .fut-date-item.selected { background: rgba(220,38,38,0.07); border-left: 3px solid var(--red); }
+
+    /* ════════════════════════════════════════
+       PRINTABLE REFERENCE SLIP
+    ════════════════════════════════════════ */
+    .slip-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(6px);
+      z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .slip-overlay.hidden { display: none !important; }
+
+    .slip-card {
+      background: #fff; color: #111;
+      border-radius: 16px; width: 100%; max-width: 360px;
+      padding: 24px 22px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+      animation: slideIn 0.25s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Slip header */
+    .slip-hdr {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 18px; padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .slip-brand { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #111; line-height: 1; }
+    .slip-brand-sub { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+    .slip-type-badge {
+      background: #dc2626; color: #fff;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* Queue number */
+    .slip-queue {
+      text-align: center; margin-bottom: 18px;
+      background: #fef2f2; border: 2px dashed #fecaca;
+      border-radius: 12px; padding: 14px;
+    }
+    .slip-q-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: #9ca3af; margin-bottom: 4px; }
+    .slip-q-num { font-family: 'Bebas Neue', sans-serif; font-size: 72px; color: #dc2626; line-height: 1; }
+    .slip-q-date { font-size: 11px; color: #6b7280; margin-top: 4px; }
+
+    /* Info rows */
+    .slip-rows { margin-bottom: 16px; }
+    .slip-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid #f3f4f6;
+      font-size: 12px; gap: 10px;
+    }
+    .slip-row:last-child { border-bottom: none; }
+    .slip-row .sl { color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; white-space: nowrap; padding-top: 1px; flex-shrink: 0; }
+    .slip-row .sv { color: #111; font-weight: 600; text-align: right; word-break: break-word; }
+
+    /* Payment box */
+    .slip-pay {
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
+    }
+    .slip-pay-hdr { font-size: 10px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .slip-pay-row { display: flex; justify-content: space-between; font-size: 12px; color: #374151; margin-bottom: 4px; }
+    .slip-pay-row:last-child { margin-bottom: 0; padding-top: 6px; border-top: 1px solid #bbf7d0; font-weight: 700; font-size: 13px; color: #111; }
+
+    /* Footer */
+    .slip-foot { text-align: center; padding-top: 12px; border-top: 2px dashed #e5e7eb; }
+    .slip-foot p { font-size: 10px; color: #9ca3af; margin-bottom: 2px; }
+
+    /* Slip buttons (hidden on print) */
+    .slip-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .slip-actions button {
+      flex: 1; padding: 9px; border-radius: 8px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.18s;
+    }
+    .slip-btn-print { background: #dc2626; color: #fff; border: none; }
+    .slip-btn-print:hover { background: #b91c1c; }
+    .slip-btn-close { background: #fff; color: #374151; border: 1.5px solid #e5e7eb; }
+    .slip-btn-close:hover { background: #f9fafb; }
+
+    /* ── Print Media ── */
+    @media print {
+      body > *:not(.slip-overlay) { display: none !important; }
+      .slip-overlay { position: static !important; background: none !important; padding: 0 !important; display: block !important; }
+      .slip-card { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; }
+      .slip-actions { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -25,240 +224,518 @@
     </div>
   </div>
 
-  <div class="walkin-layout">
-    <!-- Form -->
-    <div class="card walkin-form-card">
+  <div class="wi-layout">
+
+    <!-- ── LEFT: Form ── -->
+    <div class="card">
       <div class="card-header">
         <h2 class="card-title"><i class="fas fa-user-plus"></i> New Walk-in</h2>
       </div>
-      <form id="walkinForm" novalidate style="padding:20px;">
-        <div class="field-group">
-          <label><i class="fas fa-user"></i> Customer Name</label>
-          <div class="input-wrap"><input type="text" id="wi_name" placeholder="Juan Dela Cruz"></div>
-          <span class="field-error" id="wi_nameError"></span>
-        </div>
-        <div class="field-group">
-          <label><i class="fas fa-envelope"></i> Email (optional)</label>
-          <div class="input-wrap"><input type="email" id="wi_email" placeholder="juan@example.com"></div>
-        </div>
-        <div class="field-group">
-          <label><i class="fas fa-phone"></i> Phone</label>
-          <div class="input-wrap"><input type="tel" id="wi_phone" placeholder="09171234567" maxlength="11"></div>
-          <span class="field-error" id="wi_phoneError"></span>
-        </div>
-        <div class="field-group">
-          <label><i class="fas fa-spray-can"></i> Service</label>
-          <div class="input-wrap select-wrap"><select id="wi_service"><option value="">-- Select service --</option></select></div>
-          <span class="field-error" id="wi_serviceError"></span>
-        </div>
-        <div class="field-group">
-          <label><i class="fas fa-tags"></i> Variant / Size</label>
-          <div class="input-wrap select-wrap">
-            <select id="wi_variant" disabled><option value="">-- Select service first --</option></select>
+      <form id="wiForm" novalidate class="wi-form">
+
+        <!-- Capacity full alert -->
+        <div class="cap-alert" id="capAlert">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Today is at full capacity.</strong>
+            Select an available future date to book on the customer's behalf. Click a date on the right to choose it.
           </div>
-          <span class="field-error" id="wi_variantError"></span>
         </div>
-        <div class="field-group">
-          <label><i class="fas fa-motorcycle"></i> Plate Number</label>
-          <div class="input-wrap"><input type="text" id="wi_plate" placeholder="ABC 1234"></div>
+
+        <!-- Booking Date — today (locked) OR future date picker -->
+        <div class="wi-field" id="todayDateField">
+          <label><i class="fas fa-calendar"></i> Booking Date</label>
+          <input type="text" id="wi_date_display" readonly>
+          <input type="hidden" id="wi_date">
         </div>
-        <div class="field-group">
-          <label><i class="fas fa-info-circle"></i> Motorcycle Description</label>
-          <div class="input-wrap"><input type="text" id="wi_desc" placeholder="e.g. Black Honda CBR 150"></div>
+        <div class="wi-field" id="futureDateField" style="display:none;">
+          <label><i class="fas fa-calendar-plus"></i> Future Booking Date <span style="color:var(--red)">*</span></label>
+          <input type="date" id="wi_future_date" onchange="onFutureDateChange()">
+          <span class="ferr" id="wi_future_dateErr"></span>
+          <p class="fhint">Today is full — staff is booking a future date on customer's behalf.</p>
+        </div>
+
+        <div class="wi-row2">
+          <div class="wi-field">
+            <label><i class="fas fa-user"></i> Customer Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="wi_name" placeholder="Juan Dela Cruz">
+            <span class="ferr" id="wi_nameErr"></span>
+          </div>
+          <div class="wi-field">
+            <label><i class="fas fa-phone"></i> Phone <span style="color:var(--red)">*</span></label>
+            <input type="tel" id="wi_phone" placeholder="09171234567" maxlength="11">
+            <span class="ferr" id="wi_phoneErr"></span>
+          </div>
+        </div>
+
+        <div class="wi-field">
+          <label><i class="fas fa-envelope"></i> Email <span style="font-size:10px;color:var(--text-dim);text-transform:none;font-weight:400;">(optional — for non-techy customers)</span></label>
+          <input type="email" id="wi_email" placeholder="Leave blank if customer has no email">
+        </div>
+
+        <div class="wi-field">
+          <label><i class="fas fa-spray-can"></i> Service <span style="color:var(--red)">*</span></label>
+          <select id="wi_service" onchange="onServiceChange()">
+            <option value="">-- Select service --</option>
+          </select>
+          <span class="ferr" id="wi_serviceErr"></span>
+        </div>
+
+        <div class="wi-field">
+          <label><i class="fas fa-tags"></i> Variant / Size <span style="color:var(--red)">*</span></label>
+          <select id="wi_variant" disabled onchange="updateSummary()">
+            <option value="">-- Select service first --</option>
+          </select>
+          <span class="ferr" id="wi_variantErr"></span>
+        </div>
+
+        <div class="wi-row2">
+          <div class="wi-field">
+            <label><i class="fas fa-motorcycle"></i> Plate Number</label>
+            <input type="text" id="wi_plate" placeholder="ABC 1234">
+          </div>
+          <div class="wi-field">
+            <label><i class="fas fa-palette"></i> Color</label>
+            <input type="text" id="wi_color" placeholder="Black">
+          </div>
+        </div>
+
+        <div class="wi-field">
+          <label><i class="fas fa-motorcycle"></i> Model</label>
+          <input type="text" id="wi_model" placeholder="Honda CBR 150">
+        </div>
+
+        <div class="wi-field">
+          <label><i class="fas fa-info-circle"></i> Description</label>
+          <input type="text" id="wi_desc" placeholder="Additional notes about the motorcycle">
         </div>
 
         <!-- Summary -->
-        <div class="walkin-summary" id="walkinSummary" style="display:none;">
-          <div class="summary-row"><span>Service:</span><span id="summary_service">—</span></div>
-          <div class="summary-row"><span>Variant:</span><span id="summary_variant">—</span></div>
-          <div class="summary-row total"><span>Amount:</span><span id="summary_amount">₱0</span></div>
+        <div class="wi-summary" id="wiSummary">
+          <div class="ws-row"><span>Date</span><span id="sum_date">—</span></div>
+          <div class="ws-row"><span>Service</span><span id="sum_service">—</span></div>
+          <div class="ws-row"><span>Variant</span><span id="sum_variant">—</span></div>
+          <div class="ws-row"><span>Total</span><span id="sum_amount">₱0</span></div>
         </div>
 
-        <button type="submit" class="btn-primary full-width" id="walkinSubmit">
-          <i class="fas fa-check"></i> Confirm Walk-in Booking
+        <button type="submit" class="btn-primary full-width" id="wiSubmitBtn">
+          <i class="fas fa-check-circle"></i> Confirm Walk-in Booking
         </button>
-        <div class="form-message" id="walkinMessage"></div>
+        <div class="wi-msg" id="wiMsg"></div>
       </form>
     </div>
 
-    <!-- Info Sidebar -->
-    <div class="walkin-info">
+    <!-- ── RIGHT: Capacity info ── -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-info-circle"></i> Walk-in Guidelines</h2>
+          <h2 class="card-title"><i class="fas fa-calendar-day"></i> Today's Slots</h2>
         </div>
-        <ul class="guideline-list">
-          <li><i class="fas fa-check-circle"></i> Check today's capacity before accepting</li>
-          <li><i class="fas fa-check-circle"></i> Payment is collected immediately in cash</li>
-          <li><i class="fas fa-check-circle"></i> Walk-in is marked confirmed right away</li>
-          <li><i class="fas fa-exclamation-circle warning"></i> Use judgment on closing time vs service duration</li>
-          <li><i class="fas fa-exclamation-circle warning"></i> If no capacity, ask customer to book online</li>
+        <div id="todayCapList"><div class="empty-state" style="padding:20px;"><i class="fas fa-spinner fa-spin"></i></div></div>
+      </div>
+
+      <div class="card" id="futureCapCard" style="display:none;">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-calendar-week"></i> Available Future Dates</h2>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);padding:8px 16px 0;">Click a date to select it</p>
+        <div id="futureCapList"><div class="empty-state" style="padding:20px;"><i class="fas fa-spinner fa-spin"></i></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-info-circle"></i> Guidelines</h2>
+        </div>
+        <ul style="list-style:none;padding:12px 16px;margin:0;display:flex;flex-direction:column;gap:8px;">
+          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:var(--success);margin-top:2px;flex-shrink:0;"></i>Walk-in gets next available queue number</li>
+          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:var(--success);margin-top:2px;flex-shrink:0;"></i>Payment collected in cash — marked paid immediately</li>
+          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-exclamation-circle" style="color:#f59e0b;margin-top:2px;flex-shrink:0;"></i>If today is full, book a future date on customer's behalf</li>
+          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-print" style="color:var(--text-dim);margin-top:2px;flex-shrink:0;"></i>Print the reference slip for the customer</li>
         </ul>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-calendar-day"></i> Today's Capacity</h2>
-        </div>
-        <div id="todayCapacityList">
-          <div class="empty-state"><i class="fas fa-calendar-alt"></i><p>Loading...</p></div>
-        </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PRINTABLE REFERENCE SLIP OVERLAY
+════════════════════════════════════════════ -->
+<div class="slip-overlay hidden" id="slipOverlay">
+  <div class="slip-card" id="slipCard">
+
+    <div class="slip-hdr">
+      <div>
+        <div class="slip-brand">HERCO</div>
+        <div class="slip-brand-sub">Detailing Garage</div>
       </div>
+      <div class="slip-type-badge" id="slipTypeBadge">Walk-in</div>
+    </div>
+
+    <div class="slip-queue">
+      <div class="slip-q-label">Queue Number</div>
+      <div class="slip-q-num" id="slipQueueNum">—</div>
+      <div class="slip-q-date" id="slipQueueDate">—</div>
+    </div>
+
+    <div class="slip-rows">
+      <div class="slip-row"><span class="sl">Reference</span><span class="sv" id="slipRef">—</span></div>
+      <div class="slip-row"><span class="sl">Customer</span><span class="sv" id="slipName">—</span></div>
+      <div class="slip-row"><span class="sl">Phone</span><span class="sv" id="slipPhone">—</span></div>
+      <div class="slip-row"><span class="sl">Service</span><span class="sv" id="slipService">—</span></div>
+      <div class="slip-row" id="slipPlateRow"><span class="sl">Plate</span><span class="sv" id="slipPlate">—</span></div>
+      <div class="slip-row" id="slipModelRow"><span class="sl">Model</span><span class="sv" id="slipModel">—</span></div>
+    </div>
+
+    <div class="slip-pay">
+      <div class="slip-pay-hdr"><i class="fas fa-check-circle"></i> Payment Record</div>
+      <div class="slip-pay-row"><span>Payment Method</span><span>Cash</span></div>
+      <div class="slip-pay-row"><span>Status</span><span style="color:#16a34a;font-weight:700;">PAID ✓</span></div>
+      <div class="slip-pay-row"><span>Total</span><span id="slipAmount">—</span></div>
+    </div>
+
+    <div class="slip-foot">
+      <p>Thank you for choosing Herco Detailing Garage</p>
+      <p>Please present this slip on arrival</p>
+    </div>
+
+    <div class="slip-actions">
+      <button class="slip-btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print Slip</button>
+      <button class="slip-btn-close" onclick="closeSlip()"><i class="fas fa-times"></i> Close</button>
     </div>
   </div>
 </div>
 
+
 <script src="/admin/admin-layout.js"></script>
 <script>
   AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
-
   const { formatCurrency } = AdminLayout;
-  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-  // ── Load services & capacity ──────────────────────────
-  async function loadWalkinData() {
-    // Services
-    const res  = await fetch('/api/admin/services');
-    const data = await res.json();
-    const wiService = document.getElementById('wi_service');
-    if (wiService && data.success) {
-      wiService.innerHTML = '<option value="">-- Select service --</option>' +
-        data.data.map(s =>
-          `<option value="${s.id}" data-variants='${JSON.stringify(s.variants || [])}'>${s.name}</option>`
-        ).join('');
-    }
+  // ── State ─────────────────────────────────────────────
+  const today = new Date().toISOString().split('T')[0];
+  let isTodayFull    = false;
+  let selectedFutDate = null;
+  let services        = [];
 
-    // Capacity
-    const today  = new Date().toISOString().split('T')[0];
-    const capRes = await fetch('/api/admin/availability?date=' + today);
-    const capData = await capRes.json();
-    const capList = document.getElementById('todayCapacityList');
-    if (capList && capData.success && capData.data.length) {
-      capList.innerHTML = capData.data.map(c => {
-        const remaining = c.capacity - (c.bookings_count || 0);
-        const cls = remaining === 0 ? 'low' : remaining <= 2 ? 'mid' : 'ok';
-        return `<div class="capacity-item">
-          <span class="capacity-name">${c.service_name}</span>
-          <span class="capacity-count ${cls}">${remaining} / ${c.capacity} left</span>
+  // ── Init ──────────────────────────────────────────────
+  document.getElementById('wi_date').value = today;
+  document.getElementById('wi_date_display').value = new Date(today + 'T00:00:00')
+    .toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+  async function init() {
+    await Promise.all([loadServices(), loadTodayCapacity()]);
+  }
+
+  // ── Load Services ─────────────────────────────────────
+  async function loadServices() {
+    try {
+      const res  = await fetch('/api/admin/services');
+      const data = await res.json();
+      if (!data.success) return;
+      services = data.data || [];
+      const sel = document.getElementById('wi_service');
+      services.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        opt.dataset.variants = JSON.stringify(s.variants || []);
+        sel.appendChild(opt);
+      });
+    } catch (_) {}
+  }
+
+  // ── Load Today's Capacity ─────────────────────────────
+  async function loadTodayCapacity() {
+    const list = document.getElementById('todayCapList');
+    try {
+      const res  = await fetch('/api/admin/availability?date=' + today);
+      const data = await res.json();
+      const caps = data.data || [];
+
+      if (!caps.length) {
+        list.innerHTML = `<div class="empty-state" style="padding:20px;"><i class="fas fa-calendar-times"></i><p>No capacity set for today</p></div>`;
+        return;
+      }
+
+      const allFull = caps.every(c => (parseInt(c.bookings_count)||0) >= c.capacity);
+      isTodayFull   = allFull;
+
+      list.innerHTML = caps.map(c => {
+        const booked    = parseInt(c.bookings_count) || 0;
+        const remaining = c.capacity - booked;
+        const cls       = remaining <= 0 ? 'full' : remaining <= 2 ? 'mid' : 'ok';
+        const label     = remaining <= 0 ? 'Full' : `${remaining} / ${c.capacity}`;
+        return `<div class="cap-item">
+          <span class="cap-name">${c.service_name}</span>
+          <span class="cap-badge ${cls}">${label}</span>
         </div>`;
       }).join('');
-    } else if (capList) {
-      capList.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No capacity set for today</p></div>`;
+    } catch (_) {
+      list.innerHTML = `<div class="empty-state" style="padding:20px;"><i class="fas fa-exclamation-triangle"></i><p>Failed to load capacity</p></div>`;
     }
   }
 
-  // ── Variant chain ─────────────────────────────────────
-  document.getElementById('wi_service')?.addEventListener('change', function () {
-    const selected  = this.options[this.selectedIndex];
-    const variantEl = document.getElementById('wi_variant');
+  // ── Service Change ────────────────────────────────────
+  async function onServiceChange() {
+    const sel   = document.getElementById('wi_service');
+    const varEl = document.getElementById('wi_variant');
+    const svcId = sel.value;
+
+    // Populate variants
     let variants = [];
-    try { variants = JSON.parse(selected.dataset.variants || '[]'); } catch (_) {}
-    variantEl.innerHTML = variants.length
-      ? '<option value="">-- Select size/variant --</option>' +
-        variants.map(v =>
-          `<option value="${v.id}" data-price="${v.price}">${v.name} — ₱${Number(v.price).toLocaleString()}</option>`
-        ).join('')
-      : '<option value="">No variants available</option>';
-    variantEl.disabled = variants.length === 0;
-    document.getElementById('walkinSummary').style.display = 'none';
+    try { variants = JSON.parse(sel.options[sel.selectedIndex]?.dataset?.variants || '[]'); } catch (_) {}
+
+    varEl.innerHTML = variants.length
+      ? '<option value="">-- Select variant --</option>' +
+        variants.map(v => `<option value="${v.id}" data-price="${v.price}">${v.name} — ${formatCurrency(v.price)}</option>`).join('')
+      : '<option value="">No variants</option>';
+    varEl.disabled = !variants.length;
+
+    document.getElementById('wiSummary').classList.remove('show');
+
+    if (!svcId) {
+      hideFutureMode();
+      return;
+    }
+
+    // Check if this service has capacity today
+    await checkServiceCapacityToday(svcId);
     updateSummary();
-  });
+  }
 
-  document.getElementById('wi_variant')?.addEventListener('change', updateSummary);
+  async function checkServiceCapacityToday(svcId) {
+    try {
+      const res  = await fetch('/api/admin/availability?date=' + today);
+      const data = await res.json();
+      const cap  = (data.data || []).find(c => c.service_id === svcId);
 
+      const remaining = cap ? cap.capacity - (parseInt(cap.bookings_count)||0) : 0;
+
+      if (!cap || remaining <= 0) {
+        showFutureMode(svcId);
+      } else {
+        hideFutureMode();
+      }
+    } catch (_) { hideFutureMode(); }
+  }
+
+  function showFutureMode(svcId) {
+    document.getElementById('capAlert').classList.add('show');
+    document.getElementById('todayDateField').style.display   = 'none';
+    document.getElementById('futureDateField').style.display  = 'block';
+    document.getElementById('futureCapCard').style.display    = 'block';
+    loadFutureDates(svcId);
+  }
+
+  function hideFutureMode() {
+    document.getElementById('capAlert').classList.remove('show');
+    document.getElementById('todayDateField').style.display   = 'block';
+    document.getElementById('futureDateField').style.display  = 'none';
+    document.getElementById('futureCapCard').style.display    = 'none';
+    document.getElementById('wi_future_date').value = '';
+    selectedFutDate = null;
+    updateSummary();
+  }
+
+  async function loadFutureDates(svcId) {
+    const list = document.getElementById('futureCapList');
+    list.innerHTML = `<div class="empty-state" style="padding:20px;"><i class="fas fa-spinner fa-spin"></i></div>`;
+    try {
+      const res  = await fetch('/api/admin/availability');
+      const data = await res.json();
+      const slots = (data.data || [])
+        .filter(c => c.service_id === svcId && c.date > today && (c.capacity - (parseInt(c.bookings_count)||0)) > 0)
+        .sort((a,b) => a.date.localeCompare(b.date))
+        .slice(0, 8);
+
+      if (!slots.length) {
+        list.innerHTML = `<div class="empty-state" style="padding:20px;"><i class="fas fa-calendar-times"></i><p>No upcoming available dates</p></div>`;
+        return;
+      }
+
+      list.innerHTML = slots.map(c => {
+        const rem   = c.capacity - (parseInt(c.bookings_count)||0);
+        const label = new Date(c.date + 'T00:00:00').toLocaleDateString('en-PH', {weekday:'short', month:'short', day:'numeric'});
+        return `<div class="fut-date-item" id="fdi_${c.date}" onclick="selectFutureDate('${c.date}')">
+          <span>${label}</span>
+          <span class="cap-badge ok">${rem} slot${rem>1?'s':''} left</span>
+        </div>`;
+      }).join('');
+    } catch (_) {
+      list.innerHTML = `<div class="empty-state" style="padding:20px;"><i class="fas fa-exclamation-triangle"></i><p>Failed to load</p></div>`;
+    }
+  }
+
+  function selectFutureDate(dateStr) {
+    // Deselect all, select clicked
+    document.querySelectorAll('.fut-date-item').forEach(el => el.classList.remove('selected'));
+    const el = document.getElementById('fdi_' + dateStr);
+    if (el) el.classList.add('selected');
+    selectedFutDate = dateStr;
+    document.getElementById('wi_future_date').value = dateStr;
+    clearErr('wi_future_date');
+    updateSummary();
+  }
+
+  function onFutureDateChange() {
+    selectedFutDate = document.getElementById('wi_future_date').value;
+    // Deselect sidebar items
+    document.querySelectorAll('.fut-date-item').forEach(el => el.classList.remove('selected'));
+    const el = document.getElementById('fdi_' + selectedFutDate);
+    if (el) el.classList.add('selected');
+    clearErr('wi_future_date');
+    updateSummary();
+  }
+
+  // ── Summary ───────────────────────────────────────────
   function updateSummary() {
-    const serviceEl = document.getElementById('wi_service');
-    const variantEl = document.getElementById('wi_variant');
-    const summary   = document.getElementById('walkinSummary');
-    if (!summary) return;
-    const variantOpt = variantEl?.options[variantEl.selectedIndex];
-    if (serviceEl?.value && variantEl?.value) {
-      summary.style.display = 'block';
-      setText('summary_service', serviceEl.options[serviceEl.selectedIndex].text);
-      setText('summary_variant', variantOpt?.text || '');
-      setText('summary_amount', formatCurrency(variantOpt?.dataset?.price || 0));
+    const svcEl  = document.getElementById('wi_service');
+    const varEl  = document.getElementById('wi_variant');
+    const isFut  = document.getElementById('futureDateField').style.display !== 'none';
+    const dateVal = isFut ? (selectedFutDate || '') : today;
+
+    if (svcEl.value && varEl.value && dateVal) {
+      const varOpt  = varEl.options[varEl.selectedIndex];
+      const dateDisp = new Date(dateVal + 'T00:00:00').toLocaleDateString('en-PH', {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+      document.getElementById('sum_date').textContent    = dateDisp;
+      document.getElementById('sum_service').textContent = svcEl.options[svcEl.selectedIndex].text;
+      document.getElementById('sum_variant').textContent = varOpt.text;
+      document.getElementById('sum_amount').textContent  = formatCurrency(varOpt.dataset.price || 0);
+      document.getElementById('wiSummary').classList.add('show');
     } else {
-      summary.style.display = 'none';
+      document.getElementById('wiSummary').classList.remove('show');
     }
   }
 
   // ── Validation helpers ────────────────────────────────
-  function setWiError(id, msg) {
-    const err = document.getElementById(id + 'Error');
-    if (err) err.textContent = msg;
-    document.getElementById(id)?.classList.add('is-error');
+  function setErr(id, msg) {
+    const inp = document.getElementById(id);
+    const err = document.getElementById(id + 'Err');
+    if (inp) inp.classList.toggle('err', !!msg);
+    if (err) err.textContent = msg || '';
   }
-  function clearWiError(id) {
-    const err = document.getElementById(id + 'Error');
-    if (err) err.textContent = '';
-    document.getElementById(id)?.classList.remove('is-error');
-  }
+  function clearErr(id) { setErr(id, ''); }
 
-  // ── Form submit ───────────────────────────────────────
-  document.getElementById('walkinForm')?.addEventListener('submit', async (e) => {
+  // ── Form Submit ───────────────────────────────────────
+  document.getElementById('wiForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name    = document.getElementById('wi_name')?.value.trim();
-    const phone   = document.getElementById('wi_phone')?.value.trim();
-    const service = document.getElementById('wi_service')?.value;
-    const variant = document.getElementById('wi_variant')?.value;
-    let valid = true;
 
-    if (!name || name.length < 2)                    { setWiError('wi_name', 'Name is required'); valid = false; }
-    else clearWiError('wi_name');
-    if (!phone || phone.replace(/\D/g,'').length !== 11) { setWiError('wi_phone', 'Valid 11-digit phone required'); valid = false; }
-    else clearWiError('wi_phone');
-    if (!service)                                    { setWiError('wi_service', 'Select a service'); valid = false; }
-    else clearWiError('wi_service');
-    if (!variant)                                    { setWiError('wi_variant', 'Select a variant'); valid = false; }
-    else clearWiError('wi_variant');
-    if (!valid) return;
+    const isFut   = document.getElementById('futureDateField').style.display !== 'none';
+    const name    = document.getElementById('wi_name').value.trim();
+    const phone   = document.getElementById('wi_phone').value.trim();
+    const email   = document.getElementById('wi_email').value.trim();
+    const svcId   = document.getElementById('wi_service').value;
+    const varId   = document.getElementById('wi_variant').value;
+    const futDate = document.getElementById('wi_future_date').value;
+    const bookDate = isFut ? futDate : today;
 
-    const btn = document.getElementById('walkinSubmit');
+    let ok = true;
+    if (!name)                           { setErr('wi_name',    'Customer name is required'); ok=false; } else clearErr('wi_name');
+    if (!phone || phone.replace(/\D/g,'').length !== 11) { setErr('wi_phone', 'Valid 11-digit phone required'); ok=false; } else clearErr('wi_phone');
+    if (!svcId)                          { setErr('wi_service', 'Select a service'); ok=false; } else clearErr('wi_service');
+    if (!varId)                          { setErr('wi_variant', 'Select a variant'); ok=false; } else clearErr('wi_variant');
+    if (isFut && !futDate)               { setErr('wi_future_date', 'Select a future date'); ok=false; } else clearErr('wi_future_date');
+    if (!ok) return;
+
+    const btn = document.getElementById('wiSubmitBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
-    const payload = {
-      guest_name:             name,
-      guest_email:            document.getElementById('wi_email')?.value.trim() || null,
-      guest_phone:            phone,
-      service_id:             service,
-      variant_id:             variant,
-      motorcycle_plate:       document.getElementById('wi_plate')?.value.trim() || null,
-      motorcycle_description: document.getElementById('wi_desc')?.value.trim() || null,
-      is_walkin:              true,
-      payment_method:         'cash',
-    };
+    const varOpt = document.getElementById('wi_variant').options[document.getElementById('wi_variant').selectedIndex];
 
     try {
       const res  = await fetch('/api/admin/bookings/walkin', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guest_name:             name,
+          guest_email:            email || null,
+          guest_phone:            phone,
+          service_id:             svcId,
+          variant_id:             varId,
+          booking_date:           bookDate,
+          motorcycle_plate:       document.getElementById('wi_plate').value.trim() || null,
+          motorcycle_color:       document.getElementById('wi_color').value.trim() || null,
+          motorcycle_model:       document.getElementById('wi_model').value.trim() || null,
+          motorcycle_description: document.getElementById('wi_desc').value.trim() || null,
+          is_walkin:              true,
+          payment_method:         'cash',
+          is_future_date:         isFut,
+        }),
       });
       const data = await res.json();
-      const msgEl = document.getElementById('walkinMessage');
+
       if (data.success) {
-        msgEl.className = 'form-message success';
-        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Ref: <strong>${data.reference_code}</strong> — Queue #${data.queue_number}`;
-        msgEl.style.display = 'flex';
-        document.getElementById('walkinForm').reset();
-        document.getElementById('walkinSummary').style.display = 'none';
-        loadWalkinData(); // refresh capacity
+        const msgEl = document.getElementById('wiMsg');
+        msgEl.className = 'wi-msg success';
+        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Queue #${data.queue_number} — Ref: <strong>${data.reference_code}</strong>`;
+
+        showSlip({
+          queueNumber:  data.queue_number,
+          referenceCode: data.reference_code,
+          bookingDate:  bookDate,
+          guestName:    name,
+          guestPhone:   phone,
+          serviceName:  document.getElementById('wi_service').options[document.getElementById('wi_service').selectedIndex].text,
+          variantName:  varOpt.text,
+          plate:        document.getElementById('wi_plate').value.trim(),
+          model:        document.getElementById('wi_model').value.trim(),
+          amount:       varOpt.dataset.price || 0,
+          isFuture:     isFut,
+        });
+
+        // Reset form
+        document.getElementById('wiForm').reset();
+        document.getElementById('wi_date').value = today;
+        document.getElementById('wi_date_display').value = new Date(today + 'T00:00:00')
+          .toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+        document.getElementById('wi_variant').disabled = true;
+        document.getElementById('wi_variant').innerHTML = '<option value="">-- Select service first --</option>';
+        document.getElementById('wiSummary').classList.remove('show');
+        hideFutureMode();
+        await loadTodayCapacity();
+        selectedFutDate = null;
       } else {
-        msgEl.className = 'form-message error';
-        msgEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${data.message || 'Booking failed'}`;
-        msgEl.style.display = 'flex';
+        const msgEl = document.getElementById('wiMsg');
+        msgEl.className = 'wi-msg error';
+        msgEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${data.message || 'Booking failed. Try again.'}`;
       }
-    } catch (err) {
-      const msgEl = document.getElementById('walkinMessage');
-      msgEl.className = 'form-message error';
-      msgEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error. Try again.';
-      msgEl.style.display = 'flex';
+    } catch (_) {
+      const msgEl = document.getElementById('wiMsg');
+      msgEl.className = 'wi-msg error';
+      msgEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error. Please try again.';
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-check"></i> Confirm Walk-in Booking';
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Walk-in Booking';
     }
   });
 
-  loadWalkinData();
+  // ── Slip ──────────────────────────────────────────────
+  function showSlip(d) {
+    const dateDisp = new Date(d.bookingDate + 'T00:00:00')
+      .toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    document.getElementById('slipQueueNum').textContent  = d.queueNumber || '—';
+    document.getElementById('slipQueueDate').textContent = dateDisp;
+    document.getElementById('slipRef').textContent       = d.referenceCode || '—';
+    document.getElementById('slipName').textContent      = d.guestName || '—';
+    document.getElementById('slipPhone').textContent     = d.guestPhone || '—';
+    document.getElementById('slipService').textContent   = `${d.serviceName} — ${d.variantName}`;
+    document.getElementById('slipPlate').textContent     = d.plate || '—';
+    document.getElementById('slipModel').textContent     = d.model || '—';
+    document.getElementById('slipAmount').textContent    = formatCurrency(d.amount);
+    document.getElementById('slipTypeBadge').textContent = d.isFuture ? 'Pre-booked' : 'Walk-in';
+    document.getElementById('slipPlateRow').style.display = d.plate ? '' : 'none';
+    document.getElementById('slipModelRow').style.display = d.model ? '' : 'none';
+    document.getElementById('slipOverlay').classList.remove('hidden');
+  }
+
+  function closeSlip() {
+    document.getElementById('slipOverlay').classList.add('hidden');
+  }
+
+  init();
 </script>
 </body>
 </html>

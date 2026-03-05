@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff — Herco Admin</title>
+  <title>Staff Herco Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,6 +13,134 @@
     body { display: flex; }
     .layout-wrapper { display: flex; width: 100%; }
     #app { display: contents; }
+
+    /* ── Modal Overlay ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none !important; }
+
+    @keyframes slideIn {
+      from { opacity:0; transform: translateY(-16px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Staff Modal Box ── */
+    .staff-modal {
+      background: var(--dark-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      width: 100%; max-width: 460px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      animation: slideIn 0.22s ease;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .staff-modal::-webkit-scrollbar { width: 4px; }
+    .staff-modal::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 4px; }
+
+    .staff-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--dark-2); z-index: 1;
+    }
+    .staff-modal-header h3 {
+      font-size: 16px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .staff-modal-header h3 i { color: var(--red); }
+
+    .staff-modal-body { padding: 22px; }
+
+    .staff-modal-footer {
+      padding: 14px 22px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── Form Fields ── */
+    .m-field { margin-bottom: 16px; }
+    .m-field label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .m-field label i { color: var(--red); font-size: 11px; width: 12px; }
+    .m-field input,
+    .m-field select {
+      width: 100%; padding: 10px 13px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: var(--font-body); font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .m-field input::placeholder { color: var(--text-dim); }
+    .m-field input:focus,
+    .m-field select:focus { border-color: var(--red); background: rgba(220,38,38,0.04); }
+    .m-field input.is-error { border-color: var(--danger); }
+    .m-field select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      background-color: var(--dark-3);
+    }
+    .m-field select option { background: var(--dark-2); }
+    .m-field .field-err { font-size: 11px; color: var(--danger); margin-top: 4px; min-height: 14px; display: block; }
+
+    /* Password input wrapper */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 42px; }
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-dim);
+      cursor: pointer; font-size: 13px; padding: 4px;
+      transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--text-muted); }
+
+    /* ── Modal Status Message ── */
+    .modal-msg {
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; margin-bottom: 14px; display: none;
+      align-items: center; gap: 8px;
+    }
+    .modal-msg.success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:var(--success); display:flex; }
+    .modal-msg.error   { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:var(--danger); display:flex; }
+
+    /* ── Confirm Delete Modal ── */
+    .confirm-modal {
+      background: var(--dark-2); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius); width: 100%; max-width: 380px;
+      padding: 26px; animation: slideIn 0.2s ease; text-align: center;
+    }
+    .confirm-icon {
+      width: 52px; height: 52px;
+      background: rgba(239,68,68,0.1); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .confirm-icon i { font-size: 22px; color: var(--danger); }
+    .confirm-modal h4 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .confirm-modal p  { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
+    .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+
+    /* ── Password Strength ── */
+    .pw-strength { margin-top: 6px; }
+    .strength-bar { height: 3px; background: var(--dark-4); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+    .strength-fill.weak   { width: 33%; background: var(--danger); }
+    .strength-fill.medium { width: 66%; background: #f59e0b; }
+    .strength-fill.strong { width: 100%; background: var(--success); }
+    .strength-label { font-size: 10px; color: var(--text-dim); }
   </style>
 </head>
 <body>
@@ -25,7 +153,7 @@
     </div>
     <div class="page-actions">
       <button class="btn-primary" id="addStaffBtn">
-        <i class="fas fa-user-plus"></i> Add Staff
+        <i class="fas fa-user-plus"></i> Add Account
       </button>
     </div>
   </div>
@@ -44,19 +172,149 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════
+     ADD ACCOUNT MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="addStaffModal">
+  <div class="staff-modal">
+    <div class="staff-modal-header">
+      <h3><i class="fas fa-user-plus"></i> Add Account</h3>
+      <button class="modal-close" id="addStaffModalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="staff-modal-body">
+      <div class="modal-msg" id="addStaffMsg"></div>
+
+      <div class="m-field">
+        <label><i class="fas fa-user"></i> Full Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="staff_name" placeholder="Juan Dela Cruz" autocomplete="off">
+        <span class="field-err" id="staff_nameErr"></span>
+      </div>
+
+      <div class="m-field">
+        <label><i class="fas fa-envelope"></i> Email Address <span style="color:var(--red)">*</span></label>
+        <input type="email" id="staff_email" placeholder="juan@herco.com" autocomplete="off">
+        <span class="field-err" id="staff_emailErr"></span>
+      </div>
+
+      <div class="m-field">
+        <label><i class="fas fa-id-badge"></i> Role <span style="color:var(--red)">*</span></label>
+        <select id="staff_role">
+          <option value="">-- Select role --</option>
+          <option value="admin">Admin — Full access</option>
+          <option value="staff">Staff — Daily operations</option>
+        </select>
+        <span class="field-err" id="staff_roleErr"></span>
+      </div>
+
+      <div class="m-field">
+        <label><i class="fas fa-lock"></i> Password <span style="color:var(--red)">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="staff_password" placeholder="Min. 8 characters" autocomplete="new-password">
+          <button type="button" class="pw-toggle" id="toggleStaffPw">
+            <i class="fas fa-eye" id="staffPwIcon"></i>
+          </button>
+        </div>
+        <div class="pw-strength" id="staffPwStrength">
+          <div class="strength-bar"><div class="strength-fill" id="staffStrengthFill"></div></div>
+          <span class="strength-label" id="staffStrengthLabel">Password strength</span>
+        </div>
+        <span class="field-err" id="staff_passwordErr"></span>
+      </div>
+
+      <div class="m-field">
+        <label><i class="fas fa-lock"></i> Confirm Password <span style="color:var(--red)">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="staff_confirm" placeholder="Repeat password" autocomplete="new-password">
+        </div>
+        <span class="field-err" id="staff_confirmErr"></span>
+      </div>
+    </div>
+    <div class="staff-modal-footer">
+      <button class="btn-secondary" id="addStaffModalCancel">Cancel</button>
+      <button class="btn-primary" id="addStaffModalSave">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     DELETE CONFIRM MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="deleteStaffModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon"><i class="fas fa-user-times"></i></div>
+    <h4>Remove Account?</h4>
+    <p id="deleteStaffMsg">This will permanently remove the account.</p>
+    <div class="confirm-btns">
+      <button class="btn-secondary" id="deleteStaffCancel">Cancel</button>
+      <button class="btn-danger" id="deleteStaffConfirm"><i class="fas fa-user-times"></i> Remove</button>
+    </div>
+  </div>
+</div>
+
+
 <script src="/admin/admin-layout.js"></script>
 <script>
   AdminLayout.init({ activePage: 'staff', breadcrumb: 'Staff Accounts' });
 
   const { statusBadge, formatDate } = AdminLayout;
 
+  // ── Helpers ──────────────────────────────────────────
+  function openOverlay(id)  { document.getElementById(id).classList.remove('hidden'); }
+  function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
+
+  function showMsg(type, text) {
+    const el = document.getElementById('addStaffMsg');
+    el.className = 'modal-msg ' + type;
+    el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${text}`;
+  }
+  function hideMsg() { document.getElementById('addStaffMsg').className = 'modal-msg'; }
+
+  function setErr(id, msg) {
+    const el = document.getElementById(id + 'Err');
+    if (el) el.textContent = msg;
+    const input = document.getElementById(id);
+    if (input) input.classList.toggle('is-error', !!msg);
+  }
+  function clearErr(id) { setErr(id, ''); }
+
+  // ── Password Strength ─────────────────────────────────
+  document.getElementById('staff_password').addEventListener('input', function () {
+    const val = this.value;
+    const fill  = document.getElementById('staffStrengthFill');
+    const label = document.getElementById('staffStrengthLabel');
+    let score = 0;
+    if (val.length >= 8)         score++;
+    if (/[A-Z]/.test(val))       score++;
+    if (/[0-9]/.test(val))       score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    if (!val) { fill.className = 'strength-fill'; fill.style.width='0%'; label.textContent='Password strength'; return; }
+    if (score <= 1) { fill.className='strength-fill weak';   label.textContent='Weak'; }
+    else if (score<=2){ fill.className='strength-fill medium'; label.textContent='Medium'; }
+    else              { fill.className='strength-fill strong'; label.textContent='Strong'; }
+  });
+
+  // ── Password Toggle ───────────────────────────────────
+  document.getElementById('toggleStaffPw').addEventListener('click', function () {
+    const input = document.getElementById('staff_password');
+    const icon  = document.getElementById('staffPwIcon');
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
+
+  // ── Load Staff Table ──────────────────────────────────
   async function loadStaff() {
     const tbody = document.getElementById('staffTableBody');
     try {
       const res  = await fetch('/api/admin/staff');
       const data = await res.json();
       if (!data.success || !data.data.length) {
-        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No staff accounts found</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No staff accounts found. Click "Add Account" to create one.</p></div></td></tr>`;
         return;
       }
       tbody.innerHTML = data.data.map(u => `
@@ -73,7 +331,8 @@
           <td>${statusBadge(u.role)}</td>
           <td>${formatDate(u.created_at)}</td>
           <td>
-            <button class="action-btn danger" onclick="deleteStaff('${u.id}')">
+            <button class="action-btn danger"
+              onclick="openDeleteStaff('${u.id}', '${(u.name||'').replace(/'/g,"\\'")}')">
               <i class="fas fa-user-times"></i> Remove
             </button>
           </td>
@@ -84,13 +343,117 @@
     }
   }
 
-  document.getElementById('addStaffBtn')?.addEventListener('click', () => {
-    window.location.href = '/auth/signup';
+  // ── Open Add Modal ────────────────────────────────────
+  document.getElementById('addStaffBtn').addEventListener('click', () => {
+    // Reset form
+    ['staff_name','staff_email','staff_password','staff_confirm'].forEach(id => {
+      document.getElementById(id).value = '';
+      document.getElementById(id).classList.remove('is-error');
+    });
+    document.getElementById('staff_role').value = '';
+    ['staff_name','staff_email','staff_role','staff_password','staff_confirm'].forEach(id => clearErr(id));
+    document.getElementById('staffStrengthFill').className = 'strength-fill';
+    document.getElementById('staffStrengthFill').style.width = '0%';
+    document.getElementById('staffStrengthLabel').textContent = 'Password strength';
+    // Reset pw toggle
+    document.getElementById('staff_password').type = 'password';
+    document.getElementById('staffPwIcon').className = 'fas fa-eye';
+    hideMsg();
+    openOverlay('addStaffModal');
+    document.getElementById('staff_name').focus();
   });
 
-  function deleteStaff(id) {
-    if (confirm('Remove this account?')) alert('Delete staff: ' + id);
+  ['addStaffModalClose','addStaffModalCancel'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => closeOverlay('addStaffModal'));
+  });
+  document.getElementById('addStaffModal').addEventListener('click', e => {
+    if (e.target.id === 'addStaffModal') closeOverlay('addStaffModal');
+  });
+
+  // ── Save New Account ──────────────────────────────────
+  document.getElementById('addStaffModalSave').addEventListener('click', async () => {
+    const name     = document.getElementById('staff_name').value.trim();
+    const email    = document.getElementById('staff_email').value.trim();
+    const role     = document.getElementById('staff_role').value;
+    const password = document.getElementById('staff_password').value;
+    const confirm  = document.getElementById('staff_confirm').value;
+
+    let valid = true;
+
+    if (!name || name.length < 2)              { setErr('staff_name',     'Name must be at least 2 characters'); valid=false; } else clearErr('staff_name');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('staff_email', 'Enter a valid email address'); valid=false; } else clearErr('staff_email');
+    if (!role)                                 { setErr('staff_role',     'Please select a role');              valid=false; } else clearErr('staff_role');
+    if (!password || password.length < 8)      { setErr('staff_password', 'Password must be at least 8 characters'); valid=false; } else clearErr('staff_password');
+    if (!confirm)                              { setErr('staff_confirm',  'Please confirm the password');       valid=false; }
+    else if (confirm !== password)             { setErr('staff_confirm',  'Passwords do not match');            valid=false; }
+    else                                         clearErr('staff_confirm');
+
+    if (!valid) return;
+
+    const btn = document.getElementById('addStaffModalSave');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+    try {
+      const res  = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email: email.toLowerCase(), role, password }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showMsg('success', `Account for ${name} created successfully!`);
+        setTimeout(() => { closeOverlay('addStaffModal'); loadStaff(); }, 1000);
+      } else {
+        showMsg('error', data.message || 'Failed to create account.');
+      }
+    } catch (err) {
+      showMsg('error', 'Network error. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+    }
+  });
+
+  // ── Delete Staff ──────────────────────────────────────
+  let deletingStaffId = null;
+
+  function openDeleteStaff(id, name) {
+    deletingStaffId = id;
+    document.getElementById('deleteStaffMsg').textContent =
+      `Remove the account for "${name}"? This cannot be undone.`;
+    openOverlay('deleteStaffModal');
   }
+
+  document.getElementById('deleteStaffCancel').addEventListener('click', () => closeOverlay('deleteStaffModal'));
+  document.getElementById('deleteStaffModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteStaffModal') closeOverlay('deleteStaffModal');
+  });
+
+  document.getElementById('deleteStaffConfirm').addEventListener('click', async () => {
+    if (!deletingStaffId) return;
+    const btn = document.getElementById('deleteStaffConfirm');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+
+    try {
+      const res  = await fetch(`/api/admin/staff/${deletingStaffId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        closeOverlay('deleteStaffModal');
+        loadStaff();
+      } else {
+        alert('Failed to remove: ' + (data.message || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Network error. Try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-user-times"></i> Remove';
+      deletingStaffId = null;
+    }
+  });
 
   loadStaff();
 </script>

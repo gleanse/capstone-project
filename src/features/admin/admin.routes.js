@@ -18,7 +18,7 @@ try {
   console.warn('[admin] Could not create uploads dir:', e.message);
 }
 
-// ── Save base64 image to disk ──────────────────────────
+//  Save base64 image to disk 
 function saveBase64Image(base64String, oldImageUrl) {
   try {
     const matches = base64String.match(/^data:(.+);base64,(.+)$/);
@@ -915,5 +915,40 @@ router.get('/notifications/list', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+router.delete('/staff/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent self-deletion
+    if (req.session?.user?.id === id) {
+      return res.status(400).json({ success: false, message: 'You cannot remove your own account.' });
+    }
+
+    const result = await pool.query(
+      `DELETE FROM users WHERE id = $1 AND role IN ('admin','staff') RETURNING id, name`,
+      [id]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: 'Account not found.' });
+    }
+
+    const staffId = req.session?.user?.id || null;
+    if (staffId) {
+      await pool.query(
+        `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
+         VALUES ($1, 'Deleted staff account', 'users', $2, $3)`,
+        [staffId, id, `Account "${result.rows[0].name}" deleted`]
+      );
+    }
+
+    res.json({ success: true, message: 'Account removed successfully.' });
+  } catch (err) {
+    console.error('Delete staff error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 
 module.exports = router;
