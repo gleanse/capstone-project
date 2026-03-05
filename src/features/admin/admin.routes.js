@@ -197,16 +197,18 @@ router.patch('/bookings/:id/status', async (req, res) => {
     }
 
     // Fetch current booking (need email, name, ref for notification)
-    const current = await pool.query(
-      `SELECT b.id, b.status, b.reference_code, b.booking_date,
-              b.guest_name, b.guest_email, b.queue_number,
-              s.name AS service_name, sv.name AS variant_name
-       FROM bookings b
-       LEFT JOIN services s  ON s.id = b.service_id
-       LEFT JOIN service_variants sv ON sv.id = b.variant_id
-       WHERE b.id = $1`,
-      [id]
-    );
+   const current = await pool.query(
+  `SELECT b.id, b.status, b.reference_code,
+          b.guest_name, b.guest_email, b.queue_number,
+          a.date AS booking_date,
+          s.name AS service_name, sv.name AS variant_name
+   FROM bookings b
+   LEFT JOIN availability a ON a.id = b.availability_id
+   LEFT JOIN services s ON s.id = b.service_id
+   LEFT JOIN service_variants sv ON sv.id = b.variant_id
+   WHERE b.id = $1`,
+  [id]
+);
 
     if (!current.rows.length) {
       return res.status(404).json({ success: false, message: 'Booking not found.' });
