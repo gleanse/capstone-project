@@ -12,7 +12,7 @@ const app = express();
 // MIDDLEWARE
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
+app.set('trust proxy', 1);
 // custom session store using @upstash/redis
 class UpstashSessionStore extends session.Store {
   async get(sid, cb) {
@@ -57,6 +57,8 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 1000 * 60 * 60 * 8
     },
   })
 );
