@@ -24,6 +24,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
+    "https": "^1.0.0",
     "node-cron": "^4.2.1",
     "pdfkit": "^0.17.2",
     "pg": "^8.17.1",

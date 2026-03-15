@@ -50,7 +50,7 @@ function saveBase64Image(base64String, oldImageUrl) {
 
 router.get('/bookings/by-date', async (req, res) => {
   try {
-    const { date, service_id, status = 'confirmed' } = req.query;
+    const { date, service_id } = req.query;
     if (!date || !service_id) {
       return res.status(400).json({ success: false, message: 'date and service_id are required' });
     }
@@ -68,10 +68,10 @@ router.get('/bookings/by-date', async (req, res) => {
        LEFT JOIN service_variants sv ON sv.id = b.variant_id
        WHERE a.date       = $1
          AND b.service_id = $2
-         AND b.status     = $3
          AND b.booking_status = 'confirmed'
+         AND b.status NOT IN ('cancelled', 'picked_up')
        ORDER BY b.queue_number ASC NULLS LAST`,
-      [date, service_id, status]
+      [date, service_id]
     );
 
     res.json({ success: true, data: result.rows });
@@ -81,9 +81,7 @@ router.get('/bookings/by-date', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/stats/today
-// ===========================
 router.get('/stats/today', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -106,9 +104,7 @@ router.get('/stats/today', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/bookings/today
-// ===========================
 router.get('/bookings/today', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -132,9 +128,7 @@ router.get('/bookings/today', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/bookings/pickup-pending
-// ===========================
 router.get('/bookings/pickup-pending', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -152,9 +146,7 @@ router.get('/bookings/pickup-pending', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/bookings
-// ===========================
 router.get('/bookings', async (req, res) => {
   try {
     const { status, search } = req.query;
@@ -183,9 +175,7 @@ router.get('/bookings', async (req, res) => {
   }
 });
 
-// ===========================
 // PATCH /api/admin/bookings/:id/status
-// ===========================
 router.patch('/bookings/:id/status', async (req, res) => {
   try {
     const { id }     = req.params;
@@ -234,7 +224,7 @@ router.patch('/bookings/:id/status', async (req, res) => {
       ]
     );
 
-    // ── Send "Done" email notification ──
+    // Send "Done" email notification 
     if (status === 'done' && booking.guest_email) {
       try {
         const { sendEmail } = require('../../config/email');
@@ -271,9 +261,7 @@ router.patch('/bookings/:id/status', async (req, res) => {
   }
 });
 
-// ===========================
 // POST /api/admin/bookings/walkin
-// ===========================
 router.post('/bookings/walkin', async (req, res) => {
   const client = await pool.connect();
   try {
@@ -293,7 +281,7 @@ router.post('/bookings/walkin', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing required fields.' });
     }
 
-    // ── Find availability row for this date + service ──
+    // Find availability row for this date + service 
     // Ginagamit ang `availability` table (hindi availability_calendar)
     const avResult = await client.query(
       `SELECT a.id, a.capacity, a.is_open,
@@ -325,7 +313,7 @@ router.post('/bookings/walkin', async (req, res) => {
       });
     }
 
-    // ── Next queue number for this availability slot ──
+    //  Next queue number for this availability slot 
     const queueResult = await client.query(
       `SELECT COALESCE(MAX(queue_number), 0) + 1 AS next_queue
        FROM bookings
@@ -334,11 +322,11 @@ router.post('/bookings/walkin', async (req, res) => {
     );
     const queue_number = queueResult.rows[0].next_queue;
 
-    // ── Generate reference code ──
+    // Generate reference code 
     const refCode = 'WI-' + Date.now().toString(36).toUpperCase().slice(-6) +
                     Math.random().toString(36).toUpperCase().slice(-3);
 
-    // ── Insert booking ──
+    //  Insert booking 
     // Ginagamit ang availability_id, at ang columns na nasa actual schema
     const insertResult = await client.query(
       `INSERT INTO bookings (
@@ -376,7 +364,7 @@ router.post('/bookings/walkin', async (req, res) => {
 
     const booking = insertResult.rows[0];
 
-    // ── Audit log ──
+    // Audit log 
     const staffId = req.session?.user?.id || null;
     if (staffId) {
       pool.query(
@@ -386,7 +374,7 @@ router.post('/bookings/walkin', async (req, res) => {
       ).catch(e => console.error('Audit log error:', e));
     }
 
-    // ── Optional: confirmation email ──
+    //  Optional: confirmation email 
     if (guest_email) {
       try {
         const { sendEmail } = require('../../config/email');
@@ -439,7 +427,7 @@ router.post('/bookings/walkin', async (req, res) => {
 
 router.post('/bookings/reschedule', async (req, res) => {
   try {
-    // ── Admin-only ──
+    //  Admin-only 
     if (req.session?.user?.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Only admins can reschedule bookings.' });
     }
@@ -453,20 +441,20 @@ router.post('/bookings/reschedule', async (req, res) => {
       });
     }
 
-    // ── Verify admin password ──
+    //  Verify admin password 
     const userResult = await pool.query(
-      `SELECT password_hash FROM users WHERE id = $1`,
-      [req.session.user.id]
-    );
+  `SELECT password FROM users WHERE id = $1`,
+  [req.session.user.id]
+);
     if (!userResult.rows.length) {
       return res.status(401).json({ success: false, message: 'Session invalid. Please log in again.' });
     }
-    const passwordMatch = await bcrypt.compare(password, userResult.rows[0].password_hash);
+    const passwordMatch = await bcrypt.compare(password, userResult.rows[0].password);
     if (!passwordMatch) {
       return res.status(401).json({ success: false, message: 'Incorrect password.' });
     }
 
-    // ── Find availability row for new_date + service ──
+    //  Find availability row for new_date + service 
     const avResult = await pool.query(
       `SELECT a.id, a.capacity, a.is_open,
               COUNT(b.id) FILTER (WHERE b.booking_status IN ('locked','confirmed')) AS booked
@@ -495,7 +483,7 @@ router.post('/bookings/reschedule', async (req, res) => {
       });
     }
 
-    // ── Fetch the actual bookings (verify booking_status = confirmed) ──
+    //  Fetch the actual bookings (verify booking_status = confirmed) 
     const bkResult = await pool.query(
       `SELECT b.id, b.reference_code, b.guest_name, b.guest_email,
               s.name AS service_name
@@ -516,7 +504,7 @@ router.post('/bookings/reschedule', async (req, res) => {
 
     const bookings = bkResult.rows;
 
-    // ── Move bookings: update availability_id to new slot ──
+    //  Move bookings: update availability_id to new slot 
     await pool.query(
       `UPDATE bookings
        SET availability_id = $1, updated_at = NOW()
@@ -524,7 +512,7 @@ router.post('/bookings/reschedule', async (req, res) => {
       [av.id, booking_ids]
     );
 
-    // ── Audit log ──
+    //  Audit log 
     await pool.query(
       `INSERT INTO audit_logs (user_id, action, target_table, details)
        VALUES ($1, 'Bulk reschedule', 'bookings', $2)`,
@@ -534,7 +522,7 @@ router.post('/bookings/reschedule', async (req, res) => {
       ]
     );
 
-    // ── Email affected customers ──
+    // Email affected customers
     let notified = 0;
     try {
       const { sendEmail } = require('../../config/email');
@@ -598,9 +586,7 @@ router.post('/bookings/reschedule', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/services
-// ===========================
 router.get('/services', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -621,9 +607,7 @@ router.get('/services', async (req, res) => {
   }
 });
 
-// ===========================
 // POST /api/admin/services
-// ===========================
 router.post('/services', async (req, res) => {
   try {
     const { name, description, price, duration_hours, image_base64 } = req.body;
@@ -663,9 +647,7 @@ router.post('/services', async (req, res) => {
   }
 });
 
-// ===========================
 // PUT /api/admin/services/:id
-// ===========================
 router.put('/services/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -715,10 +697,7 @@ router.put('/services/:id', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
-
-// ===========================
 // DELETE /api/admin/services/:id
-// ===========================
 router.delete('/services/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -741,9 +720,7 @@ router.delete('/services/:id', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/services/:id/variants
-// ===========================
 router.get('/services/:id/variants', async (req, res) => {
   try {
     const result = await pool.query(
@@ -756,9 +733,7 @@ router.get('/services/:id/variants', async (req, res) => {
   }
 });
 
-// ===========================
 // POST /api/admin/services/:id/variants
-// ===========================
 router.post('/services/:id/variants', async (req, res) => {
   try {
     const { id } = req.params;
@@ -767,7 +742,7 @@ router.post('/services/:id/variants', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Name and price are required' });
     }
 
-    // ── WARN: variant duration exceeds base service duration ──────────
+    // WARN: variant duration exceeds base service duration
     if (!force && duration_hours) {
       const svcResult = await pool.query(
         `SELECT duration_hours FROM services WHERE id = $1`, [id]
@@ -793,10 +768,7 @@ router.post('/services/:id/variants', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
-
-// ===========================
 // DELETE /api/admin/services/:serviceId/variants/:variantId
-// ===========================
 router.delete('/services/:serviceId/variants/:variantId', async (req, res) => {
   try {
     await pool.query(
@@ -809,14 +781,12 @@ router.delete('/services/:serviceId/variants/:variantId', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/availability
-// ===========================
 router.get('/availability', async (req, res) => {
   try {
     const { date } = req.query;
     let query = `
-      SELECT a.id, a.date, a.capacity, a.is_open, s.name AS service_name,
+      SELECT a.id, a.service_id, a.date, a.capacity, a.is_open, s.name AS service_name,
              COUNT(b.id) FILTER (WHERE b.booking_status IN ('locked','confirmed')) AS bookings_count
       FROM availability a
       LEFT JOIN services s ON s.id=a.service_id
@@ -825,7 +795,7 @@ router.get('/availability', async (req, res) => {
     const params = [];
     if (date) { params.push(date); query += ` WHERE a.date=$1`; }
     else       { query += ` WHERE a.date>=CURRENT_DATE`; }
-    query += ` GROUP BY a.id,a.date,a.capacity,a.is_open,s.name ORDER BY a.date ASC LIMIT 60`;
+    query += ` GROUP BY a.id,a.service_id,a.date,a.capacity,a.is_open,s.name ORDER BY a.date ASC LIMIT 60`;
     const result = await pool.query(query, params);
     res.json({ success: true, data: result.rows });
   } catch (err) {
@@ -833,9 +803,7 @@ router.get('/availability', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/closed-dates
-// ===========================
 router.get('/closed-dates', async (req, res) => {
   try {
     const result = await pool.query(`SELECT * FROM closed_dates ORDER BY created_at DESC`);
@@ -845,9 +813,7 @@ router.get('/closed-dates', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/staff
-// ===========================
 router.get('/staff', async (req, res) => {
   try {
     const result = await pool.query(
@@ -859,9 +825,7 @@ router.get('/staff', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/payments
-// ===========================
 router.get('/payments', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -876,9 +840,7 @@ router.get('/payments', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/audit-logs
-// ===========================
 router.get('/audit-logs', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -892,9 +854,7 @@ router.get('/audit-logs', async (req, res) => {
   }
 });
 
-// ===========================
 // POST /api/admin/availability
-// ===========================
 router.post('/availability', async (req, res) => {
   try {
     const { service_id, date, capacity, is_open, force } = req.body;
@@ -905,7 +865,7 @@ router.post('/availability', async (req, res) => {
 
     const cap = parseInt(capacity);
 
-    // ── BLOCK: capacity 0 ─────────────────────────────────────────────
+    //  BLOCK: capacity 0 
     if (cap < 1) {
       return res.status(400).json({
         success: false,
@@ -914,7 +874,7 @@ router.post('/availability', async (req, res) => {
       });
     }
 
-    // ── BLOCK: past date ──────────────────────────────────────────────
+    //  BLOCK: past date
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const targetDate = new Date(date + 'T00:00:00');
@@ -926,7 +886,7 @@ router.post('/availability', async (req, res) => {
       });
     }
 
-    // ── WARN: no staff accounts (unless forced) ───────────────────────
+    // WARN: no staff accounts (unless forced)
     if (!force) {
       const staffCount = await pool.query(
         `SELECT COUNT(*) AS count FROM users WHERE role IN ('admin','staff')`
@@ -940,7 +900,7 @@ router.post('/availability', async (req, res) => {
         });
       }
 
-      // ── WARN: only 1 active staff ──────────────────────────────────
+      // WARN: only 1 active staff 
       if (parseInt(staffCount.rows[0].count) === 1 && cap > 3) {
         return res.status(200).json({
           success: false,
@@ -951,7 +911,7 @@ router.post('/availability', async (req, res) => {
       }
     }
 
-    // ── WARN: capacity × service duration exceeds 9 working hours ─────
+    // WARN: capacity × service duration exceeds 9 working hours
     if (!force) {
       const svcResult = await pool.query(
         `SELECT duration_hours FROM services WHERE id = $1`, [service_id]
@@ -967,7 +927,7 @@ router.post('/availability', async (req, res) => {
       }
     }
 
-    // ── WARN: setting capacity on today's date ────────────────────────
+    // WARN: setting capacity on today's date 
     const isToday = targetDate.getTime() === today.getTime();
     if (!force && isToday) {
       return res.status(200).json({
@@ -978,7 +938,7 @@ router.post('/availability', async (req, res) => {
       });
     }
 
-    // ── SAVE ──────────────────────────────────────────────────────────
+    // SAVE 
     const result = await pool.query(
       `INSERT INTO availability (service_id, date, capacity, is_open)
        VALUES ($1, $2, $3, $4)
@@ -1004,9 +964,7 @@ router.post('/availability', async (req, res) => {
   }
 });
 
-// ===========================
 // PUT /api/admin/availability/:id
-// ===========================
 router.put('/availability/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -1014,7 +972,7 @@ router.put('/availability/:id', async (req, res) => {
 
     const cap = parseInt(capacity);
 
-    // ── BLOCK: capacity 0 ─────────────────────────────────────────────
+    // BLOCK: capacity 0 
     if (!capacity || cap < 1) {
       return res.status(400).json({
         success: false,
@@ -1041,7 +999,7 @@ router.put('/availability/:id', async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // ── BLOCK: past date ──────────────────────────────────────────────
+    // BLOCK: past date 
     if (targetDate < today) {
       return res.status(400).json({
         success: false,
@@ -1050,7 +1008,7 @@ router.put('/availability/:id', async (req, res) => {
       });
     }
 
-    // ── BLOCK: reducing below confirmed bookings ──────────────────────
+    // BLOCK: reducing below confirmed bookings
     const bookedResult = await pool.query(
       `SELECT COUNT(*) AS count FROM bookings
        WHERE availability_id = $1 AND booking_status = 'confirmed'`, [id]
@@ -1065,7 +1023,7 @@ router.put('/availability/:id', async (req, res) => {
     }
 
     if (!force) {
-      // ── WARN: exceeds working hours ───────────────────────────────
+      // WARN: exceeds working hours
       const baseDuration = row.service_duration || 0;
       if (baseDuration > 0 && cap * baseDuration > 9) {
         return res.status(200).json({
@@ -1076,7 +1034,7 @@ router.put('/availability/:id', async (req, res) => {
         });
       }
 
-      // ── WARN: today's date ─────────────────────────────────────────
+      // WARN: today's date 
       const isToday = targetDate.getTime() === today.getTime();
       if (isToday) {
         return res.status(200).json({
@@ -1088,7 +1046,7 @@ router.put('/availability/:id', async (req, res) => {
       }
     }
 
-    // ── SAVE ──────────────────────────────────────────────────────────
+    // SAVE 
     const result = await pool.query(
       `UPDATE availability
        SET capacity = $1, is_open = $2, date = COALESCE($3, date)
@@ -1104,9 +1062,7 @@ router.put('/availability/:id', async (req, res) => {
   }
 });
 
-// ===========================
 // DELETE /api/admin/availability/:id
-// ===========================
 router.delete('/availability/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -1124,9 +1080,7 @@ router.delete('/availability/:id', async (req, res) => {
   }
 });
 
-// ===========================
 // POST /api/admin/closed-dates
-// ===========================
 router.post('/closed-dates', async (req, res) => {
   try {
     const { type, day_of_week, date, reason } = req.body;
@@ -1164,9 +1118,7 @@ router.post('/closed-dates', async (req, res) => {
   }
 });
 
-// ===========================
 // DELETE /api/admin/closed-dates/:id
-// ===========================
 router.delete('/closed-dates/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -1184,9 +1136,7 @@ router.delete('/closed-dates/:id', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/notifications/count
-// ===========================
 router.get('/notifications/count', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -1206,12 +1156,10 @@ router.get('/notifications/count', async (req, res) => {
   }
 });
 
-// ===========================
 // GET /api/admin/notifications/list
-// ===========================
 router.get('/notifications/list', async (req, res) => {
   try {
-    // 1. New bookings today (confirmed today)
+    // New bookings today (confirmed today)
     const newRes = await pool.query(`
       SELECT b.id, b.reference_code, b.guest_name, b.status,
              s.name AS service_name, sv.name AS variant_name
@@ -1224,7 +1172,7 @@ router.get('/notifications/list', async (req, res) => {
       ORDER BY b.created_at DESC
     `);
 
-    // 2. Pending bookings (confirmed but not yet in_progress) — today
+    // Pending bookings (confirmed but not yet in_progress) — today
     const pendingRes = await pool.query(`
       SELECT b.id, b.reference_code, b.guest_name, b.status,
              s.name AS service_name
@@ -1240,7 +1188,7 @@ router.get('/notifications/list', async (req, res) => {
       ORDER BY b.created_at ASC
     `);
 
-    // 3. Done — waiting for pickup
+    // Done — waiting for pickup
     const pickupRes = await pool.query(`
       SELECT b.id, b.reference_code, b.guest_name, b.status,
              s.name AS service_name
@@ -1251,7 +1199,7 @@ router.get('/notifications/list', async (req, res) => {
       ORDER BY b.updated_at DESC
     `);
 
-    // 4. Expired bookings today
+    // Expired bookings today
     const expiredRes = await pool.query(`
       SELECT b.id, b.reference_code, b.guest_name, b.status,
              s.name AS service_name
