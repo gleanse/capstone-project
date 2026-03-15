@@ -4,7 +4,7 @@ async function sendEmail({ to, subject, html }) {
   const payload = JSON.stringify({
     sender: {
       name: 'Herco Detailing Garage',
-      email: 'papalitNalangnito@gmail.com', // yung naka verify sa Brevo account yun lagay mo!
+      email: 'devglensprt@gmail.com', // yung naka verify sa Brevo account yun lagay mo! (DONE)
     },
     to: [{ email: to }],
     subject,
