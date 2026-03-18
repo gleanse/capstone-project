@@ -27,6 +27,10 @@ function saveBase64Image(base64String, oldImageUrl) {
 
     const mimeType = matches[1];
     const data     = matches[2];
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedMimeTypes.includes(mimeType)) {
+      throw new Error(`Invalid file type: ${mimeType}. Only images are allowed (JPEG, PNG, WEBP, GIF).`);
+    }
     const ext      = mimeType.split('/')[1].replace('jpeg', 'jpg').replace('svg+xml', 'svg');
     const filename = `svc_${Date.now()}.${ext}`;
     const filepath = path.join(UPLOADS_DIR, filename);
