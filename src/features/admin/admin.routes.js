@@ -27,17 +27,19 @@ function saveBase64Image(base64String, oldImageUrl) {
 
     const mimeType = matches[1];
     const data     = matches[2];
+
+    // ✅ Validation — image files lang
     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedMimeTypes.includes(mimeType)) {
-      throw new Error(`Invalid file type: ${mimeType}. Only images are allowed (JPEG, PNG, WEBP, GIF).`);
+      throw new Error(`Invalid file type: ${mimeType}. Images only (JPEG, PNG, WEBP, GIF).`);
     }
-    const ext      = mimeType.split('/')[1].replace('jpeg', 'jpg').replace('svg+xml', 'svg');
+
+    const ext      = mimeType.split('/')[1].replace('jpeg', 'jpg');
     const filename = `svc_${Date.now()}.${ext}`;
     const filepath = path.join(UPLOADS_DIR, filename);
 
     fs.writeFileSync(filepath, Buffer.from(data, 'base64'));
 
-    // Delete replaced local file
     if (oldImageUrl && oldImageUrl.startsWith('/uploads/services/')) {
       const oldPath = path.join(PUBLIC_DIR, oldImageUrl);
       if (fs.existsSync(oldPath)) {
@@ -48,7 +50,7 @@ function saveBase64Image(base64String, oldImageUrl) {
     return `/uploads/services/${filename}`;
   } catch (e) {
     console.error('[admin] saveBase64Image error:', e.message);
-    return null;
+    throw e; // ← importante — i-throw para ma-catch ng route
   }
 }
 
@@ -624,8 +626,12 @@ router.post('/services', async (req, res) => {
     }
 
     let finalImageUrl = null;
-    if (image_base64 && image_base64.startsWith('data:image/')) {
-      finalImageUrl = saveBase64Image(image_base64, null);
+    if (image_base64 && image_base64.startsWith('data:')) {
+  try {
+    finalImageUrl = saveBase64Image(image_base64, null);
+  } catch (imgErr) {
+    return res.status(400).json({ success: false, message: imgErr.message });
+  }
     }
 
     const result = await pool.query(
@@ -671,8 +677,12 @@ router.put('/services/:id', async (req, res) => {
         const oldPath = path.join(PUBLIC_DIR, oldImageUrl);
         if (fs.existsSync(oldPath)) { try { fs.unlinkSync(oldPath); } catch (_) {} }
       }
-    } else if (image_base64 && image_base64.startsWith('data:image/')) {
-      finalImageUrl = saveBase64Image(image_base64, oldImageUrl);
+    } else if (image_base64 && image_base64.startsWith('data:')) {
+  try {
+    finalImageUrl = saveBase64Image(image_base64, oldImageUrl);
+  } catch (imgErr) {
+    return res.status(400).json({ success: false, message: imgErr.message });
+  }
     }
 
     const result = await pool.query(
