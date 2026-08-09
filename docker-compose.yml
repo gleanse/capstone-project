@@ -10,9 +10,9 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - capstone_pgdata:/var/lib/postgresql/data
-      - ./src/database/schemas/v1.0.0_initial_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/database/current-schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
       - ./src/database/seeds/overall.sql:/docker-entrypoint-initdb.d/2-seeds.sql
 
 volumes:
-  capstone_pgdata:
+  postgres_data:
