@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Herco Detailing Garage — Motorcycle Detailing, Booked in Minutes</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="/styles/custom.css">
+  <link rel="stylesheet" href="/phosphor/regular/style.css">
+  <link rel="stylesheet" href="/styles/landing.css">
+</head>
+<body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
+
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-50 border-b border-red-500/20 bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,53,53,0.1)] animate-slideDown">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-[3px] h-7 bg-red-500 rounded-full transition-all duration-300 group-hover:h-9"></div>
+          <span
+            class="text-xl sm:text-2xl tracking-widest uppercase font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Herco Detailing Garage
+          </span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-7">
+          <a href="/services"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Services</a>
+          <a href="/track"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Track
+            Booking</a>
+          <a href="/customer/login"
+            class="nav-link text-sm text-white/50 hover:text-white transition-colors duration-200 tracking-wide">Sign
+            In</a>
+        </nav>
+
+        <a href="/services"
+          class="hidden md:flex book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors duration-200 items-center gap-2">
+          <i class="ph ph-calendar-plus text-base"></i>
+          Book Now
+        </a>
+
+        <button id="menu-toggle"
+          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
+          <span class="w-5 h-px bg-white/60" id="bar1"></span>
+          <span class="w-5 h-px bg-white/60" id="bar2"></span>
+          <span class="w-5 h-px bg-white/60" id="bar3"></span>
+        </button>
+
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden border-t border-white/5 bg-[#0d0d0d]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-1">
+        <a href="/services"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Services</a>
+        <a href="/track"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Track
+          Booking</a>
+        <a href="/customer/login"
+          class="text-sm text-white/50 hover:text-white py-3 border-b border-white/5 transition-colors">Sign In</a>
+        <a href="/services"
+          class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-3 rounded-xl text-center transition-colors">
+          Book Now
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero-glow relative overflow-hidden">
+    <main class="max-w-6xl mx-auto px-6 relative z-10">
+      <div class="grid md:grid-cols-2 gap-14 items-center pt-24 pb-28">
+        <div class="text-center md:text-left animate-fadeUp">
+          <p
+            class="text-red-400 text-xs uppercase tracking-[0.2em] mb-4 font-medium flex items-center justify-center md:justify-start gap-2">
+            <span class="pulse-dot"></span> Now booking online
+          </p>
+          <h1 class="text-6xl sm:text-7xl font-bold tracking-wide mb-6 leading-[0.92]"
+            style="font-family:'Bebas Neue',sans-serif;">
+            Your ride deserves a <span class="text-red-500">real</span> detail — booked in minutes.
+          </h1>
+          <p class="text-white/40 text-base leading-relaxed max-w-md mx-auto md:mx-0 mb-9">
+            Skip the walk-in queue. Pick a service, pick a slot, and track your bike's status from drop-off to pickup —
+            all from your phone.
+          </p>
+          <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
+            <a href="/services"
+              class="book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors duration-200 flex items-center gap-2">
+              <i class="ph ph-calendar-plus"></i> Book Now
+            </a>
+            <a href="#services"
+              class="border border-white/10 hover:border-white/25 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors duration-200">
+              See Services
+            </a>
+          </div>
+          <p class="text-white/25 text-xs flex items-center justify-center md:justify-start gap-2">
+            <i class="ph ph-lightning text-red-500/70"></i> Slots update in real time — no double-booking.
+          </p>
+        </div>
+
+        <!-- TICKET STUB HERO VISUAL -->
+        <div class="max-w-sm mx-auto w-full animate-fadeUp">
+          <div class="ticket-stub status-glow">
+            <div class="ticket-top">
+              <p class="text-white/30 text-[10px] uppercase tracking-widest mb-1.5 font-mono">Work Order</p>
+              <p class="text-2xl font-mono font-semibold tracking-wide">HRC-000000</p>
+              <span
+                class="inline-block mt-3 text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-red-500/10 border border-red-500/25 text-red-400 font-mono">
+                In Queue
+              </span>
+            </div>
+            <div class="perf-line"></div>
+            <div class="ticket-bottom flex items-center justify-between">
+              <div>
+                <p class="text-white/30 text-[10px] uppercase tracking-widest mb-1">Service</p>
+                <p class="text-sm font-semibold mb-3">Full Detail</p>
+                <p class="text-white/30 text-[10px] uppercase tracking-widest mb-1">Slot</p>
+                <p class="text-sm font-semibold text-white/50 font-mono">—:—— placeholder</p>
+              </div>
+              <div class="qr-box">
+                <i class="ph ph-qr-code text-3xl text-white/25"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <main class="max-w-6xl mx-auto px-6 relative z-10">
+
+    <!-- HOW IT WORKS SECTION -->
+    <div id="how" class="py-24 border-t border-white/5">
+      <div class="text-center max-w-lg mx-auto mb-16">
+        <p class="text-red-400 text-xs uppercase tracking-[0.2em] mb-2 font-medium">How it works</p>
+        <h2 class="text-4xl font-bold tracking-wide mb-3" style="font-family:'Bebas Neue',sans-serif;">
+          Three steps, no phone calls
+        </h2>
+        <p class="text-white/40 text-sm">The same flow your booking already runs on.</p>
+      </div>
+
+      <div class="stepper-row">
+        <div class="stepper-step animate-card card-1">
+          <div class="stepper-circle">1</div>
+          <h3 class="font-semibold text-sm mb-2 mt-4">Pick a service &amp; date</h3>
+          <p class="text-white/40 text-xs leading-relaxed">Browse services, choose an available date, confirm your slot.
+          </p>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-step animate-card card-2">
+          <div class="stepper-circle">2</div>
+          <h3 class="font-semibold text-sm mb-2 mt-4">Get your reference code</h3>
+          <p class="text-white/40 text-xs leading-relaxed">Receive a booking reference by email — your ticket to track
+            and check in.</p>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-step animate-card card-3">
+          <div class="stepper-circle">3</div>
+          <h3 class="font-semibold text-sm mb-2 mt-4">Track &amp; pick up</h3>
+          <p class="text-white/40 text-xs leading-relaxed">Check your status anytime — in queue, in progress, or ready.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES PREVIEW -->
+    <div id="services" class="py-24 border-t border-white/5">
+      <p class="text-red-400 text-xs uppercase tracking-[0.2em] mb-2 font-medium">Our Services</p>
+      <h2 class="text-4xl font-bold tracking-wide mb-10" style="font-family:'Bebas Neue',sans-serif;">
+        Choose a service to get started
+      </h2>
+
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="service-card animate-card card-1 relative rounded-2xl overflow-hidden">
+          <div class="card-img-wrap relative h-32 flex items-center justify-center">
+            <span class="card-watermark">Detailing</span>
+          </div>
+          <div class="p-5 relative z-10">
+            <div class="card-title text-white font-bold text-base mb-1 flex items-center gap-2">
+              <i class="ph ph-wrench text-red-400"></i> Detailing
+            </div>
+            <p class="text-white/40 text-xs leading-relaxed mb-4">Full paint correction and buffing service from matte
+              to glossy finish.</p>
+            <p class="text-red-400 text-sm font-semibold mb-4">Starting at ₱500.00</p>
+            <a href="/services"
+              class="book-btn w-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200">
+              <i class="ph ph-calendar-plus"></i> Book Now
+            </a>
+          </div>
+        </div>
+
+        <div class="service-card animate-card card-2 relative rounded-2xl overflow-hidden">
+          <div class="card-img-wrap relative h-32 flex items-center justify-center">
+            <span class="card-watermark">Ceramic</span>
+          </div>
+          <div class="p-5 relative z-10">
+            <div class="card-title text-white font-bold text-base mb-1 flex items-center gap-2">
+              <i class="ph ph-wrench text-red-400"></i> Ceramic Coating
+            </div>
+            <p class="text-white/40 text-xs leading-relaxed mb-4">Professional ceramic coating for long-lasting paint
+              protection and shine.</p>
+            <p class="text-red-400 text-sm font-semibold mb-4">Starting at ₱1500.00</p>
+            <a href="/services"
+              class="book-btn w-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200">
+              <i class="ph ph-calendar-plus"></i> Book Now
+            </a>
+          </div>
+        </div>
+
+        <div class="service-card animate-card card-3 relative rounded-2xl overflow-hidden">
+          <div class="card-img-wrap relative h-32 flex items-center justify-center">
+            <span class="card-watermark">Powder</span>
+          </div>
+          <div class="p-5 relative z-10">
+            <div class="card-title text-white font-bold text-base mb-1 flex items-center gap-2">
+              <i class="ph ph-wrench text-red-400"></i> Powder Coating
+            </div>
+            <p class="text-white/40 text-xs leading-relaxed mb-4">Durable powder coating for mags and metal parts with
+              color customization.</p>
+            <p class="text-red-400 text-sm font-semibold mb-4">Starting at ₱800.00</p>
+            <a href="/services"
+              class="book-btn w-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200">
+              <i class="ph ph-calendar-plus"></i> Book Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA BAND -->
+    <div class="py-24 border-t border-white/5">
+      <div
+        class="track-card cta-band flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+        <div>
+          <h2 class="text-3xl font-bold tracking-wide mb-2" style="font-family:'Bebas Neue',sans-serif;">Ready to book
+            your slot?</h2>
+          <p class="text-white/40 text-sm">Placeholder CTA copy — pairs with your existing booking flow.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-3">
+          <a href="/services"
+            class="book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors duration-200 flex items-center gap-2">
+            <i class="ph ph-calendar-plus"></i> Book Now
+          </a>
+          <a href="/track"
+            class="border border-white/10 hover:border-white/25 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors duration-200 flex items-center gap-2">
+            <i class="ph ph-magnifying-glass"></i> Track Booking
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="border-t border-white/5 py-12">
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        <div>
+          <div class="font-bold text-sm uppercase tracking-wide mb-3">Herco Detailing Garage</div>
+          <p class="text-white/25 text-xs leading-relaxed">[ placeholder address ]<br>[ placeholder city ]</p>
+        </div>
+        <div>
+          <div class="text-white/25 text-[11px] uppercase tracking-widest mb-3 font-semibold">Navigate</div>
+          <a href="/services" class="block text-white/40 hover:text-red-400 text-xs mb-2 transition-colors">Services</a>
+          <a href="#how" class="block text-white/40 hover:text-red-400 text-xs mb-2 transition-colors">How it works</a>
+          <a href="/track" class="block text-white/40 hover:text-red-400 text-xs transition-colors">Track Booking</a>
+        </div>
+        <div>
+          <div class="text-white/25 text-[11px] uppercase tracking-widest mb-3 font-semibold">Contact</div>
+          <a href="#" class="block text-white/40 hover:text-red-400 text-xs mb-2 transition-colors">[ placeholder phone
+            ]</a>
+          <a href="#" class="block text-white/40 hover:text-red-400 text-xs transition-colors">[ placeholder email ]</a>
+        </div>
+        <div>
+          <div class="text-white/25 text-[11px] uppercase tracking-widest mb-3 font-semibold">Hours</div>
+          <p class="text-white/25 text-xs">[ placeholder hours ]</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-between gap-3 pt-6 border-t border-white/5 text-[11px] text-white/20">
+        <span>© 2026 Herco Detailing Garage. Capstone project.</span>
+        <span class="text-red-500/50">Content &amp; branding pending client sign-off</span>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/landing/landing.js"></script>
+
+</body>
+</html>
