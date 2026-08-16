@@ -58,9 +58,9 @@ app.use(
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 1000 * 60 * 60 * 8
+      maxAge: 1000 * 60 * 60 * 8,
     },
-  })
+  }),
 );
 
 app.use(express.static(path.join(__dirname, '../public')));
@@ -68,8 +68,12 @@ app.use('/styles', express.static(path.join(__dirname, './styles')));
 app.use(
   '/phosphor',
   express.static(
-    path.join(__dirname, '../node_modules/@phosphor-icons/web/src')
-  )
+    path.join(__dirname, '../node_modules/@phosphor-icons/web/src'),
+  ),
+);
+app.use(
+  '/gsap',
+  express.static(path.join(__dirname, '../node_modules/gsap/dist')),
 );
 
 // DATABASE test

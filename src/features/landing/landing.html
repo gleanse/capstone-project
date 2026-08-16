@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/styles/custom.css">
   <link rel="stylesheet" href="/phosphor/regular/style.css">
   <link rel="stylesheet" href="/landing.css">
+  <link rel="stylesheet" href="/hero-animation.css">
 </head>
 <body class="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
 
@@ -19,7 +20,7 @@
 
         <!-- NOTE: logo mark, placeholder for now, swap for real logo once client provides one -->
         <a href="/" class="flex items-center gap-3 group">
-          <div class="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
+          <div class="relative w-9 h-9 flex items-center justify-center shrink-0">
             <div
               class="absolute inset-0 rounded-full bg-red-500/10 border border-red-500/30 transition-all duration-300 group-hover:border-red-500/60 group-hover:bg-red-500/15">
             </div>
@@ -54,7 +55,7 @@
         </a>
 
         <button id="menu-toggle"
-          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] cursor-pointer">
+          class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.25 cursor-pointer">
           <span class="w-5 h-px bg-white/60" id="bar1"></span>
           <span class="w-5 h-px bg-white/60" id="bar2"></span>
           <span class="w-5 h-px bg-white/60" id="bar3"></span>
@@ -81,38 +82,44 @@
   </header>
 
   <!-- HERO -->
-  <section class="hero-glow relative overflow-hidden">
+  <section class="hero-glow relative overflow-hidden" id="heroGlow">
+    <div class="wind-layer" id="windLayer"></div>
+    <div class="hero-sweep"></div>
+
     <main class="max-w-6xl mx-auto px-6 relative z-10">
       <div class="grid md:grid-cols-2 gap-14 items-center pt-24 pb-28">
-        <div class="text-center md:text-left animate-fadeUp">
-          <p
-            class="text-red-400 text-xs uppercase tracking-[0.2em] mb-4 font-medium flex items-center justify-center md:justify-start gap-2">
-            <span class="pulse-dot"></span> Now booking online
-          </p>
-          <h1 class="text-6xl sm:text-7xl font-bold tracking-wide mb-6 leading-[0.92]"
-            style="font-family:'Bebas Neue',sans-serif;">
-            Your ride deserves a <span class="text-red-500">real</span> detail — booked in minutes.
-          </h1>
-          <p class="text-white/40 text-base leading-relaxed max-w-md mx-auto md:mx-0 mb-9">
-            Skip the walk-in queue. Pick a service, pick a slot, and track your bike's status from drop-off to pickup —
-            all from your phone.
-          </p>
-          <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
-            <a href="/services"
-              class="book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors duration-200 flex items-center gap-2">
-              <i class="ph ph-calendar-plus"></i> Book Now
-            </a>
-            <a href="#services"
-              class="border border-white/10 hover:border-white/25 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors duration-200">
-              See Services
-            </a>
+        <div class="text-center md:text-left" id="heroContent">
+          <div id="heroContentTremble">
+            <p
+              class="text-red-400 text-xs uppercase tracking-[0.2em] mb-4 font-medium flex items-center justify-center md:justify-start gap-2">
+              <span class="pulse-dot"></span> Now booking online
+            </p>
+            <h1 class="text-6xl sm:text-7xl font-bold tracking-wide mb-6 leading-[0.92]"
+              style="font-family:'Bebas Neue',sans-serif;">
+              Your ride deserves a <span class="text-red-500">real</span> detail — booked in minutes.
+            </h1>
+            <p class="text-white/40 text-base leading-relaxed max-w-md mx-auto md:mx-0 mb-9">
+              Skip the walk-in queue. Pick a service, pick a slot, and track your bike's status from drop-off to pickup
+              —
+              all from your phone.
+            </p>
+            <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
+              <a href="/services"
+                class="book-now-btn bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors duration-200 flex items-center gap-2">
+                <i class="ph ph-calendar-plus"></i> Book Now
+              </a>
+              <a href="#services"
+                class="border border-white/10 hover:border-white/25 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors duration-200">
+                See Services
+              </a>
+            </div>
+            <p class="text-white/25 text-xs flex items-center justify-center md:justify-start gap-2">
+              <i class="ph ph-lightning text-red-500/70"></i> Slots update in real time — no double-booking.
+            </p>
           </div>
-          <p class="text-white/25 text-xs flex items-center justify-center md:justify-start gap-2">
-            <i class="ph ph-lightning text-red-500/70"></i> Slots update in real time — no double-booking.
-          </p>
         </div>
 
-        <!-- TICKET STUB HERO VISUAL -->
+        <!-- TICKET STUB HERO VISUAL (unchanged, keeps its own fade-up) -->
         <div class="max-w-sm mx-auto w-full animate-fadeUp">
           <div class="ticket-stub status-glow">
             <div class="ticket-top">
@@ -295,7 +302,10 @@
 
   </main>
 
-  <script src="/landing.js"></script>
+  <script src="/gsap/gsap.min.js"></script>
+  <script src="/gsap/ScrollTrigger.min.js"></script>
+  <script src="/hero-animation.js"></script>
+  <script src="/nav.js"></script>
 
 </body>
 </html>
