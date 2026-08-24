@@ -25,9 +25,6 @@ router.get('/auth.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'auth.js'));
 });
 
-// ===========================
-// POST /api/auth/signup
-// ===========================
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, role, password } = req.body;
@@ -93,9 +90,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// ===========================
-// POST /api/auth/login
-// ===========================
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -160,9 +154,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ===========================
-// GET /api/auth/me
-// ===========================
 router.get('/me', (req, res) => {
   if (!req.session?.user) {
     return res
@@ -172,9 +163,6 @@ router.get('/me', (req, res) => {
   res.json({ success: true, user: req.session.user });
 });
 
-// ===========================
-// POST /api/auth/logout
-// ===========================
 router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {

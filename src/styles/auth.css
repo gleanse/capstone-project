@@ -1,0 +1,120 @@
+@theme {
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  --color-ink-black: #0a0a0a;
+  --color-ink-900: #111111;
+  --color-ink-850: #1a1a1a;
+  --color-ink-800: #222222;
+  --color-ink-muted: #888888;
+  --color-ink-dim: #555555;
+  --color-ink-text: #f0f0f0;
+
+  --animate-fade-slide-up: fadeSlideUp 0.6s ease both;
+  --animate-glow-pulse: glowPulse 6s ease-in-out infinite alternate;
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes glowPulse {
+    from { opacity: 0.6; transform: scale(1); }
+    to { opacity: 1; transform: scale(1.1); }
+  }
+}
+
+@layer components {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f0f0f0;
+    -webkit-box-shadow: 0 0 0px 1000px #222222 inset;
+    box-shadow: 0 0 0px 1000px #222222 inset;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: #f0f0f0;
+  }
+
+  input.is-valid {
+    @apply border-emerald-500;
+  }
+  input.is-error {
+    @apply border-red-500 bg-red-500/[0.04];
+  }
+  .input-status.valid {
+    @apply text-emerald-500;
+  }
+  .input-status.error {
+    @apply text-red-500;
+  }
+
+  .checkbox-wrap input[type="checkbox"]:checked + .checkmark {
+    @apply bg-red-600 border-red-600;
+  }
+  .checkbox-wrap input[type="checkbox"]:checked + .checkmark::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+  }
+
+ .form-message {
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: messageSlideIn 0.25s ease-out;
+}
+
+.form-message.success {
+  @apply bg-emerald-500/10 border border-emerald-500/20 text-emerald-500;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.06);
+}
+
+.form-message.error {
+  @apply bg-red-500/10 border border-red-500/20 text-red-500;
+}
+
+.message-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.form-message.success .message-icon {
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.form-message.error .message-icon {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.message-icon i {
+  font-size: 14px;
+}
+
+.message-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+}

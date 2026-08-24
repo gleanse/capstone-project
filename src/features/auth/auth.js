@@ -1,13 +1,6 @@
-// ===========================
-// AUTH.JS — Login & Signup
-// ===========================
-
 const isLoginPage = document.getElementById('loginForm') !== null;
 const isSignupPage = document.getElementById('signupForm') !== null;
 
-// ===========================
-// SHARED UTILITIES
-// ===========================
 function setFieldState(fieldId, state, message = '') {
   const field = document.getElementById(fieldId);
   const error = document.getElementById(fieldId + 'Error');
@@ -18,16 +11,35 @@ function setFieldState(fieldId, state, message = '') {
 
   field.classList.remove('is-valid', 'is-error');
 
+  if (status) {
+    status.classList.remove('valid', 'error');
+  }
+
   if (state === 'valid') {
     field.classList.add('is-valid');
-    if (status) { status.className = 'input-status valid'; status.innerHTML = '<i class="fas fa-check"></i>'; }
+
+    if (status) {
+      status.classList.add('valid');
+      status.innerHTML = '<i class="fas fa-check"></i>';
+    }
+
     if (error) error.textContent = '';
+
   } else if (state === 'error') {
     field.classList.add('is-error');
-    if (status) { status.className = 'input-status error'; status.innerHTML = '<i class="fas fa-times"></i>'; }
+
+    if (status) {
+      status.classList.add('error');
+      status.innerHTML = '<i class="fas fa-times"></i>';
+    }
+
     if (error) error.textContent = message;
+
   } else {
-    if (status) { status.className = 'input-status'; status.innerHTML = ''; }
+    if (status) {
+      status.innerHTML = '';
+    }
+
     if (error) error.textContent = '';
   }
 }
@@ -35,8 +47,19 @@ function setFieldState(fieldId, state, message = '') {
 function showMessage(type, text) {
   const msg = document.getElementById('formMessage');
   if (!msg) return;
-  msg.className = 'form-message ' + type;
-  msg.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${text}`;
+
+  const icon = type === 'success'
+    ? 'fa-check-circle'
+    : 'fa-exclamation-circle';
+
+  msg.className = `form-message ${type}`;
+  msg.innerHTML = `
+    <span class="message-icon">
+      <i class="fas ${icon}"></i>
+    </span>
+    <span class="message-text">${text}</span>
+  `;
+
   msg.style.display = 'flex';
 }
 
@@ -50,9 +73,6 @@ function setLoading(isLoading) {
   if (loader) loader.style.display = isLoading ? 'flex' : 'none';
 }
 
-// ===========================
-// PASSWORD TOGGLE
-// ===========================
 const togglePw = document.getElementById('togglePw');
 const pwIcon = document.getElementById('pwIcon');
 
@@ -65,9 +85,6 @@ if (togglePw) {
   });
 }
 
-// ===========================
-// LOGIN PAGE
-// ===========================
 if (isLoginPage) {
   const loginForm = document.getElementById('loginForm');
 
@@ -141,9 +158,6 @@ if (isLoginPage) {
   });
 }
 
-// ===========================
-// SIGNUP PAGE
-// ===========================
 if (isSignupPage) {
   const signupForm = document.getElementById('signupForm');
   const pwStrength = document.getElementById('pwStrength');

@@ -8,87 +8,106 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/auth/auth.css">
-</head>
-<body>
-  <div class="bg-grid"></div>
-  <div class="bg-glow"></div>
 
-  <div class="auth-wrapper">
-    <div class="brand-panel">
-      <div class="brand-content">
-        <div class="brand-icon">
-          <i class="fas fa-motorcycle"></i>
+  <!-- Compiled Tailwind output — served statically from /public via express.static -->
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="min-h-screen flex items-stretch relative overflow-x-hidden bg-ink-black text-ink-text font-body">
+
+  <div class="fixed inset-0 pointer-events-none z-0 bg-[length:40px_40px] bg-[image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]"></div>
+  <div class="fixed -top-[20%] -left-[10%] w-[60%] h-[60%] pointer-events-none z-0 animate-glow-pulse bg-[image:radial-gradient(ellipse,rgba(220,38,38,0.08)_0%,transparent_70%)]"></div>
+
+  <div class="relative z-10 flex w-full min-h-screen">
+
+    <!-- BRAND PANEL -->
+    <div class="hidden lg:flex w-[420px] min-w-[420px] bg-ink-850 border-r border-white/[0.08] items-center justify-center p-16 relative overflow-hidden">
+      <div class="absolute -bottom-20 -right-20 w-[300px] h-[300px] rounded-full border-[60px] border-red-600/[0.05]"></div>
+      <div class="absolute -top-10 -left-10 w-[200px] h-[200px] rounded-full border-[40px] border-red-600/[0.04]"></div>
+
+      <div class="relative z-10 text-center animate-fade-slide-up">
+        <div class="w-[90px] h-[90px] bg-red-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(220,38,38,0.3)] -rotate-3">
+          <i class="fas fa-motorcycle text-[42px] text-white"></i>
         </div>
-        <h1 class="brand-name">HERCO</h1>
-        <p class="brand-tagline">Detailing Garage</p>
-        <div class="brand-divider"></div>
-        <p class="brand-desc">Premium motorcycle detailing & coating services. Manage your business with precision.</p>
-        <div class="brand-stats">
-          <div class="stat-sep"></div>
-          <div class="stat">
-            <span class="stat-num">∞</span>
-            <span class="stat-label">Quality</span>
+        <h1 class="font-display text-[64px] tracking-[4px] text-white leading-none mb-1">HERCO</h1>
+        <p class="text-[13px] tracking-[3px] uppercase text-red-600 font-medium mb-7">Detailing Garage</p>
+        <div class="w-10 h-[3px] bg-red-600 mx-auto mb-6 rounded"></div>
+        <p class="text-sm text-ink-muted leading-relaxed max-w-[280px] mx-auto mb-9">
+          Premium motorcycle detailing &amp; coating services. Manage your business with precision.
+        </p>
+        <div class="flex items-center justify-center gap-5">
+          <div class="w-px h-9 bg-white/[0.08]"></div>
+          <div class="flex flex-col items-center">
+            <span class="font-display text-[28px] text-red-600 leading-none">∞</span>
+            <span class="text-[11px] text-ink-dim uppercase tracking-wide mt-1">Quality</span>
           </div>
-          <div class="stat-sep"></div>
-          <div class="stat">
-            <span class="stat-num">24/7</span>
-            <span class="stat-label">System</span>
+          <div class="w-px h-9 bg-white/[0.08]"></div>
+          <div class="flex flex-col items-center">
+            <span class="font-display text-[28px] text-red-600 leading-none">24/7</span>
+            <span class="text-[11px] text-ink-dim uppercase tracking-wide mt-1">System</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="form-panel">
-      <div class="form-container">
-        <div class="form-header">
-          <span class="form-tag">ADMIN PORTAL</span>
-          <h2>Welcome back</h2>
-          <p>Sign in to manage your garage</p>
+    <!-- FORM PANEL -->
+    <div class="flex-1 flex items-center justify-center px-6 py-16 sm:px-10">
+      <div class="w-full max-w-[460px] animate-fade-slide-up" style="animation-delay:.1s">
+
+        <div class="mb-9">
+          <span class="inline-block bg-red-600/10 text-red-600 text-[11px] font-semibold tracking-[2px] uppercase px-3 py-1 rounded-full border border-red-600/20 mb-4">ADMIN PORTAL</span>
+          <h2 class="text-3xl md:text-4xl font-semibold text-ink-text mb-1.5 leading-tight">Welcome back</h2>
+          <p class="text-sm text-ink-muted">Sign in to manage your garage</p>
         </div>
 
         <form id="loginForm" novalidate>
-          <div class="field-group">
-            <label for="email">
-              <i class="fas fa-envelope"></i>
+          <div class="mb-5">
+            <label for="email" class="flex items-center gap-2 text-[13px] font-medium text-ink-muted mb-2 uppercase tracking-wide">
+              <i class="fas fa-envelope text-red-600 text-[13px] w-3.5"></i>
               Email Address
             </label>
-            <div class="input-wrap">
-              <input type="email" id="email" name="email" placeholder="admin@herco.com" autocomplete="email">
-              <span class="input-status"></span>
+            <div class="input-wrap relative flex items-center">
+              <input type="email" id="email" name="email" placeholder="admin@herco.com" autocomplete="email"
+                  class="box-border w-full px-4 pr-11 py-3.5 bg-ink-800 border border-white/[0.08] rounded-lg text-ink-text font-body text-[15px] outline-none transition placeholder:text-ink-dim focus:border-red-600 focus:bg-red-600/[0.04] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]">
+              <span class="input-status absolute right-3.5 top-1/2 -translate-y-1/2 text-sm leading-none pointer-events-none"></span>
             </div>
-            <span class="field-error" id="emailError"></span>
+            <span class="field-error block text-xs text-red-500 mt-1.5 min-h-[16px]" id="emailError"></span>
           </div>
 
-          <div class="field-group">
-            <label for="password">
-              <i class="fas fa-lock"></i>
+          <div class="mb-5">
+            <label for="password" class="flex items-center gap-2 text-[13px] font-medium text-ink-muted mb-2 uppercase tracking-wide">
+              <i class="fas fa-lock text-red-600 text-[13px] w-3.5"></i>
               Password
             </label>
-            <div class="input-wrap">
-              <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password">
-              <button type="button" class="toggle-pw" id="togglePw" tabindex="-1">
+            <div class="input-wrap relative flex items-center">
+              <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password"
+                class="box-border w-full px-4 pr-11 py-3.5 bg-ink-800 border border-white/[0.08] rounded-lg text-ink-text font-body text-[15px] outline-none transition placeholder:text-ink-dim focus:border-red-600 focus:bg-red-600/[0.04] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]">
+              <button type="button" id="togglePw" tabindex="-1"
+                class="absolute right-3.5 bg-transparent border-none text-ink-dim cursor-pointer p-1 text-sm transition hover:text-ink-muted">
                 <i class="fas fa-eye" id="pwIcon"></i>
               </button>
             </div>
-            <span class="field-error" id="passwordError"></span>
+            <span class="field-error block text-xs text-red-500 mt-1.5 min-h-[16px]" id="passwordError"></span>
           </div>
 
-          <div class="form-meta">
-            <label class="checkbox-wrap">
-              <input type="checkbox" id="remember">
-              <span class="checkmark"></span>
+          <div class="flex items-center justify-between mb-6">
+            <label class="checkbox-wrap flex items-center gap-2.5 cursor-pointer text-sm text-ink-muted select-none">
+              <input type="checkbox" id="remember" class="hidden">
+              <span class="checkmark w-[18px] h-[18px] min-w-[18px] border border-white/[0.08] rounded-[4px] bg-ink-800 flex items-center justify-center transition"></span>
               Remember me
             </label>
-            
           </div>
 
-          <button type="submit" class="submit-btn" id="submitBtn">
-            <span class="btn-text"><i class="fas fa-sign-in-alt"></i> Sign In</span>
-            <span class="btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Signing in...</span>
+          <button type="submit" id="submitBtn"
+            class="w-full py-[15px] px-6 bg-red-600 text-white border-none rounded-lg font-body text-[15px] font-semibold tracking-wide cursor-pointer transition flex items-center justify-center gap-2.5 hover:bg-red-700 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(220,38,38,0.35)] active:translate-y-0 disabled:bg-ink-800 disabled:text-ink-dim disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none">
+            <span class="btn-text flex items-center gap-2"><i class="fas fa-sign-in-alt"></i> Sign In</span>
+            <span class="btn-loader items-center gap-2" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Signing in...</span>
           </button>
 
-          <div class="form-message" id="formMessage"></div>
+          <div
+            class="form-message mt-5"
+            id="formMessage"
+            style="display:none;"
+          ></div>
         </form>
 
         <!-- signup link removed — account creation is managed by Admin in the Staff panel -->
