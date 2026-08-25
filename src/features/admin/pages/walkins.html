@@ -8,211 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    body { display: flex; }
-    .layout-wrapper { display: flex; width: 100%; }
-    #app { display: contents; }
-
-    /* ── Layout ── */
-    .wi-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      align-items: start;
-    }
-    @media (max-width: 960px) { .wi-layout { grid-template-columns: 1fr; } }
-
-    /* ── Modal/Overlay shared ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.78);
-      backdrop-filter: blur(5px);
-      z-index: 200;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.hidden { display: none !important; }
-    @keyframes slideIn {
-      from { opacity:0; transform: translateY(-14px) scale(0.97); }
-      to   { opacity:1; transform: translateY(0) scale(1); }
-    }
-
-    /* ── Capacity Alert Banner ── */
-    .cap-alert {
-      display: none;
-      padding: 12px 16px;
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.25);
-      border-radius: var(--radius-sm);
-      margin-bottom: 16px;
-      font-size: 13px; color: #f59e0b;
-      align-items: flex-start; gap: 10px; line-height: 1.55;
-    }
-    .cap-alert.show { display: flex; }
-    .cap-alert i { margin-top: 2px; flex-shrink: 0; }
-
-    /* ── Field Groups ── */
-    .wi-form { padding: 22px; }
-    .wi-field { margin-bottom: 16px; }
-    .wi-field label {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 600; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
-    }
-    .wi-field label i { color: var(--red); font-size: 11px; width: 12px; }
-    .wi-field input, .wi-field select {
-      width: 100%; padding: 10px 13px;
-      background: var(--dark-3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-family: var(--font-body); font-size: 14px; outline: none;
-      transition: border-color 0.2s;
-    }
-    .wi-field input::placeholder { color: var(--text-dim); }
-    .wi-field input:focus, .wi-field select:focus {
-      border-color: var(--red); background: rgba(220,38,38,0.04);
-    }
-    .wi-field input.err { border-color: var(--danger); }
-    .wi-field select {
-      cursor: pointer; -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 12px center;
-      padding-right: 36px; background-color: var(--dark-3);
-    }
-    .wi-field select option { background: var(--dark-2); }
-    .wi-field .ferr { font-size: 11px; color: var(--danger); margin-top: 4px; min-height: 14px; display: block; }
-    .wi-field .fhint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
-
-    /* ── Two-col row ── */
-    .wi-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    /* ── Amount Summary ── */
-    .wi-summary {
-      display: none;
-      background: var(--dark-3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px;
-    }
-    .wi-summary.show { display: block; }
-    .ws-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: var(--text-muted); }
-    .ws-row:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid var(--border); }
-    .ws-row:last-child span { font-size: 15px; font-weight: 700; color: var(--text); }
-    .ws-row span:last-child { color: var(--text); font-weight: 500; }
-
-    /* ── Form message ── */
-    .wi-msg { display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 12px; align-items: center; gap: 8px; }
-    .wi-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); display: flex; }
-    .wi-msg.error   { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); display: flex; }
-
-    /* ── Capacity sidebar ── */
-    .cap-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
-    .cap-item:last-child { border-bottom: none; }
-    .cap-name { color: var(--text); }
-    .cap-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
-    .cap-badge.ok   { background: rgba(16,185,129,0.1); color: var(--success); }
-    .cap-badge.mid  { background: rgba(245,158,11,0.1); color: #f59e0b; }
-    .cap-badge.full { background: rgba(239,68,68,0.1); color: var(--danger); }
-
-    /* ── Available future dates ── */
-    .fut-date-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 16px; border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: background 0.15s; font-size: 13px;
-    }
-    .fut-date-item:last-child { border-bottom: none; }
-    .fut-date-item:hover { background: var(--dark-3); }
-    .fut-date-item.selected { background: rgba(220,38,38,0.07); border-left: 3px solid var(--red); }
-
-    /* ════════════════════════════════════════
-       PRINTABLE REFERENCE SLIP
-    ════════════════════════════════════════ */
-    .slip-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.88);
-      backdrop-filter: blur(6px);
-      z-index: 300;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .slip-overlay.hidden { display: none !important; }
-
-    .slip-card {
-      background: #fff; color: #111;
-      border-radius: 16px; width: 100%; max-width: 360px;
-      padding: 24px 22px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
-      animation: slideIn 0.25s ease;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    /* Slip header */
-    .slip-hdr {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      margin-bottom: 18px; padding-bottom: 16px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-    .slip-brand { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #111; line-height: 1; }
-    .slip-brand-sub { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
-    .slip-type-badge {
-      background: #dc2626; color: #fff;
-      font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-      padding: 4px 10px; border-radius: 20px;
-    }
-
-    /* Queue number */
-    .slip-queue {
-      text-align: center; margin-bottom: 18px;
-      background: #fef2f2; border: 2px dashed #fecaca;
-      border-radius: 12px; padding: 14px;
-    }
-    .slip-q-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: #9ca3af; margin-bottom: 4px; }
-    .slip-q-num { font-family: 'Bebas Neue', sans-serif; font-size: 72px; color: #dc2626; line-height: 1; }
-    .slip-q-date { font-size: 11px; color: #6b7280; margin-top: 4px; }
-
-    /* Info rows */
-    .slip-rows { margin-bottom: 16px; }
-    .slip-row {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      padding: 8px 0; border-bottom: 1px solid #f3f4f6;
-      font-size: 12px; gap: 10px;
-    }
-    .slip-row:last-child { border-bottom: none; }
-    .slip-row .sl { color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; white-space: nowrap; padding-top: 1px; flex-shrink: 0; }
-    .slip-row .sv { color: #111; font-weight: 600; text-align: right; word-break: break-word; }
-
-    /* Payment box */
-    .slip-pay {
-      background: #f0fdf4; border: 1px solid #bbf7d0;
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
-    }
-    .slip-pay-hdr { font-size: 10px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
-    .slip-pay-row { display: flex; justify-content: space-between; font-size: 12px; color: #374151; margin-bottom: 4px; }
-    .slip-pay-row:last-child { margin-bottom: 0; padding-top: 6px; border-top: 1px solid #bbf7d0; font-weight: 700; font-size: 13px; color: #111; }
-
-    /* Footer */
-    .slip-foot { text-align: center; padding-top: 12px; border-top: 2px dashed #e5e7eb; }
-    .slip-foot p { font-size: 10px; color: #9ca3af; margin-bottom: 2px; }
-
-    /* Slip buttons (hidden on print) */
-    .slip-actions { display: flex; gap: 10px; margin-top: 14px; }
-    .slip-actions button {
-      flex: 1; padding: 9px; border-radius: 8px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: all 0.18s;
-    }
-    .slip-btn-print { background: #dc2626; color: #fff; border: none; }
-    .slip-btn-print:hover { background: #b91c1c; }
-    .slip-btn-close { background: #fff; color: #374151; border: 1.5px solid #e5e7eb; }
-    .slip-btn-close:hover { background: #f9fafb; }
-
-    /* ── Print Media ── */
-    @media print {
-      body > *:not(.slip-overlay) { display: none !important; }
-      .slip-overlay { position: static !important; background: none !important; padding: 0 !important; display: block !important; }
-      .slip-card { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; }
-      .slip-actions { display: none !important; }
-    }
-  </style>
+  <link rel="stylesheet" href="/css/output.css">
 </head>
 <body>
 
@@ -249,7 +45,7 @@
           <input type="hidden" id="wi_date">
         </div>
         <div class="wi-field" id="futureDateField" style="display:none;">
-          <label><i class="fas fa-calendar-plus"></i> Future Booking Date <span style="color:var(--red)">*</span></label>
+          <label><i class="fas fa-calendar-plus"></i> Future Booking Date <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
           <input type="date" id="wi_future_date" onchange="onFutureDateChange()">
           <span class="ferr" id="wi_future_dateErr"></span>
           <p class="fhint">Today is full — staff is booking a future date on customer's behalf.</p>
@@ -257,24 +53,24 @@
 
         <div class="wi-row2">
           <div class="wi-field">
-            <label><i class="fas fa-user"></i> Customer Name <span style="color:var(--red)">*</span></label>
+            <label><i class="fas fa-user"></i> Customer Name <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
             <input type="text" id="wi_name" placeholder="Juan Dela Cruz">
             <span class="ferr" id="wi_nameErr"></span>
           </div>
           <div class="wi-field">
-            <label><i class="fas fa-phone"></i> Phone <span style="color:var(--red)">*</span></label>
+            <label><i class="fas fa-phone"></i> Phone <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
             <input type="tel" id="wi_phone" placeholder="09171234567" maxlength="11">
             <span class="ferr" id="wi_phoneErr"></span>
           </div>
         </div>
 
         <div class="wi-field">
-          <label><i class="fas fa-envelope"></i> Email <span style="font-size:10px;color:var(--text-dim);text-transform:none;font-weight:400;">(optional — for non-techy customers)</span></label>
+          <label><i class="fas fa-envelope"></i> Email <span style="font-size:10px;color:var(--color-admin-dim);text-transform:none;font-weight:400;">(optional — for non-techy customers)</span></label>
           <input type="email" id="wi_email" placeholder="Leave blank if customer has no email">
         </div>
 
         <div class="wi-field">
-          <label><i class="fas fa-spray-can"></i> Service <span style="color:var(--red)">*</span></label>
+          <label><i class="fas fa-spray-can"></i> Service <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
           <select id="wi_service" onchange="onServiceChange()">
             <option value="">-- Select service --</option>
           </select>
@@ -282,7 +78,7 @@
         </div>
 
         <div class="wi-field">
-          <label><i class="fas fa-tags"></i> Variant / Size <span style="color:var(--red)">*</span></label>
+          <label><i class="fas fa-tags"></i> Variant / Size <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
           <select id="wi_variant" disabled onchange="updateSummary()">
             <option value="">-- Select service first --</option>
           </select>
@@ -338,7 +134,7 @@
         <div class="card-header">
           <h2 class="card-title"><i class="fas fa-calendar-week"></i> Available Future Dates</h2>
         </div>
-        <p style="font-size:12px;color:var(--text-muted);padding:8px 16px 0;">Click a date to select it</p>
+        <p style="font-size:12px;color:var(--color-admin-muted);padding:8px 16px 0;">Click a date to select it</p>
         <div id="futureCapList"><div class="empty-state" style="padding:20px;"><i class="fas fa-spinner fa-spin"></i></div></div>
       </div>
 
@@ -347,10 +143,10 @@
           <h2 class="card-title"><i class="fas fa-info-circle"></i> Guidelines</h2>
         </div>
         <ul style="list-style:none;padding:12px 16px;margin:0;display:flex;flex-direction:column;gap:8px;">
-          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:var(--success);margin-top:2px;flex-shrink:0;"></i>Walk-in gets next available queue number</li>
-          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:var(--success);margin-top:2px;flex-shrink:0;"></i>Payment collected in cash — marked paid immediately</li>
-          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-exclamation-circle" style="color:#f59e0b;margin-top:2px;flex-shrink:0;"></i>If today is full, book a future date on customer's behalf</li>
-          <li style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;"><i class="fas fa-print" style="color:var(--text-dim);margin-top:2px;flex-shrink:0;"></i>Print the reference slip for the customer</li>
+          <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px;flex-shrink:0;"></i>Walk-in gets next available queue number</li>
+          <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px;flex-shrink:0;"></i>Payment collected in cash — marked paid immediately</li>
+          <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-exclamation-circle" style="color:#f59e0b;margin-top:2px;flex-shrink:0;"></i>If today is full, book a future date on customer's behalf</li>
+          <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-print" style="color:var(--color-admin-dim);margin-top:2px;flex-shrink:0;"></i>Print the reference slip for the customer</li>
         </ul>
       </div>
     </div>

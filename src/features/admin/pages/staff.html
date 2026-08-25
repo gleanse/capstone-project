@@ -8,140 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    body { display: flex; }
-    .layout-wrapper { display: flex; width: 100%; }
-    #app { display: contents; }
-
-    /* ── Modal Overlay ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.hidden { display: none !important; }
-
-    @keyframes slideIn {
-      from { opacity:0; transform: translateY(-16px) scale(0.97); }
-      to   { opacity:1; transform: translateY(0) scale(1); }
-    }
-
-    /* ── Staff Modal Box ── */
-    .staff-modal {
-      background: var(--dark-2);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius);
-      width: 100%; max-width: 460px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-      animation: slideIn 0.22s ease;
-      max-height: 92vh;
-      overflow-y: auto;
-    }
-    .staff-modal::-webkit-scrollbar { width: 4px; }
-    .staff-modal::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 4px; }
-
-    .staff-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; background: var(--dark-2); z-index: 1;
-    }
-    .staff-modal-header h3 {
-      font-size: 16px; font-weight: 600; color: var(--text);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .staff-modal-header h3 i { color: var(--red); }
-
-    .staff-modal-body { padding: 22px; }
-
-    .staff-modal-footer {
-      padding: 14px 22px; border-top: 1px solid var(--border);
-      display: flex; justify-content: flex-end; gap: 10px;
-    }
-
-    /* ── Form Fields ── */
-    .m-field { margin-bottom: 16px; }
-    .m-field label {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 600; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-    .m-field label i { color: var(--red); font-size: 11px; width: 12px; }
-    .m-field input,
-    .m-field select {
-      width: 100%; padding: 10px 13px;
-      background: var(--dark-3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-family: var(--font-body); font-size: 14px; outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .m-field input::placeholder { color: var(--text-dim); }
-    .m-field input:focus,
-    .m-field select:focus { border-color: var(--red); background: rgba(220,38,38,0.04); }
-    .m-field input.is-error { border-color: var(--danger); }
-    .m-field select {
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
-      background-color: var(--dark-3);
-    }
-    .m-field select option { background: var(--dark-2); }
-    .m-field .field-err { font-size: 11px; color: var(--danger); margin-top: 4px; min-height: 14px; display: block; }
-
-    /* Password input wrapper */
-    .pw-wrap { position: relative; }
-    .pw-wrap input { padding-right: 42px; }
-    .pw-toggle {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; color: var(--text-dim);
-      cursor: pointer; font-size: 13px; padding: 4px;
-      transition: color 0.2s;
-    }
-    .pw-toggle:hover { color: var(--text-muted); }
-
-    /* ── Modal Status Message ── */
-    .modal-msg {
-      padding: 10px 14px; border-radius: var(--radius-sm);
-      font-size: 13px; margin-bottom: 14px; display: none;
-      align-items: center; gap: 8px;
-    }
-    .modal-msg.success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:var(--success); display:flex; }
-    .modal-msg.error   { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:var(--danger); display:flex; }
-
-    /* ── Confirm Delete Modal ── */
-    .confirm-modal {
-      background: var(--dark-2); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius); width: 100%; max-width: 380px;
-      padding: 26px; animation: slideIn 0.2s ease; text-align: center;
-    }
-    .confirm-icon {
-      width: 52px; height: 52px;
-      background: rgba(239,68,68,0.1); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 14px;
-    }
-    .confirm-icon i { font-size: 22px; color: var(--danger); }
-    .confirm-modal h4 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-    .confirm-modal p  { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
-    .confirm-btns { display: flex; gap: 10px; justify-content: center; }
-
-    /* ── Password Strength ── */
-    .pw-strength { margin-top: 6px; }
-    .strength-bar { height: 3px; background: var(--dark-4); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
-    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
-    .strength-fill.weak   { width: 33%; background: var(--danger); }
-    .strength-fill.medium { width: 66%; background: #f59e0b; }
-    .strength-fill.strong { width: 100%; background: var(--success); }
-    .strength-label { font-size: 10px; color: var(--text-dim); }
-  </style>
+  <link rel="stylesheet" href="/css/output.css">
 </head>
 <body>
 
@@ -186,19 +53,19 @@
       <div class="modal-msg" id="addStaffMsg"></div>
 
       <div class="m-field">
-        <label><i class="fas fa-user"></i> Full Name <span style="color:var(--red)">*</span></label>
+        <label><i class="fas fa-user"></i> Full Name <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
         <input type="text" id="staff_name" placeholder="Juan Dela Cruz" autocomplete="off">
         <span class="field-err" id="staff_nameErr"></span>
       </div>
 
       <div class="m-field">
-        <label><i class="fas fa-envelope"></i> Email Address <span style="color:var(--red)">*</span></label>
+        <label><i class="fas fa-envelope"></i> Email Address <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
         <input type="email" id="staff_email" placeholder="juan@herco.com" autocomplete="off">
         <span class="field-err" id="staff_emailErr"></span>
       </div>
 
       <div class="m-field">
-        <label><i class="fas fa-id-badge"></i> Role <span style="color:var(--red)">*</span></label>
+        <label><i class="fas fa-id-badge"></i> Role <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
         <select id="staff_role">
           <option value="">-- Select role --</option>
           <option value="admin">Admin — Full access</option>
@@ -208,7 +75,7 @@
       </div>
 
       <div class="m-field">
-        <label><i class="fas fa-lock"></i> Password <span style="color:var(--red)">*</span></label>
+        <label><i class="fas fa-lock"></i> Password <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
         <div class="pw-wrap">
           <input type="password" id="staff_password" placeholder="Min. 8 characters" autocomplete="new-password">
           <button type="button" class="pw-toggle" id="toggleStaffPw">
@@ -223,7 +90,7 @@
       </div>
 
       <div class="m-field">
-        <label><i class="fas fa-lock"></i> Confirm Password <span style="color:var(--red)">*</span></label>
+        <label><i class="fas fa-lock"></i> Confirm Password <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
         <div class="pw-wrap">
           <input type="password" id="staff_confirm" placeholder="Repeat password" autocomplete="new-password">
         </div>
