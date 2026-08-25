@@ -1,6 +1,3 @@
-// admin-layout.js — Shared sidebar + topbar for all admin pages
-// Each page calls: AdminLayout.init({ activePage: 'dashboard', breadcrumb: 'Dashboard' })
-
 const AdminLayout = (() => {
 
   const NAV_SECTIONS = [

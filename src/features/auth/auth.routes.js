@@ -9,7 +9,6 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/signup', (req, res) => {
-  // Check if user is logged in AND is admin
   if (!req.session?.user || req.session.user.role !== 'admin') {
     return res.redirect('/auth/login?error=Signup+is+disabled');
   }

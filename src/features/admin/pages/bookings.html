@@ -14,7 +14,6 @@
     .layout-wrapper { display: flex; width: 100%; }
     #app { display: contents; }
 
-    /* ── Ref Confirmation Step ── */
     .ref-confirm-step {
       margin-top: 16px;
       padding-top: 16px;
@@ -96,7 +95,6 @@
       display: block;
     }
 
-    /* Shake animation on wrong ref */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20%       { transform: translateX(-6px); }
@@ -147,7 +145,6 @@
   </div>
 </div>
 
-<!-- Status Modal -->
 <div class="modal-overlay" id="statusModal" style="display:none;">
   <div class="modal">
     <div class="modal-header">
@@ -157,8 +154,6 @@
     <div class="modal-body">
       <p>Select new status for this booking:</p>
       <div class="status-options" id="statusOptions"></div>
-
-      <!-- ── Ref Confirmation Step ── -->
       <div class="ref-confirm-step" id="refConfirmStep" style="display:none;">
         <label>Confirm Reference Number</label>
         <p class="ref-hint">Type the booking reference number to confirm this update.</p>
@@ -189,10 +184,9 @@
 
   const { statusBadge, formatCurrency, formatDate } = AdminLayout;
 
-  // ── State ─────────────────────────────────────────────
   let currentBookingId  = null;
   let selectedStatus    = null;
-  let currentRefCode    = null;   // <-- stores the ref of the booking being updated
+  let currentRefCode    = null;  
 
   const statusFlow = {
     pending:     [{ value: 'in_progress', label: 'Mark In Progress', icon: 'fas fa-tools' }],
@@ -201,7 +195,6 @@
     picked_up:   [],
   };
 
-  // ── Open Modal ────────────────────────────────────────
   function openStatusModal(bookingId, currentStatus, refCode) {
     currentBookingId = bookingId;
     selectedStatus   = null;
@@ -213,7 +206,6 @@
     const confirmBtn = document.getElementById('modalConfirm');
     const refStep    = document.getElementById('refConfirmStep');
 
-    // Reset ref confirmation
     resetRefInput();
     refStep.style.display = 'none';
     confirmBtn.disabled   = true;
@@ -233,20 +225,17 @@
     document.getElementById('statusModal').style.display = 'flex';
   }
 
-  // ── Select Status → show ref input ───────────────────
   function selectStatus(el, value) {
     document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
     selectedStatus = value;
 
-    // Show the ref confirmation step
     const refStep = document.getElementById('refConfirmStep');
     refStep.style.display = 'block';
     resetRefInput();
     document.getElementById('refConfirmInput').focus();
   }
 
-  // ── Ref Input Validation ──────────────────────────────
   function resetRefInput() {
     const input   = document.getElementById('refConfirmInput');
     const wrap    = document.getElementById('refInputWrap');
@@ -284,7 +273,7 @@
     }
   });
 
-  // ── Close Modal ───────────────────────────────────────
+  
   const closeModal = () => {
     document.getElementById('statusModal').style.display = 'none';
     resetRefInput();
@@ -296,11 +285,9 @@
     if (e.target.id === 'statusModal') closeModal();
   });
 
-  // ── Confirm Update ────────────────────────────────────
   document.getElementById('modalConfirm')?.addEventListener('click', async () => {
     if (!selectedStatus || !currentBookingId) { alert('Select a status first.'); return; }
 
-    // Double-check ref before firing API (safety net)
     const typed  = (document.getElementById('refConfirmInput')?.value || '').trim().toUpperCase();
     const target = (currentRefCode || '').trim().toUpperCase();
     if (typed !== target) {
@@ -331,7 +318,6 @@
     }
   });
 
-  // ── Load Bookings ─────────────────────────────────────
   async function loadBookings() {
     const status = document.getElementById('bookingStatusFilter')?.value || '';
     const search = document.getElementById('bookingSearch')?.value || '';

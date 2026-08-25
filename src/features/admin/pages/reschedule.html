@@ -13,8 +13,6 @@
     body { display: flex; }
     .layout-wrapper { display: flex; width: 100%; }
     #app { display: contents; }
-
-    /* ── Access Denied ── */
     .access-denied {
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; min-height: 60vh; text-align: center; gap: 14px;
@@ -23,7 +21,6 @@
     .access-denied h3 { font-size: 22px; font-weight: 600; color: var(--text); }
     .access-denied p  { font-size: 14px; color: var(--text-muted); max-width: 320px; }
 
-    /* ── Grid layout ── */
     .rs-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -32,7 +29,6 @@
     }
     @media (max-width: 900px) { .rs-grid { grid-template-columns: 1fr; } }
 
-    /* ── Step Cards ── */
     .step-card {
       background: var(--dark-2); border: 1px solid var(--border);
       border-radius: var(--radius); overflow: hidden;
@@ -51,8 +47,6 @@
     .step-hdr-text .t { font-size: 14px; font-weight: 600; color: var(--text); }
     .step-hdr-text .s { font-size: 11px; color: var(--text-muted); }
     .step-body { padding: 18px; }
-
-    /* ── Fields ── */
     .rs-field { margin-bottom: 14px; }
     .rs-field label {
       display: flex; align-items: center; gap: 6px;
@@ -77,7 +71,6 @@
     .rs-field select option { background: var(--dark-2); }
     .rs-field .fhint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
 
-    /* ── Bookings list ── */
     .rs-select-bar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 9px 14px; background: var(--dark-4); border-bottom: 1px solid var(--border);
@@ -197,10 +190,6 @@
   <div id="pageRoot"></div>
 </div>
 
-
-<!-- ════════════════════════════════════════
-     CONFIRM RESCHEDULE MODAL
-════════════════════════════════════════ -->
 <div class="modal-overlay hidden" id="confirmRescheduleModal">
   <div class="rs-confirm-modal">
     <div class="rs-cm-hdr">
@@ -251,7 +240,7 @@
 
   let currentUser = null;
 
-  // ── Access check ──────────────────────────────────────
+  // Access check
   async function boot() {
     try {
       const res  = await fetch('/api/auth/me');
@@ -274,7 +263,6 @@
     } catch (_) { window.location.href = '/auth/login'; }
   }
 
-  // ── Render page ───────────────────────────────────────
   function renderPage() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('pageRoot').innerHTML = `
@@ -376,7 +364,6 @@
     loadServicesDropdown();
   }
 
-  // ── Load services ─────────────────────────────────────
   async function loadServicesDropdown() {
     try {
       const res  = await fetch('/api/admin/services');
