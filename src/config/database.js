@@ -15,7 +15,7 @@ const pool = new Pool(
         // LOCAL POSTGRES DATABASE
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 5432,
-        database: process.env.DB_NAME || 'capstonedb',
+        database: process.env.DB_NAME || 'detailing_booking_db',
         user: process.env.DB_USER || process.env.USER,
         password: process.env.DB_PASSWORD || '',
         max: 20,

@@ -23,18 +23,18 @@ npm run css
 
 **Drop and recreate:**
 ```bash
-psql -U postgres -c "DROP DATABASE capstonedb;"
-psql -U postgres -c "CREATE DATABASE capstonedb;"
+psql -U postgres -c "DROP DATABASE detailing_booking_db;"
+psql -U postgres -c "CREATE DATABASE detailing_booking_db;"
 ```
 
 **Create all tables (run after drop and recreate):**
 ```bash
-psql -U postgres -d capstonedb -f src/database/BOOKING-SYSTEM.sql
+psql -U postgres -d detailing_booking_db -f src/database/BOOKING-SYSTEM.sql
 ```
 
 **Insert sample data:**
 ```bash
-psql -U postgres -d capstonedb -f src/database/seeds/services.sql
+psql -U postgres -d detailing_booking_db -f src/database/seeds/services.sql
 ```
 
 ## Database (DOCKER option)
@@ -57,7 +57,7 @@ docker compose up -d
 
 **Check logs / confirm it initialized correctly:**
 ```bash
-docker logs capstone-db
+docker logs detailing_booking_db
 ```
 
 **Note:** only one Postgres can use port 5432 at a time. If running another dockerized project locally (e.g. budgeting-api), stop that one first:

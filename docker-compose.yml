@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17
-    container_name: capstone-db
+    container_name: detailing_booking_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
