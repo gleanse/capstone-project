@@ -10,8 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/seeds.js",
-    "db:create": "node scripts/setup-db.js",
-    "db:setup": "npm run db:create && npm run migrate up && npm run seed",
+    "db:ensure": "node scripts/ensure-db.js",
+    "db:setup": "npm run db:ensure && npm run migrate up && npm run seed",
     "db:setup:docker": "docker compose up -d && npm run migrate up && npm run seed"
   },
   "keywords": [],
