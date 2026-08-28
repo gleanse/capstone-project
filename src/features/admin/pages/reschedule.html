@@ -8,181 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/admin/admin.css">
-  <style>
-    body { display: flex; }
-    .layout-wrapper { display: flex; width: 100%; }
-    #app { display: contents; }
-    .access-denied {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 60vh; text-align: center; gap: 14px;
-    }
-    .access-denied .ad-icon { font-size: 52px; color: var(--danger); opacity: 0.35; }
-    .access-denied h3 { font-size: 22px; font-weight: 600; color: var(--text); }
-    .access-denied p  { font-size: 14px; color: var(--text-muted); max-width: 320px; }
-
-    .rs-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-    @media (max-width: 900px) { .rs-grid { grid-template-columns: 1fr; } }
-
-    .step-card {
-      background: var(--dark-2); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-    }
-    .step-hdr {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-      background: var(--dark-3);
-    }
-    .step-num {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--red); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; flex-shrink: 0;
-    }
-    .step-hdr-text .t { font-size: 14px; font-weight: 600; color: var(--text); }
-    .step-hdr-text .s { font-size: 11px; color: var(--text-muted); }
-    .step-body { padding: 18px; }
-    .rs-field { margin-bottom: 14px; }
-    .rs-field label {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 600; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
-    }
-    .rs-field label i { color: var(--red); font-size: 11px; width: 12px; }
-    .rs-field input, .rs-field select {
-      width: 100%; padding: 10px 12px;
-      background: var(--dark-3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-family: var(--font-body); font-size: 14px; outline: none;
-      transition: border-color 0.2s; -webkit-appearance: none;
-    }
-    .rs-field input:focus, .rs-field select:focus { border-color: var(--red); background: rgba(220,38,38,0.04); }
-    .rs-field select {
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 12px center;
-      padding-right: 36px; background-color: var(--dark-3);
-    }
-    .rs-field select option { background: var(--dark-2); }
-    .rs-field .fhint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
-
-    .rs-select-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 14px; background: var(--dark-4); border-bottom: 1px solid var(--border);
-      font-size: 12px;
-    }
-    .rs-select-bar label {
-      display: flex; align-items: center; gap: 7px; cursor: pointer;
-      color: var(--text-muted); text-transform: none; font-weight: 400; margin: 0; font-size: 12px;
-    }
-    .rs-select-bar input[type="checkbox"] { accent-color: var(--red); width: 14px; height: 14px; }
-    .rs-count { font-weight: 700; color: var(--red); }
-
-    .rs-booking-list { max-height: 320px; overflow-y: auto; }
-    .rs-booking-list::-webkit-scrollbar { width: 4px; }
-    .rs-booking-list::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 4px; }
-
-    .rs-bk-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 14px; border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: background 0.15s; font-size: 13px;
-    }
-    .rs-bk-item:last-child { border-bottom: none; }
-    .rs-bk-item:hover { background: var(--dark-3); }
-    .rs-bk-item input[type="checkbox"] { accent-color: var(--red); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
-    .rs-bk-info { flex: 1; min-width: 0; }
-    .rs-bk-name { font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .rs-bk-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-    .rs-bk-ref  { font-size: 10px; color: var(--text-dim); font-family: monospace; }
-    .rs-email-icon { font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
-
-    /* ── Capacity check ── */
-    .cap-check {
-      padding: 10px 12px; border-radius: var(--radius-sm);
-      font-size: 13px; margin-top: 8px; display: none;
-      align-items: center; gap: 8px; line-height: 1.5;
-    }
-    .cap-check.ok   { background: rgba(16,185,129,0.09); border: 1px solid rgba(16,185,129,0.2); color: var(--success); display: flex; }
-    .cap-check.err  { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); display: flex; }
-    .cap-check.warn { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); color: #f59e0b; display: flex; }
-
-    /* ── Summary box ── */
-    .rs-summary-box {
-      background: var(--dark-3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;
-    }
-    .rsb-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 7px; }
-    .rsb-row:last-child { margin-bottom: 0; }
-    .rsb-row span:first-child { color: var(--text-muted); }
-    .rsb-row span:last-child  { color: var(--text); font-weight: 600; }
-    .rsb-row.big span:last-child { color: var(--red); font-size: 16px; }
-
-    /* ── Modal ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-      z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal-overlay.hidden { display: none !important; }
-    @keyframes slideIn {
-      from { opacity:0; transform: translateY(-14px) scale(0.97); }
-      to   { opacity:1; transform: translateY(0) scale(1); }
-    }
-    .rs-confirm-modal {
-      background: var(--dark-2); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius); width: 100%; max-width: 430px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: slideIn 0.22s ease; overflow: hidden;
-    }
-    .rs-cm-hdr {
-      padding: 18px 22px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 14px;
-    }
-    .rs-cm-icon {
-      width: 42px; height: 42px; border-radius: 10px;
-      background: rgba(245,158,11,0.1);
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .rs-cm-icon i { color: #f59e0b; font-size: 20px; }
-    .rs-cm-hdr h3 { font-size: 15px; font-weight: 600; color: var(--text); }
-    .rs-cm-hdr p  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .rs-cm-body { padding: 20px 22px; }
-    .rs-cm-foot { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
-
-    .rs-detail-box {
-      background: var(--dark-3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; font-size: 13px;
-    }
-    .rsdb-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-    .rsdb-row:last-child { margin-bottom: 0; }
-    .rsdb-row span:first-child { color: var(--text-muted); }
-    .rsdb-row span:last-child  { color: var(--text); font-weight: 600; }
-
-    .pw-wrap { position: relative; }
-    .pw-wrap input { padding-right: 42px; }
-    .pw-toggle {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; color: var(--text-dim);
-      cursor: pointer; font-size: 13px; padding: 4px;
-    }
-    .pw-toggle:hover { color: var(--text-muted); }
-
-    .modal-msg { padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; display: none; align-items: center; gap: 8px; }
-    .modal-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); display: flex; }
-    .modal-msg.error   { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); display: flex; }
-
-    .info-note {
-      display: flex; align-items: flex-start; gap: 8px;
-      font-size: 12px; color: var(--text-muted); line-height: 1.6;
-      padding: 10px 12px; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15);
-      border-radius: var(--radius-sm); margin-bottom: 14px;
-    }
-    .info-note i { color: #3b82f6; margin-top: 1px; flex-shrink: 0; }
-  </style>
+  <link rel="stylesheet" href="/css/output.css">
 </head>
 <body>
 
@@ -215,7 +41,7 @@
       </div>
 
       <div class="rs-field">
-        <label><i class="fas fa-lock"></i> Re-enter your password to confirm <span style="color:var(--red)">*</span></label>
+        <label><i class="fas fa-lock"></i> Re-enter your password to confirm <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
         <div class="pw-wrap">
           <input type="password" id="rsConfirmPassword" placeholder="Your admin password" autocomplete="current-password">
           <button type="button" class="pw-toggle" id="rsPwToggle">
@@ -286,13 +112,13 @@
           </div>
           <div class="step-body">
             <div class="rs-field">
-              <label><i class="fas fa-spray-can"></i> Service <span style="color:var(--red)">*</span></label>
+              <label><i class="fas fa-spray-can"></i> Service <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
               <select id="rs_service" onchange="loadSourceBookings()">
                 <option value="">-- Select service --</option>
               </select>
             </div>
             <div class="rs-field">
-              <label><i class="fas fa-calendar"></i> Source Date <span style="color:var(--red)">*</span></label>
+              <label><i class="fas fa-calendar"></i> Source Date <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
               <input type="date" id="rs_from_date" onchange="loadSourceBookings()">
               <p class="fhint">The date you want to move bookings FROM.</p>
             </div>
@@ -328,7 +154,7 @@
             </div>
             <div class="step-body">
               <div class="rs-field">
-                <label><i class="fas fa-calendar-plus"></i> New Date <span style="color:var(--red)">*</span></label>
+                <label><i class="fas fa-calendar-plus"></i> New Date <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
                 <input type="date" id="rs_to_date" min="${today}" onchange="checkNewDateCap()">
               </div>
               <div class="cap-check" id="rsCapCheck"></div>
@@ -471,7 +297,7 @@
 
       if (!cap) {
         capEl.className = 'cap-check err';
-        capEl.innerHTML = `<i class="fas fa-times-circle"></i> No capacity configured for this service on this date. <a href="/admin/availability" style="color:var(--danger);text-decoration:underline;margin-left:4px;">Set it up →</a>`;
+        capEl.innerHTML = `<i class="fas fa-times-circle"></i> No capacity configured for this service on this date. <a href="/admin/availability" style="color:var(--color-admin-danger);text-decoration:underline;margin-left:4px;">Set it up →</a>`;
         checkSummaryReady(); return;
       }
 
