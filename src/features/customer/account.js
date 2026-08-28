@@ -227,7 +227,7 @@ async function openBookingModal(referenceCode) {
         </div>
         <div>
           <p class="text-white/30 text-xs mb-1">Variant</p>
-          <p class="text-white text-sm font-medium">${b.variant_name || '—'}</p>
+          <p class="text-white text-sm font-medium">${b.variant_name || '-'}</p>
         </div>
         <div>
           <p class="text-white/30 text-xs mb-1">Date</p>
@@ -571,7 +571,7 @@ async function loadProfile() {
   const u = json.user;
   document.getElementById('profile-name').textContent = u.name;
   document.getElementById('profile-email').textContent = u.email;
-  document.getElementById('profile-phone').textContent = u.phone || '—';
+  document.getElementById('profile-phone').textContent = u.phone || '-';
   document.getElementById('profile-email-2').textContent = u.email;
   document.getElementById('edit-name').value = u.name;
   document.getElementById('edit-phone').value = u.phone || '';

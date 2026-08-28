@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Walk-in — Herco Admin</title>
+  <title>Walk-in - Herco Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <!-- Booking Date — today (locked) OR future date picker -->
+        <!-- Booking Date - today (locked) OR future date picker -->
         <div class="wi-field" id="todayDateField">
           <label><i class="fas fa-calendar"></i> Booking Date</label>
           <input type="text" id="wi_date_display" readonly>
@@ -48,7 +48,7 @@
           <label><i class="fas fa-calendar-plus"></i> Future Booking Date <span style="color:var(--color-admin-danger, #dc2626)">*</span></label>
           <input type="date" id="wi_future_date" onchange="onFutureDateChange()">
           <span class="ferr" id="wi_future_dateErr"></span>
-          <p class="fhint">Today is full — staff is booking a future date on customer's behalf.</p>
+          <p class="fhint">Today is full - staff is booking a future date on customer's behalf.</p>
         </div>
 
         <div class="wi-row2">
@@ -65,7 +65,7 @@
         </div>
 
         <div class="wi-field">
-          <label><i class="fas fa-envelope"></i> Email <span style="font-size:10px;color:var(--color-admin-dim);text-transform:none;font-weight:400;">(optional — for non-techy customers)</span></label>
+          <label><i class="fas fa-envelope"></i> Email <span style="font-size:10px;color:var(--color-admin-dim);text-transform:none;font-weight:400;">(optional - for non-techy customers)</span></label>
           <input type="email" id="wi_email" placeholder="Leave blank if customer has no email">
         </div>
 
@@ -108,9 +108,9 @@
 
         <!-- Summary -->
         <div class="wi-summary" id="wiSummary">
-          <div class="ws-row"><span>Date</span><span id="sum_date">—</span></div>
-          <div class="ws-row"><span>Service</span><span id="sum_service">—</span></div>
-          <div class="ws-row"><span>Variant</span><span id="sum_variant">—</span></div>
+          <div class="ws-row"><span>Date</span><span id="sum_date">-</span></div>
+          <div class="ws-row"><span>Service</span><span id="sum_service">-</span></div>
+          <div class="ws-row"><span>Variant</span><span id="sum_variant">-</span></div>
           <div class="ws-row"><span>Total</span><span id="sum_amount">₱0</span></div>
         </div>
 
@@ -144,7 +144,7 @@
         </div>
         <ul style="list-style:none;padding:12px 16px;margin:0;display:flex;flex-direction:column;gap:8px;">
           <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px;flex-shrink:0;"></i>Walk-in gets next available queue number</li>
-          <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px;flex-shrink:0;"></i>Payment collected in cash — marked paid immediately</li>
+          <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-check-circle" style="color:#10b981;margin-top:2px;flex-shrink:0;"></i>Payment collected in cash - marked paid immediately</li>
           <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-exclamation-circle" style="color:#f59e0b;margin-top:2px;flex-shrink:0;"></i>If today is full, book a future date on customer's behalf</li>
           <li style="font-size:12px;color:var(--color-admin-muted);display:flex;gap:8px;"><i class="fas fa-print" style="color:var(--color-admin-dim);margin-top:2px;flex-shrink:0;"></i>Print the reference slip for the customer</li>
         </ul>
@@ -167,24 +167,24 @@
 
     <div class="slip-queue">
       <div class="slip-q-label">Queue Number</div>
-      <div class="slip-q-num" id="slipQueueNum">—</div>
-      <div class="slip-q-date" id="slipQueueDate">—</div>
+      <div class="slip-q-num" id="slipQueueNum">-</div>
+      <div class="slip-q-date" id="slipQueueDate">-</div>
     </div>
 
     <div class="slip-rows">
-      <div class="slip-row"><span class="sl">Reference</span><span class="sv" id="slipRef">—</span></div>
-      <div class="slip-row"><span class="sl">Customer</span><span class="sv" id="slipName">—</span></div>
-      <div class="slip-row"><span class="sl">Phone</span><span class="sv" id="slipPhone">—</span></div>
-      <div class="slip-row"><span class="sl">Service</span><span class="sv" id="slipService">—</span></div>
-      <div class="slip-row" id="slipPlateRow"><span class="sl">Plate</span><span class="sv" id="slipPlate">—</span></div>
-      <div class="slip-row" id="slipModelRow"><span class="sl">Model</span><span class="sv" id="slipModel">—</span></div>
+      <div class="slip-row"><span class="sl">Reference</span><span class="sv" id="slipRef">-</span></div>
+      <div class="slip-row"><span class="sl">Customer</span><span class="sv" id="slipName">-</span></div>
+      <div class="slip-row"><span class="sl">Phone</span><span class="sv" id="slipPhone">-</span></div>
+      <div class="slip-row"><span class="sl">Service</span><span class="sv" id="slipService">-</span></div>
+      <div class="slip-row" id="slipPlateRow"><span class="sl">Plate</span><span class="sv" id="slipPlate">-</span></div>
+      <div class="slip-row" id="slipModelRow"><span class="sl">Model</span><span class="sv" id="slipModel">-</span></div>
     </div>
 
     <div class="slip-pay">
       <div class="slip-pay-hdr"><i class="fas fa-check-circle"></i> Payment Record</div>
       <div class="slip-pay-row"><span>Payment Method</span><span>Cash</span></div>
       <div class="slip-pay-row"><span>Status</span><span style="color:#16a34a;font-weight:700;">PAID ✓</span></div>
-      <div class="slip-pay-row"><span>Total</span><span id="slipAmount">—</span></div>
+      <div class="slip-pay-row"><span>Total</span><span id="slipAmount">-</span></div>
     </div>
 
     <div class="slip-foot">
@@ -281,7 +281,7 @@
 
     varEl.innerHTML = variants.length
       ? '<option value="">-- Select variant --</option>' +
-        variants.map(v => `<option value="${v.id}" data-price="${v.price}">${v.name} — ${formatCurrency(v.price)}</option>`).join('')
+        variants.map(v => `<option value="${v.id}" data-price="${v.price}">${v.name} - ${formatCurrency(v.price)}</option>`).join('')
       : '<option value="">No variants</option>';
     varEl.disabled = !variants.length;
 
@@ -462,7 +462,7 @@
       if (data.success) {
         const msgEl = document.getElementById('wiMsg');
         msgEl.className = 'wi-msg success';
-        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Queue #${data.queue_number} — Ref: <strong>${data.reference_code}</strong>`;
+        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Queue #${data.queue_number} - Ref: <strong>${data.reference_code}</strong>`;
 
         showSlip({
           queueNumber:  data.queue_number,
@@ -508,14 +508,14 @@
   function showSlip(d) {
     const dateDisp = new Date(d.bookingDate + 'T00:00:00')
       .toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
-    document.getElementById('slipQueueNum').textContent  = d.queueNumber || '—';
+    document.getElementById('slipQueueNum').textContent  = d.queueNumber || '-';
     document.getElementById('slipQueueDate').textContent = dateDisp;
-    document.getElementById('slipRef').textContent       = d.referenceCode || '—';
-    document.getElementById('slipName').textContent      = d.guestName || '—';
-    document.getElementById('slipPhone').textContent     = d.guestPhone || '—';
-    document.getElementById('slipService').textContent   = `${d.serviceName} — ${d.variantName}`;
-    document.getElementById('slipPlate').textContent     = d.plate || '—';
-    document.getElementById('slipModel').textContent     = d.model || '—';
+    document.getElementById('slipRef').textContent       = d.referenceCode || '-';
+    document.getElementById('slipName').textContent      = d.guestName || '-';
+    document.getElementById('slipPhone').textContent     = d.guestPhone || '-';
+    document.getElementById('slipService').textContent   = `${d.serviceName} - ${d.variantName}`;
+    document.getElementById('slipPlate').textContent     = d.plate || '-';
+    document.getElementById('slipModel').textContent     = d.model || '-';
     document.getElementById('slipAmount').textContent    = formatCurrency(d.amount);
     document.getElementById('slipTypeBadge').textContent = d.isFuture ? 'Pre-booked' : 'Walk-in';
     document.getElementById('slipPlateRow').style.display = d.plate ? '' : 'none';

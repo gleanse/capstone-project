@@ -323,7 +323,7 @@ const getMyInProgress = async (req, res) => {
   }
 };
 
-// returns who marked a booking as in_progress — used by frontend to show ownership warning
+// returns who marked a booking as in_progress - used by frontend to show ownership warning
 const getStartedBy = async (req, res) => {
   try {
     const { id } = req.params;
@@ -469,7 +469,7 @@ const downloadSlip = async (req, res) => {
     doc
       .fontSize(11)
       .font('Helvetica')
-      .text(`Queue No: ${booking.queue_number ?? '—'}`, { align: 'center' });
+      .text(`Queue No: ${booking.queue_number ?? '-'}`, { align: 'center' });
     doc.moveDown(0.5);
     doc.moveTo(40, doc.y).lineTo(555, doc.y).stroke('#eee');
     doc.moveDown(0.5);
@@ -484,17 +484,17 @@ const downloadSlip = async (req, res) => {
         .fontSize(10)
         .font('Helvetica')
         .fillColor('#000')
-        .text(value || '—');
+        .text(value || '-');
       doc.moveDown(0.3);
     };
 
     field('Customer Name', booking.guest_name || booking.customer_name);
-    field('Phone', booking.guest_phone || booking.customer_phone || '—');
+    field('Phone', booking.guest_phone || booking.customer_phone || '-');
     field('Service', booking.service_name);
     field('Variant', booking.variant_name);
     field(
       'Date',
-      booking.booking_date ? new Date(booking.booking_date).toDateString() : '—'
+      booking.booking_date ? new Date(booking.booking_date).toDateString() : '-'
     );
     field('Motorcycle Plate', booking.motorcycle_plate);
     field('Motorcycle Model', booking.motorcycle_model);

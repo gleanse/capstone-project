@@ -37,7 +37,7 @@ const sendBookingConfirmationEmail = async (booking) => {
       : null;
 
   const serviceLabel = variant_name
-    ? `${service_name} — ${variant_name}`
+    ? `${service_name} - ${variant_name}`
     : service_name;
   const paymentLabel =
     payment_type === 'full' ? 'Full Payment' : '50% Down Payment';
@@ -254,7 +254,7 @@ const sendBookingConfirmationEmail = async (booking) => {
   const data = await brevo.transactionalEmails.sendTransacEmail({
     sender: { name: 'Herco Detailing Garage', email: 'devglensprt@gmail.com' },
     to: [{ email: guest_email, name: guest_name }],
-    subject: `Booking Confirmed — ${reference_code}`,
+    subject: `Booking Confirmed - ${reference_code}`,
     htmlContent: html,
   });
 
@@ -408,7 +408,7 @@ const sendPasswordResetEmail = async ({ email, name, otp }) => {
   const data = await brevo.transactionalEmails.sendTransacEmail({
     sender: { name: 'Herco Detailing Garage', email: 'devglensprt@gmail.com' },
     to: [{ email, name }],
-    subject: 'Reset Your Password — Herco Detailing Garage',
+    subject: 'Reset Your Password - Herco Detailing Garage',
     htmlContent: html,
   });
 
@@ -425,7 +425,7 @@ const _statusEmailBase = ({
   variantName,
 }) => {
   const serviceLabel = variantName
-    ? `${serviceName} — ${variantName}`
+    ? `${serviceName} - ${variantName}`
     : serviceName;
   return `
     <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:14px;margin-bottom:14px;"><tr>
@@ -495,7 +495,7 @@ const sendBookingInProgressEmail = async ({
   const data = await brevo.transactionalEmails.sendTransacEmail({
     sender: { name: 'Herco Detailing Garage', email: 'devglensprt@gmail.com' },
     to: [{ email, name }],
-    subject: `Work Has Started — ${referenceCode}`,
+    subject: `Work Has Started - ${referenceCode}`,
     htmlContent: html,
   });
   console.log('[EMAIL] In-progress email sent:', data.messageId);
@@ -530,7 +530,7 @@ const sendBookingDoneEmail = async ({
   const data = await brevo.transactionalEmails.sendTransacEmail({
     sender: { name: 'Herco Detailing Garage', email: 'devglensprt@gmail.com' },
     to: [{ email, name }],
-    subject: `Your Motorcycle Is Ready — ${referenceCode}`,
+    subject: `Your Motorcycle Is Ready - ${referenceCode}`,
     htmlContent: html,
   });
   console.log('[EMAIL] Done email sent:', data.messageId);
@@ -565,7 +565,7 @@ const sendBookingPickedUpEmail = async ({
   const data = await brevo.transactionalEmails.sendTransacEmail({
     sender: { name: 'Herco Detailing Garage', email: 'devglensprt@gmail.com' },
     to: [{ email, name }],
-    subject: `Booking Complete — ${referenceCode}`,
+    subject: `Booking Complete - ${referenceCode}`,
     htmlContent: html,
   });
   console.log('[EMAIL] Picked-up email sent:', data.messageId);

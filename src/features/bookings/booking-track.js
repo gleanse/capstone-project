@@ -140,16 +140,16 @@ function render(b) {
   document.getElementById('ref-code').textContent = b.reference_code;
   document.getElementById('queue-number').textContent = `#${b.queue_number}`;
   document.getElementById('service-name').textContent = b.variant_name
-    ? `${b.service_name} — ${b.variant_name}`
+    ? `${b.service_name} - ${b.variant_name}`
     : b.service_name;
   document.getElementById('booking-date').textContent = fmtDate(b.booking_date);
   document.getElementById('guest-name').textContent = b.guest_name;
 
   // motorcycle
   document.getElementById('moto-plate').textContent =
-    b.motorcycle_plate?.toUpperCase() || '—';
-  document.getElementById('moto-model').textContent = b.motorcycle_model || '—';
-  document.getElementById('moto-color').textContent = b.motorcycle_color || '—';
+    b.motorcycle_plate?.toUpperCase() || '-';
+  document.getElementById('moto-model').textContent = b.motorcycle_model || '-';
+  document.getElementById('moto-color').textContent = b.motorcycle_color || '-';
   if (b.motorcycle_description) {
     document.getElementById('moto-desc-row').classList.remove('hidden');
     document.getElementById('moto-desc-row').classList.add('flex');
@@ -189,7 +189,7 @@ function render(b) {
       </span>`;
   }
 
-  // recommended arrival — only show if booking is confirmed and not yet picked up
+  // recommended arrival - only show if booking is confirmed and not yet picked up
   if (['pending', 'confirmed', 'in_progress', 'done'].includes(currentStatus)) {
     const total = parseInt(b.date_capacity) || 10;
     const arrival = getRecommendedArrival(b.queue_number, total);

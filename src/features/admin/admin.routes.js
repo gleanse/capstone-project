@@ -1,4 +1,4 @@
-// admin.routes.js — JSON API ONLY (used by apiRouter)
+// admin.routes.js - JSON API ONLY (used by apiRouter)
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router  = express.Router();
@@ -28,7 +28,7 @@ function saveBase64Image(base64String, oldImageUrl) {
     const mimeType = matches[1];
     const data     = matches[2];
 
-    // ✅ Validation — image files lang
+    // ✅ Validation - image files lang
     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedMimeTypes.includes(mimeType)) {
       throw new Error(`Invalid file type: ${mimeType}. Images only (JPEG, PNG, WEBP, GIF).`);
@@ -50,7 +50,7 @@ function saveBase64Image(base64String, oldImageUrl) {
     return `/uploads/services/${filename}`;
   } catch (e) {
     console.error('[admin] saveBase64Image error:', e.message);
-    throw e; // ← importante — i-throw para ma-catch ng route
+    throw e; // ← importante - i-throw para ma-catch ng route
   }
 }
 
@@ -239,7 +239,7 @@ router.patch('/bookings/:id/status', async (req, res) => {
 
         await sendEmail({
           to:      booking.guest_email,
-          subject: `Your Motorcycle is Ready for Pickup! — Ref ${booking.reference_code}`,
+          subject: `Your Motorcycle is Ready for Pickup! - Ref ${booking.reference_code}`,
           html: `
             <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;">
               <h2 style="color:#dc2626;">Herco Detailing Garage</h2>
@@ -247,16 +247,16 @@ router.patch('/bookings/:id/status', async (req, res) => {
               <p>Great news! Your motorcycle service is <strong style="color:#16a34a;">complete</strong> and ready for pickup.</p>
               <table style="width:100%;border-collapse:collapse;margin:16px 0;">
                 <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Reference</td><td style="padding:8px;border:1px solid #e5e7eb;font-weight:700;">${booking.reference_code}</td></tr>
-                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Service</td><td style="padding:8px;border:1px solid #e5e7eb;">${booking.service_name}${booking.variant_name ? ` — ${booking.variant_name}` : ''}</td></tr>
+                <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Service</td><td style="padding:8px;border:1px solid #e5e7eb;">${booking.service_name}${booking.variant_name ? ` - ${booking.variant_name}` : ''}</td></tr>
                 <tr><td style="padding:8px;border:1px solid #e5e7eb;color:#6b7280;">Date</td><td style="padding:8px;border:1px solid #e5e7eb;">${dateDisp}</td></tr>
               </table>
               <p>Please come to the garage to pick up your motorcycle at your earliest convenience.</p>
-              <p style="color:#6b7280;font-size:13px;">— Herco Detailing Garage Team</p>
+              <p style="color:#6b7280;font-size:13px;">- Herco Detailing Garage Team</p>
             </div>`,
         });
       } catch (emailErr) {
         console.error('Done email notification error:', emailErr);
-        // Don't fail the status update — email is best-effort
+        // Don't fail the status update - email is best-effort
       }
     }
 
@@ -276,7 +276,7 @@ router.post('/bookings/walkin', async (req, res) => {
     const {
       guest_name, guest_email, guest_phone,
       service_id, variant_id,
-      booking_date,         // "YYYY-MM-DD" — galing sa frontend
+      booking_date,         // "YYYY-MM-DD" - galing sa frontend
       motorcycle_plate, motorcycle_color, motorcycle_model, motorcycle_description,
       payment_method = 'cash',
       is_future_date = false,
@@ -389,7 +389,7 @@ router.post('/bookings/walkin', async (req, res) => {
 
         await sendEmail({
           to:      guest_email,
-          subject: `Walk-in Booking Confirmed — Ref ${booking.reference_code}`,
+          subject: `Walk-in Booking Confirmed - Ref ${booking.reference_code}`,
           html: `
             <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;">
               <h2 style="color:#dc2626;">Herco Detailing Garage</h2>
@@ -404,7 +404,7 @@ router.post('/bookings/walkin', async (req, res) => {
                     <td style="padding:8px;border:1px solid #e5e7eb;">${dateDisp}</td></tr>
               </table>
               <p style="color:#6b7280;font-size:13px;">Please bring this reference number when you arrive.</p>
-              <p style="color:#6b7280;font-size:13px;">— Herco Detailing Garage Team</p>
+              <p style="color:#6b7280;font-size:13px;">- Herco Detailing Garage Team</p>
             </div>`,
         });
       } catch (emailErr) {
@@ -542,7 +542,7 @@ router.post('/bookings/reschedule', async (req, res) => {
         try {
           await sendEmail({
             to:      b.guest_email,
-            subject: `Your Booking Has Been Rescheduled — Ref ${b.reference_code}`,
+            subject: `Your Booking Has Been Rescheduled - Ref ${b.reference_code}`,
             html: `
               <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;">
                 <h2 style="color:#dc2626;">Herco Detailing Garage</h2>
@@ -567,7 +567,7 @@ router.post('/bookings/reschedule', async (req, res) => {
                   </tr>
                 </table>
                 <p>If you have any questions, please contact us directly.</p>
-                <p style="color:#6b7280;font-size:13px;">— Herco Detailing Garage Team</p>
+                <p style="color:#6b7280;font-size:13px;">- Herco Detailing Garage Team</p>
               </div>`,
           });
           notified++;
@@ -936,7 +936,7 @@ router.post('/availability', async (req, res) => {
           success: false,
           code: 'EXCEEDS_HOURS',
           warning: true,
-          message: `Setting capacity to ${cap} with a ${baseDuration}h service duration totals ${cap * baseDuration} hours — exceeding the 9-hour workday. Proceed anyway?`
+          message: `Setting capacity to ${cap} with a ${baseDuration}h service duration totals ${cap * baseDuration} hours - exceeding the 9-hour workday. Proceed anyway?`
         });
       }
     }
@@ -1044,7 +1044,7 @@ router.put('/availability/:id', async (req, res) => {
           success: false,
           code: 'EXCEEDS_HOURS',
           warning: true,
-          message: `Setting capacity to ${cap} with a ${baseDuration}h service duration totals ${cap * baseDuration} hours — exceeding the 9-hour workday. Proceed anyway?`
+          message: `Setting capacity to ${cap} with a ${baseDuration}h service duration totals ${cap * baseDuration} hours - exceeding the 9-hour workday. Proceed anyway?`
         });
       }
 
@@ -1186,7 +1186,7 @@ router.get('/notifications/list', async (req, res) => {
       ORDER BY b.created_at DESC
     `);
 
-    // Pending bookings (confirmed but not yet in_progress) — today
+    // Pending bookings (confirmed but not yet in_progress) - today
     const pendingRes = await pool.query(`
       SELECT b.id, b.reference_code, b.guest_name, b.status,
              s.name AS service_name
@@ -1202,7 +1202,7 @@ router.get('/notifications/list', async (req, res) => {
       ORDER BY b.created_at ASC
     `);
 
-    // Done — waiting for pickup
+    // Done - waiting for pickup
     const pickupRes = await pool.query(`
       SELECT b.id, b.reference_code, b.guest_name, b.status,
              s.name AS service_name

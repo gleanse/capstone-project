@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Compiled Tailwind output — dating "/admin/admin.css" + inline <style>, nasa admin.css partial na ngayon -->
+  <!-- Compiled Tailwind output - dating "/admin/admin.css" + inline <style>, nasa admin.css partial na ngayon -->
   <link rel="stylesheet" href="/css/output.css">
   <style>
     body { display: flex; }
@@ -248,9 +248,9 @@
       }
       tbody.innerHTML = data.data.map(b => `
         <tr>
-          <td><strong>${b.reference_code || '—'}</strong></td>
-          <td><strong>${b.guest_name || b.user_name || '—'}</strong><br><small>${b.guest_email || ''}</small></td>
-          <td>${b.service_name || '—'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
+          <td><strong>${b.reference_code || '-'}</strong></td>
+          <td><strong>${b.guest_name || b.user_name || '-'}</strong><br><small>${b.guest_email || ''}</small></td>
+          <td>${b.service_name || '-'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
           <td>${formatDate(b.booking_date)}</td>
           <td>${formatCurrency(b.total_price || b.variant_price)}</td>
           <td>${b.payment_method === 'cash'

@@ -76,13 +76,13 @@
         totalBalance += Number(p.remaining_balance || 0);
         return `
           <tr>
-            <td><strong>${p.reference_code || '—'}</strong></td>
-            <td>${p.guest_name || p.user_name || '—'}</td>
+            <td><strong>${p.reference_code || '-'}</strong></td>
+            <td>${p.guest_name || p.user_name || '-'}</td>
             <td>${formatCurrency(p.amount)}</td>
             <td><strong style="color:#10b981">${formatCurrency(p.amount_paid)}</strong></td>
             <td>${p.remaining_balance > 0
               ? `<strong style="color:var(--color-admin-warning)">${formatCurrency(p.remaining_balance)}</strong>`
-              : '—'}</td>
+              : '-'}</td>
             <td>${p.payment_type === 'full'
               ? '<span class="status-badge status-confirmed">Full</span>'
               : '<span class="status-badge status-pending">Down Payment</span>'}</td>

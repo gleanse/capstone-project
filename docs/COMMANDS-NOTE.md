@@ -9,12 +9,12 @@ npm install
 
 Run both terminals simultaneously:
 
-**Terminal 1 — Server:**
+**Terminal 1 - Server:**
 ```bash
 npm run dev
 ```
 
-**Terminal 2 — Tailwind:**
+**Terminal 2 - Tailwind:**
 ```bash
 npm run css
 ```

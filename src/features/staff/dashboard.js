@@ -42,7 +42,7 @@ const hideAllActionModals = () =>
   ].forEach(hideModal);
 
 const renderBookingRow = (b) => {
-  const name = b.guest_name || b.customer_name || '—';
+  const name = b.guest_name || b.customer_name || '-';
   const mismatch = isDateMismatch(b.booking_date);
   const dateLabel =
     viewMode === 'upcoming'
@@ -60,7 +60,7 @@ const renderBookingRow = (b) => {
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-8 h-8 rounded-xl bg-red-600/15 flex items-center justify-center flex-shrink-0 text-red-400 font-bold text-sm" style="font-family:'Bebas Neue',sans-serif;">${
-            b.queue_number ?? '—'
+            b.queue_number ?? '-'
           }</div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
@@ -79,7 +79,7 @@ const renderBookingRow = (b) => {
             </div>
             <p class="text-white/30 text-xs mt-0.5">${b.reference_code} · ${
     b.service_name
-  }${b.variant_name ? ' — ' + b.variant_name : ''}</p>
+  }${b.variant_name ? ' - ' + b.variant_name : ''}</p>
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
@@ -262,11 +262,11 @@ const loadDoneList = async () => {
       }')">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-lg font-bold text-green-400" style="font-family:'Bebas Neue',sans-serif;">#${
-            b.queue_number ?? '—'
+            b.queue_number ?? '-'
           }</span>
           <span class="status-badge status-done">Done</span>
         </div>
-        <p class="text-white text-xs font-medium">${b.guest_name || '—'}</p>
+        <p class="text-white text-xs font-medium">${b.guest_name || '-'}</p>
         <p class="text-white/30 text-xs">${b.motorcycle_plate} · ${
           b.service_name
         }</p>
@@ -304,14 +304,14 @@ const loadMyInProgress = async () => {
       }')">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-lg font-bold text-blue-400" style="font-family:'Bebas Neue',sans-serif;">#${
-            b.queue_number ?? '—'
+            b.queue_number ?? '-'
           }</span>
           <span class="status-badge status-in_progress">In Progress</span>
         </div>
-        <p class="text-white text-xs font-medium">${b.guest_name || '—'}</p>
+        <p class="text-white text-xs font-medium">${b.guest_name || '-'}</p>
         <p class="text-white/30 text-xs">${b.motorcycle_plate} · ${
           b.service_name
-        }${b.variant_name ? ' — ' + b.variant_name : ''}</p>
+        }${b.variant_name ? ' - ' + b.variant_name : ''}</p>
         <p class="text-white/20 text-[10px] mt-1">${b.reference_code}</p>
       </div>`
       )
@@ -349,9 +349,9 @@ const openModal = (b) => {
   currentBooking = b;
   document.getElementById('modal-ref').textContent = b.reference_code;
 
-  const name = b.guest_name || b.customer_name || '—';
-  const phone = b.guest_phone || b.customer_phone || '—';
-  const email = b.guest_email || b.customer_email || '—';
+  const name = b.guest_name || b.customer_name || '-';
+  const phone = b.guest_phone || b.customer_phone || '-';
+  const email = b.guest_email || b.customer_email || '-';
   const mismatch = isDateMismatch(b.booking_date);
 
   const canProgress = b.status === 'pending';
@@ -375,7 +375,7 @@ const openModal = (b) => {
       <div class="bg-white/3 rounded-xl px-3 py-2.5">
         <p class="text-white/30 text-[10px] uppercase tracking-widest mb-0.5">Queue</p>
         <p class="text-white font-bold text-lg" style="font-family:'Bebas Neue',sans-serif;">#${
-          b.queue_number ?? '—'
+          b.queue_number ?? '-'
         }</p>
       </div>
       <div class="bg-white/3 rounded-xl px-3 py-2.5">
@@ -390,17 +390,17 @@ const openModal = (b) => {
       ${modalField('ph-phone', 'Phone', phone)}
       ${modalField('ph-envelope', 'Email', email)}
       ${modalField('ph-motorcycle', 'Plate', b.motorcycle_plate)}
-      ${modalField('ph-car', 'Model', b.motorcycle_model || '—')}
-      ${modalField('ph-palette', 'Color', b.motorcycle_color || '—')}
+      ${modalField('ph-car', 'Model', b.motorcycle_model || '-')}
+      ${modalField('ph-palette', 'Color', b.motorcycle_color || '-')}
       ${modalField(
         'ph-wrench',
         'Service',
-        `${b.service_name} — ${b.variant_name || '—'}`
+        `${b.service_name} - ${b.variant_name || '-'}`
       )}
       ${modalField(
         'ph-calendar',
         'Booking Date',
-        b.booking_date ? new Date(b.booking_date).toDateString() : '—'
+        b.booking_date ? new Date(b.booking_date).toDateString() : '-'
       )}
     </div>
     <div class="bg-white/3 rounded-xl px-4 py-3 mb-4 text-xs space-y-1.5">
@@ -566,7 +566,7 @@ const triggerVariantSwap = async () => {
         (v) =>
           `<option value="${v.id}" data-price="${v.price}"${
             v.id === currentBooking.variant_id ? ' selected' : ''
-          }>${v.name} — PHP ${parseFloat(v.price).toLocaleString()}</option>`
+          }>${v.name} - PHP ${parseFloat(v.price).toLocaleString()}</option>`
       )
       .join('');
     updateVariantPreview();
@@ -730,7 +730,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.target === document.getElementById('modal-booking')) closeModal();
   });
 
-  // in progress — retype last 4 chars of reference code
+  // in progress - retype last 4 chars of reference code
   document.getElementById('inprogress-cancel').addEventListener('click', () => {
     hideModal('modal-inprogress');
     document.getElementById('inprogress-confirm-input').value = '';
@@ -756,7 +756,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       commitStatus('in_progress');
     });
 
-  // done — retype last 4 chars + ownership warning already shown in modal
+  // done - retype last 4 chars + ownership warning already shown in modal
   document.getElementById('done-cancel').addEventListener('click', () => {
     hideModal('modal-done');
     document.getElementById('done-confirm-input').value = '';

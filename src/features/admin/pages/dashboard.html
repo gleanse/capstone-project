@@ -33,7 +33,7 @@
     <div class="stat-card" style="--accent:#dc2626">
       <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
       <div class="stat-info">
-        <span class="stat-value" id="statBookingsToday">—</span>
+        <span class="stat-value" id="statBookingsToday">-</span>
         <span class="stat-label">Bookings Today</span>
       </div>
       <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Today</div>
@@ -41,7 +41,7 @@
     <div class="stat-card" style="--accent:#f59e0b">
       <div class="stat-icon"><i class="fas fa-clock"></i></div>
       <div class="stat-info">
-        <span class="stat-value" id="statPending">—</span>
+        <span class="stat-value" id="statPending">-</span>
         <span class="stat-label">Pending</span>
       </div>
       <div class="stat-trend"><i class="fas fa-minus"></i> Awaiting</div>
@@ -49,7 +49,7 @@
     <div class="stat-card" style="--accent:#3b82f6">
       <div class="stat-icon"><i class="fas fa-tools"></i></div>
       <div class="stat-info">
-        <span class="stat-value" id="statInProgress">—</span>
+        <span class="stat-value" id="statInProgress">-</span>
         <span class="stat-label">In Progress</span>
       </div>
       <div class="stat-trend"><i class="fas fa-spinner"></i> Active</div>
@@ -57,7 +57,7 @@
     <div class="stat-card" style="--accent:#10b981">
       <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
       <div class="stat-info">
-        <span class="stat-value" id="statDone">—</span>
+        <span class="stat-value" id="statDone">-</span>
         <span class="stat-label">Done / Pickup</span>
       </div>
       <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Ready</div>
@@ -266,9 +266,9 @@
     }
     tbody.innerHTML = bookings.map(b => `
       <tr>
-        <td><strong>${b.reference_code || '—'}</strong></td>
-        <td><strong>${b.guest_name || b.user_name || '—'}</strong><br><small>${b.guest_email || ''}</small></td>
-        <td>${b.service_name || '—'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
+        <td><strong>${b.reference_code || '-'}</strong></td>
+        <td><strong>${b.guest_name || b.user_name || '-'}</strong><br><small>${b.guest_email || ''}</small></td>
+        <td>${b.service_name || '-'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
         <td>${b.payment_method === 'cash'
           ? '<span class="status-badge status-staff">Cash</span>'
           : '<span class="status-badge status-info">Online</span>'}</td>
@@ -282,15 +282,15 @@
     const tbody = document.getElementById('pickupTableBody');
     tbody.innerHTML = bookings.map(b => `
       <tr>
-        <td><strong>${b.reference_code || '—'}</strong></td>
-        <td><strong>${b.guest_name || '—'}</strong></td>
-        <td>${b.service_name || '—'}</td>
+        <td><strong>${b.reference_code || '-'}</strong></td>
+        <td><strong>${b.guest_name || '-'}</strong></td>
+        <td>${b.service_name || '-'}</td>
         <td>${b.is_fully_paid
           ? '<span class="status-badge status-paid">Fully Paid</span>'
           : '<span class="status-badge status-unpaid">Down Payment</span>'}</td>
         <td>${b.remaining_balance > 0
           ? `<strong style="color:var(--color-admin-warning)">${formatCurrency(b.remaining_balance)}</strong>`
-          : '—'}</td>
+          : '-'}</td>
         <td><button class="action-btn" onclick="openStatusModal('${b.id}','done','${b.reference_code}')">
           <i class="fas fa-check"></i> Mark Picked Up</button></td>
       </tr>`).join('');
@@ -307,10 +307,10 @@
         const stats = await statsRes.json();
         if (stats.success) {
           const s = stats.data;
-          setText('statBookingsToday', s.total    ?? '—');
-          setText('statPending',       s.pending  ?? '—');
-          setText('statInProgress',    s.in_progress ?? '—');
-          setText('statDone',          s.done     ?? '—');
+          setText('statBookingsToday', s.total    ?? '-');
+          setText('statPending',       s.pending  ?? '-');
+          setText('statInProgress',    s.in_progress ?? '-');
+          setText('statDone',          s.done     ?? '-');
           const badge = document.getElementById('pendingBadge');
           if (badge) badge.textContent = s.pending || 0;
         }

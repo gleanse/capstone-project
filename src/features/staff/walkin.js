@@ -129,7 +129,7 @@ const loadVariants = (serviceId) => {
     svc.variants
       .map(
         (v) => `<option value="${v.id}">
-      ${v.name} — PHP ${parseFloat(v.price).toLocaleString('en-PH', {
+      ${v.name} - PHP ${parseFloat(v.price).toLocaleString('en-PH', {
           minimumFractionDigits: 2,
         })}
       ${v.duration_hours ? ' (' + v.duration_hours + 'h est.)' : ''}
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('s-ref').textContent = data.booking.referenceCode;
       document.getElementById('s-queue').textContent =
         '#' + data.booking.queueNumber;
-      document.getElementById('s-service').textContent = `${svc?.name} — ${
+      document.getElementById('s-service').textContent = `${svc?.name} - ${
         variant?.name || ''
       }`;
       document.getElementById('s-name').textContent = guestName;

@@ -587,7 +587,7 @@ async function loadDates() {
       const display = document.getElementById('selected-date-display');
       display.classList.remove('hidden');
       display.classList.add('flex');
-      document.getElementById('selected-date-text').textContent = `${label} — ${
+      document.getElementById('selected-date-text').textContent = `${label} - ${
         slot.remaining
       } slot${slot.remaining > 1 ? 's' : ''} left`;
     }
@@ -701,7 +701,7 @@ function confirmSelectDate(slot, dateStr) {
       const display = document.getElementById('selected-date-display');
       display.classList.remove('hidden');
       display.classList.add('flex');
-      document.getElementById('selected-date-text').textContent = `${label} — ${
+      document.getElementById('selected-date-text').textContent = `${label} - ${
         slot.remaining
       } slot${slot.remaining > 1 ? 's' : ''} left`;
 

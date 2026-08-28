@@ -58,8 +58,8 @@
         <tr>
           <td><strong>${l.action}</strong></td>
           <td>${l.user_name || 'System'}</td>
-          <td><code style="font-size:11px;background:var(--color-admin-dark-3);padding:2px 6px;border-radius:4px;">${l.target_table || '—'}</code></td>
-          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.details || '—'}</td>
+          <td><code style="font-size:11px;background:var(--color-admin-dark-3);padding:2px 6px;border-radius:4px;">${l.target_table || '-'}</code></td>
+          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.details || '-'}</td>
           <td>${formatDateTime(l.created_at)}</td>
         </tr>`).join('');
     } catch (err) {

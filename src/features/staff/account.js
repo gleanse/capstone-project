@@ -65,12 +65,12 @@ document.getElementById('new-password').addEventListener('input', () => {
   } else if (medium) {
     fill.className =
       'h-full rounded-full transition-all duration-300 w-2/3 bg-yellow-400';
-    label.textContent = 'Medium — add numbers or symbols';
+    label.textContent = 'Medium - add numbers or symbols';
     label.className = 'text-xs mt-1 text-yellow-400';
   } else {
     fill.className =
       'h-full rounded-full transition-all duration-300 w-1/3 bg-red-500';
-    label.textContent = 'Weak — too short';
+    label.textContent = 'Weak - too short';
     label.className = 'text-xs mt-1 text-red-400';
   }
 });
@@ -160,7 +160,7 @@ document
     text.textContent = 'Save Password';
   });
 
-// CHANGE EMAIL — Step 1
+// CHANGE EMAIL - Step 1
 document
   .getElementById('btn-send-email-otp')
   .addEventListener('click', async () => {

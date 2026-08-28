@@ -266,7 +266,7 @@ const AdminLayout = (() => {
             <div class="notif-icon new-booking"><i class="fas fa-calendar-check"></i></div>
             <div class="notif-content">
               <strong>${b.guest_name || 'Guest'}</strong>
-              <p>${b.service_name || '—'} ${b.variant_name ? `(${b.variant_name})` : ''}</p>
+              <p>${b.service_name || '-'} ${b.variant_name ? `(${b.variant_name})` : ''}</p>
               <span class="notif-ref">${b.reference_code || ''}</span>
             </div>
           </div>`).join('');
@@ -286,7 +286,7 @@ const AdminLayout = (() => {
           </div>`).join('');
       }
 
-      // Done — waiting for pickup
+      // Done - waiting for pickup
       if (pickup?.length) {
         html += `<div class="notif-section-label"><i class="fas fa-motorcycle" style="margin-right:5px;color:#3b82f6"></i> Ready for Pickup <span class="notif-count-badge" style="background:#3b82f6">${pickup.length}</span></div>`;
         html += pickup.map(b => `
@@ -294,7 +294,7 @@ const AdminLayout = (() => {
             <div class="notif-icon pickup"><i class="fas fa-motorcycle"></i></div>
             <div class="notif-content">
               <strong>${b.guest_name || 'Guest'}</strong>
-              <p>${b.service_name || '—'} — Done, awaiting pickup</p>
+              <p>${b.service_name || '-'} - Done, awaiting pickup</p>
               <span class="notif-ref">${b.reference_code || ''}</span>
             </div>
           </div>`).join('');
@@ -369,12 +369,12 @@ const AdminLayout = (() => {
   }
 
   function formatDate(dateStr) {
-    if (!dateStr) return '—';
+    if (!dateStr) return '-';
     return new Date(dateStr).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   function formatDateTime(dateStr) {
-    if (!dateStr) return '—';
+    if (!dateStr) return '-';
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })
       + ' ' + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });

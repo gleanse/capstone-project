@@ -1,4 +1,4 @@
-// admin.pages.js — serves HTML pages ONLY (used by pagesRouter)
+// admin.pages.js - serves HTML pages ONLY (used by pagesRouter)
 const express = require('express');
 const router  = express.Router();
 const path    = require('path');

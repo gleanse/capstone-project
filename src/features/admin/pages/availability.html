@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Compiled Tailwind output — dating "/admin/admin.css" + inline <style>, nasa admin.css partial na ngayon -->
+  <!-- Compiled Tailwind output - dating "/admin/admin.css" + inline <style>, nasa admin.css partial na ngayon -->
   <link rel="stylesheet" href="/css/output.css">
   <style>
     body { display: flex; }
@@ -296,7 +296,7 @@
           ${formatDate(r.date)}
           ${chips ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px;">${chips}</div>` : ''}
         </td>
-        <td>${r.service_name || '—'}</td>
+        <td>${r.service_name || '-'}</td>
         <td><strong>${r.capacity}</strong></td>
         <td>${booked}</td>
         <td>${r.is_open
@@ -326,7 +326,7 @@
           ? '<span class="status-badge status-staff">Recurring</span>'
           : '<span class="status-badge status-pending">One-time</span>'}</td>
         <td>${r.type === 'recurring' ? DAYS[r.day_of_week] : formatDate(r.date)}</td>
-        <td>${r.reason || '—'}</td>
+        <td>${r.reason || '-'}</td>
         <td>
           <button class="action-btn danger" onclick="openDeleteClosure('${r.id}', ${r.type === 'recurring' ? `'${DAYS[r.day_of_week]}'` : `'${formatDate(r.date)}'`})">
             <i class="fas fa-trash"></i>

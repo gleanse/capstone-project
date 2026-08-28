@@ -50,11 +50,11 @@ if (!isLoginPage && pwInput) {
       label.className = 'text-green-400 text-xs mt-1';
     } else if (medium) {
       fill.className = 'strength-fill medium';
-      label.textContent = 'Medium — add numbers or symbols';
+      label.textContent = 'Medium - add numbers or symbols';
       label.className = 'text-yellow-400 text-xs mt-1';
     } else {
       fill.className = 'strength-fill weak';
-      label.textContent = 'Weak — too short';
+      label.textContent = 'Weak - too short';
       label.className = 'text-red-400 text-xs mt-1';
     }
   });

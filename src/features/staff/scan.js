@@ -101,28 +101,28 @@ const renderBooking = (b) => {
     showFlex('date-warn');
   }
 
-  document.getElementById('b-queue').textContent = `#${b.queue_number ?? '—'}`;
+  document.getElementById('b-queue').textContent = `#${b.queue_number ?? '-'}`;
   document.getElementById('b-date').textContent = b.booking_date
     ? new Date(b.booking_date + 'T00:00:00').toLocaleDateString('en-PH', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
       })
-    : '—';
+    : '-';
 
   infoRow(
     'b-row-name',
     'ph-user',
     'Customer',
-    b.guest_name || b.customer_name || '—'
+    b.guest_name || b.customer_name || '-'
   );
-  infoRow('b-row-plate', 'ph-motorcycle', 'Plate', b.motorcycle_plate || '—');
-  infoRow('b-row-model', 'ph-car', 'Model', b.motorcycle_model || '—');
+  infoRow('b-row-plate', 'ph-motorcycle', 'Plate', b.motorcycle_plate || '-');
+  infoRow('b-row-model', 'ph-car', 'Model', b.motorcycle_model || '-');
   infoRow(
     'b-row-service',
     'ph-wrench',
     'Service',
-    `${b.service_name}${b.variant_name ? ' — ' + b.variant_name : ''}`
+    `${b.service_name}${b.variant_name ? ' - ' + b.variant_name : ''}`
   );
 
   document.getElementById('b-total').textContent = fmt(b.amount);
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('notfound-ref').textContent = `Reference: ${ref}`;
   }
 
-  // in progress — retype 8 chars after HRC-
+  // in progress - retype 8 chars after HRC-
   document.getElementById('inprogress-cancel').addEventListener('click', () => {
     hideEl('modal-inprogress');
     document.getElementById('inprogress-confirm-input').value = '';
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       commitStatus('in_progress');
     });
 
-  // done — retype 8 chars after HRC-
+  // done - retype 8 chars after HRC-
   document.getElementById('done-cancel').addEventListener('click', () => {
     hideEl('modal-done');
     document.getElementById('done-confirm-input').value = '';
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     commitStatus('done');
   });
 
-  // picked up — retype 8 chars after HRC-
+  // picked up - retype 8 chars after HRC-
   document.getElementById('pickup-cancel').addEventListener('click', () => {
     hideEl('modal-pickup');
     document.getElementById('pickup-confirm-input').value = '';

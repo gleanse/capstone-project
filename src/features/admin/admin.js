@@ -159,12 +159,12 @@ function formatCurrency(amount) {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return '—';
+  if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function formatDateTime(dateStr) {
-  if (!dateStr) return '—';
+  if (!dateStr) return '-';
   const d = new Date(dateStr);
   return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric' }) +
     ' ' + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
@@ -184,10 +184,10 @@ async function loadDashboard() {
       const stats = await statsRes.json();
       if (stats.success) {
         const s = stats.data;
-        setText('statBookingsToday', s.total    ?? '—');
-        setText('statPending',       s.pending  ?? '—');
-        setText('statInProgress',    s.in_progress ?? '—');
-        setText('statDone',          s.done     ?? '—');
+        setText('statBookingsToday', s.total    ?? '-');
+        setText('statPending',       s.pending  ?? '-');
+        setText('statInProgress',    s.in_progress ?? '-');
+        setText('statDone',          s.done     ?? '-');
         const badge = document.getElementById('pendingBadge');
         if (badge) badge.textContent = s.pending || 0;
       }
@@ -228,13 +228,13 @@ function renderTodayTable(bookings) {
 
   tbody.innerHTML = bookings.map((b) => `
     <tr>
-      <td><strong>${b.reference_code || '—'}</strong></td>
+      <td><strong>${b.reference_code || '-'}</strong></td>
       <td>
-        <strong>${b.guest_name || b.user_name || '—'}</strong><br>
+        <strong>${b.guest_name || b.user_name || '-'}</strong><br>
         <small>${b.guest_email || b.user_email || ''}</small>
       </td>
-      <td>${b.service_name || '—'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
-      <td>${b.booking_time || '—'}</td>
+      <td>${b.service_name || '-'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
+      <td>${b.booking_time || '-'}</td>
       <td>${b.payment_method === 'cash' ? '<span class="status-badge status-staff">Cash</span>' : '<span class="status-badge status-info">Online</span>'}</td>
       <td>${statusBadge(b.status)}</td>
       <td>
@@ -252,11 +252,11 @@ function renderPickupTable(bookings) {
 
   tbody.innerHTML = bookings.map((b) => `
     <tr>
-      <td><strong>${b.reference_code || '—'}</strong></td>
-      <td><strong>${b.guest_name || '—'}</strong></td>
-      <td>${b.service_name || '—'}</td>
+      <td><strong>${b.reference_code || '-'}</strong></td>
+      <td><strong>${b.guest_name || '-'}</strong></td>
+      <td>${b.service_name || '-'}</td>
       <td>${b.is_fully_paid ? '<span class="status-badge status-paid">Fully Paid</span>' : '<span class="status-badge status-unpaid">Down Payment</span>'}</td>
-      <td>${b.remaining_balance > 0 ? `<strong style="color:var(--warning)">${formatCurrency(b.remaining_balance)}</strong>` : '—'}</td>
+      <td>${b.remaining_balance > 0 ? `<strong style="color:var(--warning)">${formatCurrency(b.remaining_balance)}</strong>` : '-'}</td>
       <td>
         <button class="action-btn" onclick="openStatusModal('${b.id}', 'done', '${b.reference_code}')">
           <i class="fas fa-check"></i> Mark Picked Up
@@ -291,12 +291,12 @@ async function loadBookings() {
 
     tbody.innerHTML = data.data.map((b) => `
       <tr>
-        <td><strong>${b.reference_code || '—'}</strong></td>
+        <td><strong>${b.reference_code || '-'}</strong></td>
         <td>
-          <strong>${b.guest_name || b.user_name || '—'}</strong><br>
+          <strong>${b.guest_name || b.user_name || '-'}</strong><br>
           <small>${b.guest_email || b.user_email || ''}</small>
         </td>
-        <td>${b.service_name || '—'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
+        <td>${b.service_name || '-'} ${b.variant_name ? `<small>(${b.variant_name})</small>` : ''}</td>
         <td>${formatDate(b.booking_date)} <small>${b.booking_time || ''}</small></td>
         <td>${formatCurrency(b.total_price || b.variant_price)}</td>
         <td>${b.payment_method === 'cash' ? '<span class="status-badge status-staff">Cash</span>' : '<span class="status-badge status-info">Online</span>'}</td>
@@ -367,7 +367,7 @@ async function loadServices() {
 }
 
 document.getElementById('addServiceBtn')?.addEventListener('click', () => {
-  alert('Add Service modal — connect to your API here.');
+  alert('Add Service modal - connect to your API here.');
 });
 
 function editService(id)          { alert('Edit service: ' + id); }
@@ -410,7 +410,7 @@ function renderCapacityTable(rows) {
   tbody.innerHTML = rows.map((r) => `
     <tr>
       <td>${formatDate(r.date)}</td>
-      <td>${r.service_name || '—'}</td>
+      <td>${r.service_name || '-'}</td>
       <td><strong>${r.capacity}</strong></td>
       <td>${r.is_open ? '<span class="status-badge status-confirmed">Open</span>' : '<span class="status-badge status-expired">Closed</span>'}</td>
       <td>
@@ -436,14 +436,14 @@ function renderClosedDates(rows) {
     <tr>
       <td>${r.type === 'recurring' ? '<span class="status-badge status-staff">Recurring</span>' : '<span class="status-badge status-pending">One-time</span>'}</td>
       <td>${r.type === 'recurring' ? days[r.day_of_week] : formatDate(r.date)}</td>
-      <td>${r.reason || '—'}</td>
+      <td>${r.reason || '-'}</td>
       <td><button class="action-btn danger" onclick="deleteClosedDate('${r.id}')"><i class="fas fa-trash"></i></button></td>
     </tr>
   `).join('');
 }
 
-document.getElementById('addCapacityBtn')?.addEventListener('click', () => alert('Set Capacity modal — connect to API.'));
-document.getElementById('addClosedBtn')?.addEventListener('click',   () => alert('Add Closure modal — connect to API.'));
+document.getElementById('addCapacityBtn')?.addEventListener('click', () => alert('Set Capacity modal - connect to API.'));
+document.getElementById('addClosedBtn')?.addEventListener('click',   () => alert('Add Closure modal - connect to API.'));
 
 function editCapacity(id)     { alert('Edit capacity: ' + id); }
 function deleteCapacity(id)   { if (confirm('Remove this capacity entry?')) alert('Delete: ' + id); }
@@ -486,7 +486,7 @@ async function loadStaff() {
   }
 }
 
-document.getElementById('addStaffBtn')?.addEventListener('click', () => alert('Add Staff — redirect to signup or modal.'));
+document.getElementById('addStaffBtn')?.addEventListener('click', () => alert('Add Staff - redirect to signup or modal.'));
 
 function deleteStaff(id) { if (confirm('Remove this account?')) alert('Delete staff: ' + id); }
 
@@ -513,11 +513,11 @@ async function loadPayments() {
       totalBalance += Number(p.remaining_balance || 0);
       return `
         <tr>
-          <td><strong>${p.reference_code || '—'}</strong></td>
-          <td>${p.guest_name || p.user_name || '—'}</td>
+          <td><strong>${p.reference_code || '-'}</strong></td>
+          <td>${p.guest_name || p.user_name || '-'}</td>
           <td>${formatCurrency(p.amount)}</td>
           <td><strong style="color:var(--success)">${formatCurrency(p.amount_paid)}</strong></td>
-          <td>${p.remaining_balance > 0 ? `<strong style="color:var(--warning)">${formatCurrency(p.remaining_balance)}</strong>` : '—'}</td>
+          <td>${p.remaining_balance > 0 ? `<strong style="color:var(--warning)">${formatCurrency(p.remaining_balance)}</strong>` : '-'}</td>
           <td>${p.payment_type === 'full' ? '<span class="status-badge status-confirmed">Full</span>' : '<span class="status-badge status-pending">Down Payment</span>'}</td>
           <td>${statusBadge(p.status)}</td>
           <td>${formatDateTime(p.paid_at)}</td>
@@ -552,8 +552,8 @@ async function loadAuditLogs() {
       <tr>
         <td><strong>${l.action}</strong></td>
         <td>${l.user_name || 'System'}</td>
-        <td><code style="font-size:11px;background:var(--dark-3);padding:2px 6px;border-radius:4px;">${l.target_table || '—'}</code></td>
-        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.details || '—'}</td>
+        <td><code style="font-size:11px;background:var(--dark-3);padding:2px 6px;border-radius:4px;">${l.target_table || '-'}</code></td>
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.details || '-'}</td>
         <td>${formatDateTime(l.created_at)}</td>
       </tr>
     `).join('');
@@ -613,7 +613,7 @@ document.getElementById('wi_service')?.addEventListener('change', function () {
   try { variants = JSON.parse(selected.dataset.variants || '[]'); } catch (_) {}
 
   variantEl.innerHTML = variants.length
-    ? '<option value="">-- Select size/variant --</option>' + variants.map((v) => `<option value="${v.id}" data-price="${v.price}">${v.name} — ₱${Number(v.price).toLocaleString()}</option>`).join('')
+    ? '<option value="">-- Select size/variant --</option>' + variants.map((v) => `<option value="${v.id}" data-price="${v.price}">${v.name} - ₱${Number(v.price).toLocaleString()}</option>`).join('')
     : '<option value="">No variants available</option>';
 
   variantEl.disabled = variants.length === 0;
@@ -701,7 +701,7 @@ document.getElementById('walkinForm')?.addEventListener('submit', async (e) => {
     if (data.success) {
       if (msgEl) {
         msgEl.className = 'form-message success';
-        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Ref: <strong>${data.reference_code}</strong> — Queue #${data.queue_number}`;
+        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Walk-in booked! Ref: <strong>${data.reference_code}</strong> - Queue #${data.queue_number}`;
         msgEl.style.display = 'flex';
       }
       document.getElementById('walkinForm').reset();
