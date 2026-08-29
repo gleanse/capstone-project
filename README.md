@@ -19,16 +19,16 @@ A booking system built for a vehicle detailing garage, developed as a capstone p
 
 ## Third-party services
 
-Supabase, Cloudinary, Xendit, Brevo, Render. See [`docs/SERVICES.md`](docs/SERVICES.md) for how each is configured and used.
+Supabase, Cloudinary, Xendit, Brevo, Render. See [`EXTERNAL SERVICES`](docs/EXTERNAL-SERVICES.md) for how each is configured and used.
 
 ## Getting started
 
-This project supports both a Docker and a non-Docker local dev workflow. See [`docs/COMMANDS-NOTE.md`](docs/COMMANDS-NOTE.md) for available scripts.
+This project supports both a Docker and a non-Docker local dev workflow. See [`SETUP`](docs/SETUP.md) for available scripts.
 
 ## Documentation
-
-- [`docs/COMMANDS-NOTE.md`](docs/COMMANDS-NOTE.md) - npm script reference
-- [`docs/SERVICES.md`](docs/SERVICES.md) - external service configuration (database, storage, payments, email)
+ 
+- [`docs/SETUP.md`](docs/SETUP.md) - dev environment setup and command reference
+- [`docs/EXTERNAL-SERVICES.md`](docs/EXTERNAL-SERVICES.md) - external service configuration (database, storage, payments, email)
 
 ## Status
 
