@@ -1,0 +1,17 @@
+# node_modules gets reinstalled fresh inside the container, so the host copy is skipped (wrong os/arch)
+node_modules
+
+# git history not needed inside a container
+.git
+
+# secrets - loaded at runtime via compose env_file, never baked into the image
+.env
+
+# local uploads - production uses cloudinary instead
+public/uploads
+
+# stray local log files
+*.log
+
+# macos system file
+.ds_store

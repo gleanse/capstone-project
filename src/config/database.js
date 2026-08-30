@@ -1,6 +1,10 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// NOTE: if migrating from supabase to a self-hosted vps (fully dockerized),
+// update this branch so 'production' also supports db_host/db_port/etc.
+// instead of only DATABASE_URL - otherwise docker's production target
+// will still try to reach supabase via DATABASE_URL.
 const pool = new Pool(
   process.env.NODE_ENV === 'production'
     ? {

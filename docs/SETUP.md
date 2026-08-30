@@ -98,10 +98,12 @@ npm run db:ensure           # create the database if it doesn't already exist
 
 **Docker container:**
 ```bash
-docker compose up -d        # start
+docker compose up --build   # build images and start (use after dockerfile/dependency changes)
+docker compose up -d        # start (no rebuild)
 docker compose down         # stop
 docker compose down -v      # stop and wipe data (full reset)
-docker logs detailing_booking_db   # check logs / confirm it initialized correctly
+docker logs detailing_booking_db    # check postgres logs / confirm it initialized correctly
+docker logs detailing_booking_app   # check app logs (server, nodemon, css watcher)
 docker ps                   # list running containers
 docker ps -a                # list all containers, including stopped ones
 ```
