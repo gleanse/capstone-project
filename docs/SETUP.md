@@ -4,91 +4,114 @@ Guide for getting this project running on a new machine, plus a reference for co
 
 ## Prerequisites
 
-- **Node.js** (v20+ recommended - check with `node -v`)
-- **npm** (comes with Node)
-- **PostgreSQL** - required either way, via one of the two options below:
+- **Node.js** (v20+ recommended - check with `node -v`) - only needed if running Node natively (Options A/B). Not required for Option C, since the container handles this.
+- **npm** (comes with Node) - same as above, not required for Option C.
+- **Docker + Docker Compose** - required for Option B (database only) or Option C (fully Dockerized).
+- **PostgreSQL** (native install) - only required if not using Docker for the database at all (Option A).
 
-| Option | What you need |
-|---|---|
-| Docker | Docker + Docker Compose |
-| Native | A local PostgreSQL installation |
+| Option | What runs natively | What runs in Docker |
+|---|---|---|
+| A - Fully native | Node + Postgres | - |
+| B - DB only in Docker | Node | Postgres |
+| C - Fully Dockerized | - | Node + Postgres |
 
 ## First-time setup
 
 1. **Clone the repo**
 
-   Via SSH:
-   ```bash
+Via SSH:
+```bash
    git clone git@github.com:gleanse/detailing-booking-system.git
-   ```
+```
 
    Or via HTTPS:
-   ```bash
+```bash
    git clone https://github.com/gleanse/detailing-booking-system.git
-   ```
+```
 
    Then navigate to the directory:
-   ```bash
+```bash
    cd detailing-booking-system
-   ```
+```
 
 2. **Install dependencies**
-   ```bash
+```bash
    npm install
-   ```
+```
+   Not required if you're running fully Dockerized (Option C below) - dependencies install inside the container instead.
 
 3. **Set up environment variables**
 
-   Copy the example file and fill in your own values:
-   ```bash
+Copy the example file and fill in your own values:
+```bash
    cp .env.example .env
-   ```
+```
    `.env.example` is the template - this command creates your actual `.env` from it.
    See [`EXTERNAL-SERVICES.md`](EXTERNAL-SERVICES.md) for what each third-party service credential is and how to get one.
 
-4. **Set up the database** - pick one:
+4. **Set up the database and run the app** - pick one:
 
-   **Option A - Docker (recommended, less manual setup):**
-   ```bash
-   npm run db:setup:docker
-   ```
-   This starts the Postgres container, runs migrations, and seeds sample data.
-
-   **Option B - Native Postgres:**
-   ```bash
+**Option A - Native (Postgres installed locally, app runs on host):**
+```bash
    npm run db:setup
-   ```
+```
    This creates the database if it doesn't exist, runs migrations, and seeds sample data. Requires a local Postgres instance already running.
 
-5. **Run the dev servers**
-
-   You need two terminals running at the same time:
+   Then run the dev servers - you need two terminals:
 
    **Terminal 1 - server:**
-   ```bash
+```bash
    npm run dev
-   ```
+```
 
    **Terminal 2 - Tailwind:**
-   ```bash
+```bash
    npm run css
-   ```
+```
    This watches your source files and rebuilds `output.css` on every change. Keep it running the whole time you're developing - if it's not running, style changes won't show up, even after a refresh.
 
-You should now have the app running locally.
+   **Option B - Docker for database only (Postgres in a container, app runs on host):**
+```bash
+   npm run db:setup:docker
+```
+   This starts the Postgres container, runs migrations, and seeds sample data. The app itself still runs natively - continue with the same two-terminal setup as Option A (`npm run dev` + `npm run css`).
+
+   **Option C - Fully Dockerized (app + database both in containers):**
+```bash
+   docker compose up --build
+```
+   This builds and starts both the app and Postgres containers together. No need to run `npm install`, `npm run dev`, or `npm run css` separately - the container handles all of that internally (nodemon + Tailwind watcher run together automatically). Once it's up, seed/migrate the same way:
+```bash
+   npm run migrate up
+   npm run seed
+```
+   Not required if you're not using Docker - this option is entirely optional, useful for environment parity across machines or if you'd rather not install Postgres/Node dependencies natively at all.
+   Or, for future resets, use the combined script instead:
+```bash
+   npm run db:setup:docker
+```
+   This starts the containers (if not already running), then migrates and seeds in one step - useful after `docker compose down -v` when you need a fresh database. Note: for a first-time setup, use `docker compose up --build` first (above) since the app image needs to be built.
+
+You should now have the app running locally, regardless of which option you picked.
 
 ## Everyday dev commands
 
-**Start the app:**
+**Native / Option A & B:**
 ```bash
 npm run dev      # terminal 1
 npm run css      # terminal 2
 ```
 
+**Fully Dockerized / Option C:**
+```bash
+docker compose up -d        # start in background (after first build)
+docker logs -f detailing_booking_app   # follow logs
+```
+
 **Database setup / reset:**
 ```bash
 npm run db:setup           # native Postgres: ensure db exists, migrate, seed
-npm run db:setup:docker    # docker: start container, migrate, seed
+npm run db:setup:docker    # docker: start containers, migrate, seed (both app + db if using Option C)
 npm run migrate up         # run migrations only
 npm run seed                # run seed script only
 npm run db:ensure           # create the database if it doesn't already exist
