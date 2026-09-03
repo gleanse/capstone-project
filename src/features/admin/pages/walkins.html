@@ -22,14 +22,12 @@
 
   <div class="wi-layout">
 
-    <!-- ── LEFT: Form ── -->
     <div class="card">
       <div class="card-header">
         <h2 class="card-title"><i class="fas fa-user-plus"></i> New Walk-in</h2>
       </div>
       <form id="wiForm" novalidate class="wi-form">
 
-        <!-- Capacity full alert -->
         <div class="cap-alert" id="capAlert">
           <i class="fas fa-exclamation-triangle"></i>
           <div>
@@ -38,7 +36,6 @@
           </div>
         </div>
 
-        <!-- Booking Date - today (locked) OR future date picker -->
         <div class="wi-field" id="todayDateField">
           <label><i class="fas fa-calendar"></i> Booking Date</label>
           <input type="text" id="wi_date_display" readonly>
@@ -106,7 +103,6 @@
           <input type="text" id="wi_desc" placeholder="Additional notes about the motorcycle">
         </div>
 
-        <!-- Summary -->
         <div class="wi-summary" id="wiSummary">
           <div class="ws-row"><span>Date</span><span id="sum_date">-</span></div>
           <div class="ws-row"><span>Service</span><span id="sum_service">-</span></div>
@@ -121,7 +117,6 @@
       </form>
     </div>
 
-    <!-- ── RIGHT: Capacity info ── -->
     <div style="display:flex;flex-direction:column;gap:16px;">
       <div class="card">
         <div class="card-header">

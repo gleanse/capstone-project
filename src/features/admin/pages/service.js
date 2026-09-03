@@ -2,14 +2,14 @@
 
   const { formatCurrency } = AdminLayout;
 
-  // ── State ──────────────────────────────────────────────
+  //  State 
   let editingServiceId  = null;
   let variantsServiceId = null;
   let deletingServiceId = null;
   let currentImageBase64 = null; // base64 of newly selected file
   let clearImageFlag     = false; // user clicked "remove image"
 
-  // ── Image upload handling ──────────────────────────────
+  //  Image upload handling 
   const imgFileInput    = document.getElementById('svc_image_file');
   const imgUploadArea   = document.getElementById('imgUploadArea');
   const imgPlaceholder  = document.getElementById('imgPlaceholder');
@@ -74,7 +74,7 @@
     }
   }
 
-  // ── Helpers ────────────────────────────────────────────
+  //  Helpers 
   function showModalMsg(msgId, type, text) {
     const el = document.getElementById(msgId);
     el.className = 'modal-msg ' + type;
@@ -89,7 +89,7 @@
     return String(str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   }
 
-  // ── Load Services ──────────────────────────────────────
+  //  Load Services 
   async function loadServices() {
     const grid = document.getElementById('servicesGrid');
     grid.innerHTML = `<div class="empty-state full-width"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
@@ -152,7 +152,7 @@
     }
   }
 
-  // ── ADD SERVICE ────────────────────────────────────────
+  //  ADD SERVICE 
   document.getElementById('addServiceBtn').addEventListener('click', () => {
     editingServiceId = null;
     document.getElementById('serviceModalTitle').innerHTML = '<i class="fas fa-spray-can"></i> Add Service';
@@ -167,7 +167,7 @@
     document.getElementById('svc_name').focus();
   });
 
-  // ── EDIT SERVICE ───────────────────────────────────────
+  //  EDIT SERVICE 
   function openEditService(btn) {
     editingServiceId = btn.dataset.id;
     document.getElementById('serviceModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Service';
@@ -190,7 +190,7 @@
     if (e.target.id === 'serviceModal') closeOverlay('serviceModal');
   });
 
-  // ── SAVE SERVICE ───────────────────────────────────────
+  //  SAVE SERVICE 
   document.getElementById('serviceModalSave').addEventListener('click', async () => {
     const name     = document.getElementById('svc_name').value.trim();
     const desc     = document.getElementById('svc_description').value.trim();
@@ -245,7 +245,7 @@
     }
   });
 
-  // ── DELETE SERVICE ─────────────────────────────────────
+  //  DELETE SERVICE 
   function openDelete(id, name) {
     deletingServiceId = id;
     document.getElementById('deleteModalMsg').textContent =
@@ -276,7 +276,7 @@
     }
   });
 
-  // ── VARIANTS MODAL ─────────────────────────────────────
+  //  VARIANTS MODAL 
   async function openVariants(serviceId, serviceName) {
     variantsServiceId = serviceId;
     document.getElementById('variantsModalServiceName').textContent = serviceName;
@@ -390,5 +390,5 @@
     });
   });
 
-  // ── Init ───────────────────────────────────────────────
+  //  Init 
   loadServices();

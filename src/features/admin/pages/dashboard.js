@@ -1,4 +1,3 @@
-// dashboard.js - logic for /admin/dashboard page
 AdminLayout.init({ activePage: 'dashboard', breadcrumb: 'Dashboard' });
 
 // Greeting time
@@ -6,11 +5,11 @@ const hour = new Date().getHours();
 const greetEl = document.getElementById('greetingTime');
 if (greetEl) greetEl.textContent = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
 
-// ── Helpers ──────────────────────────────────────────
+// Helpers
 const { statusBadge, formatCurrency } = AdminLayout;
 const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-// ── Status Modal ──────────────────────────────────────
+//  Status Modal 
 let currentBookingId = null, selectedStatus = null, currentRefCode = null;
 const statusFlow = {
   pending:     [{ value: 'in_progress', label: 'Mark In Progress', icon: 'fas fa-tools' }],
@@ -19,7 +18,7 @@ const statusFlow = {
   picked_up:   [],
 };
 
-// ── Open Modal ────────────────────────────────────────
+//  Open Modal 
 function openStatusModal(bookingId, currentStatus, refCode) {
   currentBookingId = bookingId;
   selectedStatus   = null;
@@ -116,7 +115,7 @@ document.getElementById('modalConfirm')?.addEventListener('click', async () => {
   else alert('Failed: ' + (data.message || 'Unknown error'));
 });
 
-// ── Render ────────────────────────────────────────────
+//  Render 
 function renderTodayTable(bookings) {
   const tbody = document.getElementById('todayTableBody');
   if (!bookings.length) {
@@ -155,7 +154,7 @@ function renderPickupTable(bookings) {
     </tr>`).join('');
 }
 
-// ── Load ──────────────────────────────────────────────
+//  Load 
 async function loadDashboard() {
   try {
     const [bookingsRes, statsRes] = await Promise.all([

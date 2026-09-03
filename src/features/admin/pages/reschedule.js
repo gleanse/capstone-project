@@ -139,7 +139,7 @@
     } catch (_) {}
   }
 
-  // ── Load source bookings ──────────────────────────────
+  //  Load source bookings 
   async function loadSourceBookings() {
     const svcId    = document.getElementById('rs_service')?.value;
     const fromDate = document.getElementById('rs_from_date')?.value;
@@ -215,7 +215,7 @@
     return [...document.querySelectorAll('.rs-cb:checked')].map(cb => cb.dataset.id);
   }
 
-  // ── Check new date capacity ───────────────────────────
+  //  Check new date capacity 
   async function checkNewDateCap() {
     const svcId  = document.getElementById('rs_service')?.value;
     const toDate = document.getElementById('rs_to_date')?.value;
@@ -282,7 +282,7 @@
     if (capEl) capEl.className = 'cap-check';
   }
 
-  // ── Confirm Modal ─────────────────────────────────────
+  //  Confirm Modal 
   function openConfirmModal() {
     const capEl = document.getElementById('rsCapCheck');
     if (capEl.classList.contains('err')) {

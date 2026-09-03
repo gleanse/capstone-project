@@ -166,7 +166,7 @@ const AdminLayout = (() => {
     } catch (_) {}
   }
 
-  // ── NOTIFICATIONS ────────────────────────────────────────
+  //  NOTIFICATIONS 
   function initNotifications() {
     const btn      = document.getElementById('notifBtn');
     const panel    = document.getElementById('notifPanel');

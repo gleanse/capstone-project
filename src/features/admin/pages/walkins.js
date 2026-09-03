@@ -1,13 +1,13 @@
 AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
   const { formatCurrency } = AdminLayout;
 
-  // ── State ─────────────────────────────────────────────
+  //  State 
   const today = new Date().toISOString().split('T')[0];
   let isTodayFull    = false;
   let selectedFutDate = null;
   let services        = [];
 
-  // ── Init ──────────────────────────────────────────────
+  //  Init 
   document.getElementById('wi_date').value = today;
   document.getElementById('wi_date_display').value = new Date(today + 'T00:00:00')
     .toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
@@ -16,7 +16,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
     await Promise.all([loadServices(), loadTodayCapacity()]);
   }
 
-  // ── Load Services ─────────────────────────────────────
+  //  Load Services 
   async function loadServices() {
     try {
       const res  = await fetch('/api/admin/services');
@@ -34,7 +34,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
     } catch (_) {}
   }
 
-  // ── Load Today's Capacity ─────────────────────────────
+  //  Load Today's Capacity 
   async function loadTodayCapacity() {
     const list = document.getElementById('todayCapList');
     try {
@@ -65,7 +65,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
     }
   }
 
-  // ── Service Change ────────────────────────────────────
+  //  Service Change 
   async function onServiceChange() {
     const sel   = document.getElementById('wi_service');
     const varEl = document.getElementById('wi_variant');
@@ -177,7 +177,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
     updateSummary();
   }
 
-  // ── Summary ───────────────────────────────────────────
+  //  Summary 
   function updateSummary() {
     const svcEl  = document.getElementById('wi_service');
     const varEl  = document.getElementById('wi_variant');
@@ -197,7 +197,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
     }
   }
 
-  // ── Validation helpers ────────────────────────────────
+  //  Validation helpers 
   function setErr(id, msg) {
     const inp = document.getElementById(id);
     const err = document.getElementById(id + 'Err');
@@ -206,7 +206,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
   }
   function clearErr(id) { setErr(id, ''); }
 
-  // ── Form Submit ───────────────────────────────────────
+  //  Form Submit 
   document.getElementById('wiForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -300,7 +300,7 @@ AdminLayout.init({ activePage: 'walkins', breadcrumb: 'Walk-in Booking' });
     }
   });
 
-  // ── Slip ──────────────────────────────────────────────
+  //  Slip 
   function showSlip(d) {
     const dateDisp = new Date(d.bookingDate + 'T00:00:00')
       .toLocaleDateString('en-PH', {weekday:'long', month:'long', day:'numeric', year:'numeric'});

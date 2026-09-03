@@ -2,7 +2,7 @@
 
   const { statusBadge, formatDate } = AdminLayout;
 
-  // ── Helpers ──────────────────────────────────────────
+  //  Helpers 
   function openOverlay(id)  { document.getElementById(id).classList.remove('hidden'); }
   function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -21,7 +21,7 @@
   }
   function clearErr(id) { setErr(id, ''); }
 
-  // ── Password Strength ─────────────────────────────────
+  //  Password Strength 
   document.getElementById('staff_password').addEventListener('input', function () {
     const val = this.value;
     const fill  = document.getElementById('staffStrengthFill');
@@ -38,7 +38,7 @@
     else              { fill.className='strength-fill strong'; label.textContent='Strong'; }
   });
 
-  // ── Password Toggle ───────────────────────────────────
+  //  Password Toggle 
   document.getElementById('toggleStaffPw').addEventListener('click', function () {
     const input = document.getElementById('staff_password');
     const icon  = document.getElementById('staffPwIcon');
@@ -47,7 +47,7 @@
     icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
   });
 
-  // ── Load Staff Table ──────────────────────────────────
+  //  Load Staff Table 
   async function loadStaff() {
     const tbody = document.getElementById('staffTableBody');
     try {
@@ -83,7 +83,7 @@
     }
   }
 
-  // ── Open Add Modal ────────────────────────────────────
+  //  Open Add Modal 
   document.getElementById('addStaffBtn').addEventListener('click', () => {
     // Reset form
     ['staff_name','staff_email','staff_password','staff_confirm'].forEach(id => {
@@ -110,7 +110,7 @@
     if (e.target.id === 'addStaffModal') closeOverlay('addStaffModal');
   });
 
-  // ── Save New Account ──────────────────────────────────
+  //  Save New Account 
   document.getElementById('addStaffModalSave').addEventListener('click', async () => {
     const name     = document.getElementById('staff_name').value.trim();
     const email    = document.getElementById('staff_email').value.trim();
@@ -156,7 +156,7 @@
     }
   });
 
-  // ── Delete Staff ──────────────────────────────────────
+  //  Delete Staff 
   let deletingStaffId = null;
 
   function openDeleteStaff(id, name) {

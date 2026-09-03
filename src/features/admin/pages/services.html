@@ -33,9 +33,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     ADD / EDIT SERVICE MODAL
-══════════════════════════════════════════ -->
 <div class="modal-overlay hidden" id="serviceModal">
   <div class="svc-modal">
     <div class="svc-modal-header">
@@ -45,18 +42,15 @@
     <div class="svc-modal-body">
       <div class="modal-msg" id="serviceModalMsg"></div>
 
-      <!-- Image Upload -->
       <div class="svc-field">
         <label><i class="fas fa-image"></i> Service Image</label>
         <div class="img-upload-area" id="imgUploadArea">
           <input type="file" id="svc_image_file" accept="image/*">
-          <!-- Placeholder shown when no image -->
           <div class="img-upload-placeholder" id="imgPlaceholder">
             <i class="fas fa-cloud-upload-alt"></i>
             <p>Click to upload image</p>
             <span>PNG, JPG, WEBP - max 5MB</span>
           </div>
-          <!-- Preview shown when image selected -->
           <div class="img-preview-wrap" id="imgPreviewWrap">
             <img id="imgPreview" src="" alt="Preview">
             <div class="img-preview-overlay">
@@ -64,7 +58,6 @@
             </div>
           </div>
         </div>
-        <!-- Clear button outside area for easy access -->
         <button type="button" id="imgClearBtn"
           style="display:none;margin-top:6px;font-size:12px;color:var(--color-admin-dim);background:none;border:none;cursor:pointer;align-items:center;gap:5px;">
           <i class="fas fa-times-circle"></i> Remove image
@@ -100,9 +93,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MANAGE VARIANTS MODAL
-══════════════════════════════════════════ -->
 <div class="modal-overlay hidden" id="variantsModal">
   <div class="svc-modal">
     <div class="svc-modal-header">
@@ -148,9 +138,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     DELETE CONFIRM MODAL
-══════════════════════════════════════════ -->
 <div class="modal-overlay hidden" id="deleteModal">
   <div class="confirm-modal">
     <div class="confirm-icon"><i class="fas fa-trash"></i></div>
