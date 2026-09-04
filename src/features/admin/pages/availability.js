@@ -1,6 +1,6 @@
 AdminLayout.init({ activePage: 'availability', breadcrumb: 'Availability' });
 
-  const { formatDate } = AdminLayout;
+  const { formatDate, skeletonTableRows } = AdminLayout;
   const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   function openOverlay(id)  { document.getElementById(id).classList.remove('hidden'); }
   function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
@@ -34,17 +34,27 @@ AdminLayout.init({ activePage: 'availability', breadcrumb: 'Availability' });
   };
 
   async function loadAvailability() {
-    try {
-      const [capRes, closeRes] = await Promise.all([
-        fetch('/api/admin/availability'),
-        fetch('/api/admin/closed-dates'),
-      ]);
-      if (capRes.ok)   renderCapacity((await capRes.json()).data || []);
-      if (closeRes.ok) renderClosedDates((await closeRes.json()).data || []);
-    } catch (err) {
-      console.error('Load availability error:', err);
-    }
+  const capBody   = document.getElementById('capacityTableBody');
+  const closeBody = document.getElementById('closedDatesBody');
+
+  const cancelSkeleton = AdminLayout.delayedSkeleton(() => {
+    capBody.innerHTML   = skeletonTableRows(6, 4);
+    closeBody.innerHTML = skeletonTableRows(4, 3);
+  });
+
+  try {
+    const [capRes, closeRes] = await Promise.all([
+      fetch('/api/admin/availability'),
+      fetch('/api/admin/closed-dates'),
+    ]);
+    cancelSkeleton();
+    if (capRes.ok)   renderCapacity((await capRes.json()).data || []);
+    if (closeRes.ok) renderClosedDates((await closeRes.json()).data || []);
+  } catch (err) {
+    cancelSkeleton();
+    console.error('Load availability error:', err);
   }
+}
 
 
   async function renderCapacity(rows) {
