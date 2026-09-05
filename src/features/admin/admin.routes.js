@@ -28,7 +28,7 @@ function saveBase64Image(base64String, oldImageUrl) {
     const mimeType = matches[1];
     const data     = matches[2];
 
-    // ✅ Validation - image files lang
+    // Validation - image files lang
     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedMimeTypes.includes(mimeType)) {
       throw new Error(`Invalid file type: ${mimeType}. Images only (JPEG, PNG, WEBP, GIF).`);

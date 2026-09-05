@@ -74,9 +74,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ===========================
-// TOP BAR DATE & GREETING
-// ===========================
 function updateDateTime() {
   const now = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -93,9 +90,6 @@ function updateDateTime() {
 updateDateTime();
 setInterval(updateDateTime, 60000);
 
-// ===========================
-// USER INFO
-// ===========================
 async function loadUserInfo() {
   try {
     const res  = await fetch('/api/auth/me');
@@ -119,9 +113,6 @@ async function loadUserInfo() {
 
 loadUserInfo();
 
-// ===========================
-// LOGOUT
-// ===========================
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {
@@ -132,9 +123,6 @@ if (logoutBtn) {
   });
 }
 
-// ===========================
-// STATUS HELPERS
-// ===========================
 function statusBadge(status) {
   const icons = {
     pending:     'fas fa-clock',
@@ -170,9 +158,6 @@ function formatDateTime(dateStr) {
     ' ' + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
 }
 
-// ===========================
-// DASHBOARD
-// ===========================
 async function loadDashboard() {
   try {
     const [bookingsRes, statsRes] = await Promise.all([
@@ -266,9 +251,6 @@ function renderPickupTable(bookings) {
   `).join('');
 }
 
-// ===========================
-// BOOKINGS
-// ===========================
 async function loadBookings() {
   const statusFilter = document.getElementById('bookingStatusFilter')?.value || '';
   const search = document.getElementById('bookingSearch')?.value || '';
@@ -319,9 +301,7 @@ async function loadBookings() {
   if (el) el.addEventListener('input', () => loadBookings());
 });
 
-// ===========================
-// SERVICES
-// ===========================
+
 async function loadServices() {
   try {
     const res  = await fetch('/api/admin/services');
@@ -374,9 +354,6 @@ function editService(id)          { alert('Edit service: ' + id); }
 function manageVariants(id, name) { alert('Manage variants for: ' + name); }
 function deleteService(id)        { if (confirm('Delete this service?')) alert('Delete service: ' + id); }
 
-// ===========================
-// AVAILABILITY
-// ===========================
 async function loadAvailability() {
   try {
     const [capRes, closeRes] = await Promise.all([
@@ -449,9 +426,7 @@ function editCapacity(id)     { alert('Edit capacity: ' + id); }
 function deleteCapacity(id)   { if (confirm('Remove this capacity entry?')) alert('Delete: ' + id); }
 function deleteClosedDate(id) { if (confirm('Remove this closure?')) alert('Delete: ' + id); }
 
-// ===========================
-// STAFF
-// ===========================
+
 async function loadStaff() {
   try {
     const res  = await fetch('/api/admin/staff');
@@ -490,9 +465,6 @@ document.getElementById('addStaffBtn')?.addEventListener('click', () => alert('A
 
 function deleteStaff(id) { if (confirm('Remove this account?')) alert('Delete staff: ' + id); }
 
-// ===========================
-// PAYMENTS
-// ===========================
 async function loadPayments() {
   try {
     const res  = await fetch('/api/admin/payments');
@@ -532,9 +504,6 @@ async function loadPayments() {
   }
 }
 
-// ===========================
-// AUDIT LOGS
-// ===========================
 async function loadAuditLogs() {
   try {
     const res  = await fetch('/api/admin/audit-logs');
@@ -561,10 +530,6 @@ async function loadAuditLogs() {
     console.error('Load audit logs error:', err);
   }
 }
-
-// ===========================
-// WALK-IN
-// ===========================
 async function loadWalkinData() {
   try {
     // Load services for the form
@@ -739,9 +704,6 @@ function clearWiError(id) {
   if (field) field.classList.remove('is-error');
 }
 
-// ===========================
-// STATUS UPDATE MODAL
-// ===========================
 let currentBookingId = null;
 let selectedStatus   = null;
 
@@ -824,12 +786,6 @@ document.getElementById('modalConfirm')?.addEventListener('click', async () => {
   }
 });
 
-// ===========================
-// REFRESH BUTTON
-// ===========================
-document.getElementById('refreshDashboard')?.addEventListener('click', loadDashboard);
 
-// ===========================
-// INITIAL LOAD
-// ===========================
+document.getElementById('refreshDashboard')?.addEventListener('click', loadDashboard);
 navigateTo('dashboard');
