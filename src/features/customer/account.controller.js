@@ -134,7 +134,7 @@ const requestEmailChange = async (req, res) => {
     const key = `email_otp:${userId}`;
 
     // store otp and pending email together, expire in 10 minutes
-    await redis.set(key, { otp, newEmail: normalized }, { ex: 600 });
+    await redis.set(key, JSON.stringify({ otp, newEmail: normalized }), 'EX', 600);
 
     await sendEmailVerificationEmail({
       email: normalized,
@@ -173,7 +173,7 @@ const verifyEmailChange = async (req, res) => {
       });
     }
 
-    const { otp: storedOtp, newEmail } = stored;
+    const { otp: storedOtp, newEmail } = JSON.parse(stored);
 
     if (otp.trim() !== storedOtp) {
       return res
