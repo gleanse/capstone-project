@@ -148,7 +148,7 @@ function validateLogin() {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showError(
       'error-email',
-      !email ? 'Email is required.' : 'Enter a valid email address.'
+      !email ? 'Email is required.' : 'Enter a valid email address.',
     );
     valid = false;
   } else clearError('error-email');
@@ -168,13 +168,13 @@ function validateRegister() {
   const phone = document.getElementById('input-phone').value.trim();
   const password = document.getElementById('input-password').value;
   const confirmPassword = document.getElementById(
-    'input-confirm-password'
+    'input-confirm-password',
   ).value;
 
   if (!name || name.length < 2) {
     showError(
       'error-name',
-      !name ? 'Full name is required.' : 'Name must be at least 2 characters.'
+      !name ? 'Full name is required.' : 'Name must be at least 2 characters.',
     );
     valid = false;
   } else clearError('error-name');
@@ -182,7 +182,7 @@ function validateRegister() {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showError(
       'error-email',
-      !email ? 'Email is required.' : 'Enter a valid email address.'
+      !email ? 'Email is required.' : 'Enter a valid email address.',
     );
     valid = false;
   } else clearError('error-email');
@@ -202,7 +202,7 @@ function validateRegister() {
       'error-password',
       !password
         ? 'Password is required.'
-        : 'Password must be at least 8 characters.'
+        : 'Password must be at least 8 characters.',
     );
     valid = false;
   } else clearError('error-password');
@@ -265,7 +265,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
         window.location.href = json.redirect || '/customer/account';
       } else {
         showFormError(
-          json.message || 'Could not create account. Please try again.'
+          json.message || 'Could not create account. Please try again.',
         );
       }
     } catch {
@@ -289,7 +289,7 @@ if (isLoginPage) {
 } else {
   // For register page - submit on Enter in confirm password field
   const confirmPasswordInput = document.getElementById(
-    'input-confirm-password'
+    'input-confirm-password',
   );
   if (confirmPasswordInput) {
     confirmPasswordInput.addEventListener('keydown', (e) => {
@@ -343,7 +343,7 @@ if (isLoginPage) {
   });
 
   const toggleResetConfirmPw = document.getElementById(
-    'toggle-reset-confirm-pw'
+    'toggle-reset-confirm-pw',
   );
   const resetConfirmPwIcon = document.getElementById('reset-confirm-pw-icon');
   const resetConfirmPwInput = document.getElementById('reset-confirm-password');
@@ -454,7 +454,7 @@ if (isLoginPage) {
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showForgotFieldError(
           'error-forgot-email',
-          !email ? 'Email is required.' : 'Enter a valid email address.'
+          !email ? 'Email is required.' : 'Enter a valid email address.',
         );
         return;
       }
@@ -474,7 +474,7 @@ if (isLoginPage) {
           startResendCooldown();
         } else {
           showForgotError(
-            json.message || 'Could not send reset code. Please try again.'
+            json.message || 'Could not send reset code. Please try again.',
           );
         }
       } catch {
@@ -496,7 +496,7 @@ if (isLoginPage) {
           startResendCooldown();
         } else {
           showResetError(
-            json.message || 'Could not resend code. Please try again.'
+            json.message || 'Could not resend code. Please try again.',
           );
         }
       } catch {
@@ -516,7 +516,7 @@ if (isLoginPage) {
           'error-reset-otp',
           !otp
             ? 'Reset code is required.'
-            : 'Enter the 6-digit code from your email.'
+            : 'Enter the 6-digit code from your email.',
         );
         return;
       }
@@ -561,7 +561,7 @@ if (isLoginPage) {
       const otp = document.getElementById('reset-otp').value.trim();
       const password = document.getElementById('reset-password').value;
       const confirmPassword = document.getElementById(
-        'reset-confirm-password'
+        'reset-confirm-password',
       ).value;
       let valid = true;
 
@@ -570,7 +570,7 @@ if (isLoginPage) {
           'error-reset-otp',
           !otp
             ? 'Reset code is required.'
-            : 'Enter the 6-digit code from your email.'
+            : 'Enter the 6-digit code from your email.',
         );
         valid = false;
       } else clearForgotFieldError('error-reset-otp');
@@ -580,7 +580,7 @@ if (isLoginPage) {
           'error-reset-password',
           !password
             ? 'Password is required.'
-            : 'Password must be at least 8 characters.'
+            : 'Password must be at least 8 characters.',
         );
         valid = false;
       } else clearForgotFieldError('error-reset-password');
@@ -588,13 +588,13 @@ if (isLoginPage) {
       if (!confirmPassword) {
         showForgotFieldError(
           'error-reset-confirm-password',
-          'Please confirm your password.'
+          'Please confirm your password.',
         );
         valid = false;
       } else if (confirmPassword !== password) {
         showForgotFieldError(
           'error-reset-confirm-password',
-          'Passwords do not match.'
+          'Passwords do not match.',
         );
         valid = false;
       } else clearForgotFieldError('error-reset-confirm-password');
@@ -622,19 +622,19 @@ if (isLoginPage) {
             'hidden',
             'border-red-500/20',
             'bg-red-500/10',
-            'text-red-400'
+            'text-red-400',
           );
           el.classList.add(
             'flex',
             'border-green-500/20',
             'bg-green-500/10',
-            'text-green-400'
+            'text-green-400',
           );
           document.getElementById('form-error-text').textContent =
             'Password reset successfully. You can now sign in.';
         } else {
           showResetError(
-            json.message || 'Could not reset password. Please try again.'
+            json.message || 'Could not reset password. Please try again.',
           );
         }
       } catch {

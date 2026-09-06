@@ -102,7 +102,7 @@ function renderActiveBooking(b) {
             ${
               isDownPayment
                 ? `<span class="text-yellow-400 flex items-center gap-1.5"><i class="ph ph-warning"></i> ${formatPrice(
-                    b.remaining_balance
+                    b.remaining_balance,
                   )} due</span>`
                 : ''
             }
@@ -122,8 +122,8 @@ function renderHistoryBooking(b) {
             ? 'opacity-50 cursor-default'
             : 'cursor-pointer hover:border-white/14 booking-card'
         } transition-all duration-200" ${
-    !isExpired ? `data-ref="${b.reference_code}"` : ''
-  }>
+          !isExpired ? `data-ref="${b.reference_code}"` : ''
+        }>
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="text-white/80 font-medium text-sm">${b.service_name}</p>
@@ -179,7 +179,7 @@ function renderStatusTimeline(logs) {
               ${
                 log
                   ? `<p class="text-white/30 text-xs mt-0.5">${new Date(
-                      log.created_at
+                      log.created_at,
                     ).toLocaleString('en-PH', {
                       month: 'short',
                       day: 'numeric',
@@ -232,7 +232,7 @@ async function openBookingModal(referenceCode) {
         <div>
           <p class="text-white/30 text-xs mb-1">Date</p>
           <p class="text-white text-sm font-medium">${formatDate(
-            b.booking_date
+            b.booking_date,
           )}</p>
         </div>
         <div>
@@ -242,8 +242,8 @@ async function openBookingModal(referenceCode) {
         <div class="col-span-2">
           <p class="text-white/30 text-xs mb-1">Motorcycle</p>
           <p class="text-white text-sm font-medium">${b.motorcycle_model} · ${
-    b.motorcycle_color
-  } · ${b.motorcycle_plate}</p>
+            b.motorcycle_color
+          } · ${b.motorcycle_plate}</p>
         </div>
       </div>
     </div>`;
@@ -257,13 +257,13 @@ async function openBookingModal(referenceCode) {
       <div class="flex justify-between items-center">
         <span class="text-white/40 text-sm">Total</span>
         <span class="text-white text-sm font-medium">${formatPrice(
-          b.total_amount
+          b.total_amount,
         )}</span>
       </div>
       <div class="flex justify-between items-center">
         <span class="text-white/40 text-sm">Paid</span>
         <span class="text-green-400 text-sm font-semibold">${formatPrice(
-          b.amount_paid
+          b.amount_paid,
         )}</span>
       </div>
       ${
@@ -272,7 +272,7 @@ async function openBookingModal(referenceCode) {
       <div class="flex justify-between items-center border-t border-white/5 pt-3 mt-1">
         <span class="text-yellow-400/80 text-sm">Balance Due</span>
         <span class="text-yellow-400 text-sm font-bold">${formatPrice(
-          b.remaining_balance
+          b.remaining_balance,
         )}</span>
       </div>`
           : `
@@ -603,7 +603,7 @@ async function loadBookings() {
   const json = await res.json();
   const activeContainer = document.getElementById('active-bookings-container');
   const historyContainer = document.getElementById(
-    'history-bookings-container'
+    'history-bookings-container',
   );
 
   if (!json.success) {
@@ -615,7 +615,7 @@ async function loadBookings() {
   const bookings = json.data;
   const active = bookings.filter(
     (b) =>
-      b.booking_status === 'confirmed' && ACTIVE_STATUSES.includes(b.status)
+      b.booking_status === 'confirmed' && ACTIVE_STATUSES.includes(b.status),
   );
   const history = bookings.filter((b) => !active.includes(b));
 

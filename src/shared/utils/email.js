@@ -27,7 +27,7 @@ const sendBookingConfirmationEmail = async (booking) => {
 
   const formattedAmountPaid = `₱${parseFloat(amount_paid).toLocaleString(
     'en-PH',
-    { minimumFractionDigits: 2 }
+    { minimumFractionDigits: 2 },
   )}`;
   const formattedRemaining =
     remaining_balance > 0

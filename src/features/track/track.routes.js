@@ -15,7 +15,7 @@ router.get('/:referenceCode', async (req, res) => {
     // verify reference code exists first
     const result = await pool.query(
       'SELECT id FROM bookings WHERE reference_code = $1',
-      [referenceCode]
+      [referenceCode],
     );
 
     if (!result.rows.length) {

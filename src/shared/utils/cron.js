@@ -39,7 +39,7 @@ const startCronJobs = () => {
          SET booking_status = 'expired'
          WHERE booking_status = 'locked'
          AND expires_at < NOW()
-         RETURNING id, ip_address, user_id`
+         RETURNING id, ip_address, user_id`,
       );
 
       if (result.rows.length > 0) {
@@ -61,7 +61,7 @@ const startCronJobs = () => {
         `DELETE FROM bookings
          WHERE booking_status = 'expired'
          AND expires_at < NOW() - INTERVAL '30 days'
-         RETURNING id`
+         RETURNING id`,
       );
 
       if (result.rows.length > 0) {

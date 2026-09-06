@@ -162,7 +162,7 @@ function render(b) {
   document.getElementById('payment-type').textContent =
     b.payment_type === 'full' ? 'Full Payment' : '50% Down Payment';
   document.getElementById('total-amount').textContent = fmtMoney(
-    b.total_amount
+    b.total_amount,
   );
   document.getElementById('amount-paid').textContent = fmtMoney(b.amount_paid);
 
@@ -170,7 +170,7 @@ function render(b) {
     document.getElementById('remaining-row').classList.remove('hidden');
     document.getElementById('remaining-row').classList.add('flex');
     document.getElementById('remaining-balance').textContent = fmtMoney(
-      b.remaining_balance
+      b.remaining_balance,
     );
   } else {
     document.getElementById('remaining-row').classList.add('hidden');
@@ -257,7 +257,7 @@ function renderTimeline(logs, currentStatus) {
         ${
           log
             ? `<p class="text-xs text-white/30 mt-0.5">${fmtDateTime(
-                log.created_at
+                log.created_at,
               )}</p>`
             : ''
         }

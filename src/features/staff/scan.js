@@ -81,23 +81,20 @@ const renderBooking = (b) => {
   const banner = document.getElementById('status-banner');
   banner.style.backgroundColor = cfg.bg;
   banner.style.borderColor = cfg.border;
-  document.getElementById(
-    'status-icon'
-  ).className = `ph ${cfg.icon} text-4xl flex-shrink-0`;
+  document.getElementById('status-icon').className =
+    `ph ${cfg.icon} text-4xl flex-shrink-0`;
   document.getElementById('status-icon').style.color = cfg.color;
   document.getElementById('status-label').textContent = cfg.label;
   document.getElementById('status-label').style.color = cfg.color;
-  document.getElementById(
-    'status-badge-scan'
-  ).className = `status-badge status-${b.status}`;
+  document.getElementById('status-badge-scan').className =
+    `status-badge status-${b.status}`;
   document.getElementById('status-badge-scan').textContent = cfg.label;
 
   if (isDateMismatch(b.booking_date)) {
-    document.getElementById(
-      'date-warn-text'
-    ).textContent = `Booking date is ${new Date(
-      b.booking_date
-    ).toDateString()} but today is ${new Date().toDateString()}. Confirm changes carefully.`;
+    document.getElementById('date-warn-text').textContent =
+      `Booking date is ${new Date(
+        b.booking_date,
+      ).toDateString()} but today is ${new Date().toDateString()}. Confirm changes carefully.`;
     showFlex('date-warn');
   }
 
@@ -114,7 +111,7 @@ const renderBooking = (b) => {
     'b-row-name',
     'ph-user',
     'Customer',
-    b.guest_name || b.customer_name || '-'
+    b.guest_name || b.customer_name || '-',
   );
   infoRow('b-row-plate', 'ph-motorcycle', 'Plate', b.motorcycle_plate || '-');
   infoRow('b-row-model', 'ph-car', 'Model', b.motorcycle_model || '-');
@@ -122,7 +119,7 @@ const renderBooking = (b) => {
     'b-row-service',
     'ph-wrench',
     'Service',
-    `${b.service_name}${b.variant_name ? ' - ' + b.variant_name : ''}`
+    `${b.service_name}${b.variant_name ? ' - ' + b.variant_name : ''}`,
   );
 
   document.getElementById('b-total').textContent = fmt(b.amount);
@@ -132,9 +129,8 @@ const renderBooking = (b) => {
   remEl.className = `font-semibold ${
     b.is_fully_paid ? 'text-green-400' : 'text-red-400'
   }`;
-  document.getElementById(
-    'b-method'
-  ).textContent = `${b.payment_method} · ${b.payment_type}`;
+  document.getElementById('b-method').textContent =
+    `${b.payment_method} · ${b.payment_type}`;
 
   renderActions(b);
 };
@@ -186,7 +182,7 @@ const renderActions = (b) => {
     const w = document.getElementById('inprogress-warn');
     const warn = isDateMismatch(booking.booking_date)
       ? `⚠ Booking date is ${new Date(
-          booking.booking_date
+          booking.booking_date,
         ).toDateString()} but today is ${new Date().toDateString()}.`
       : null;
     warn
@@ -204,7 +200,7 @@ const renderActions = (b) => {
     const w = document.getElementById('done-warn');
     const warn = isDateMismatch(booking.booking_date)
       ? `⚠ Booking date is ${new Date(
-          booking.booking_date
+          booking.booking_date,
         ).toDateString()} but today is ${new Date().toDateString()}.`
       : null;
     warn
@@ -238,7 +234,7 @@ const renderActions = (b) => {
     const w = document.getElementById('pickup-warn');
     const warn = isDateMismatch(booking.booking_date)
       ? `⚠ Booking date is ${new Date(
-          booking.booking_date
+          booking.booking_date,
         ).toDateString()} but today is ${new Date().toDateString()}.`
       : null;
     warn
@@ -250,7 +246,7 @@ const renderActions = (b) => {
   document.getElementById('btn-paid')?.addEventListener('click', () => {
     document.getElementById('paid-ref').textContent = booking.reference_code;
     document.getElementById('paid-amount').textContent = fmt(
-      booking.remaining_balance
+      booking.remaining_balance,
     );
     showEl('modal-paid');
   });
@@ -268,22 +264,20 @@ const commitStatus = async (status) => {
 
     booking.status = status;
     ['modal-inprogress', 'modal-done', 'modal-pickup'].forEach((id) =>
-      hideEl(id)
+      hideEl(id),
     );
 
     const cfg = statusConfig[status];
     const banner = document.getElementById('status-banner');
     banner.style.backgroundColor = cfg.bg;
     banner.style.borderColor = cfg.border;
-    document.getElementById(
-      'status-icon'
-    ).className = `ph ${cfg.icon} text-4xl flex-shrink-0`;
+    document.getElementById('status-icon').className =
+      `ph ${cfg.icon} text-4xl flex-shrink-0`;
     document.getElementById('status-icon').style.color = cfg.color;
     document.getElementById('status-label').textContent = cfg.label;
     document.getElementById('status-label').style.color = cfg.color;
-    document.getElementById(
-      'status-badge-scan'
-    ).className = `status-badge status-${status}`;
+    document.getElementById('status-badge-scan').className =
+      `status-badge status-${status}`;
     document.getElementById('status-badge-scan').textContent = cfg.label;
 
     renderActions(booking);

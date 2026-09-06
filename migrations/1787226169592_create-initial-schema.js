@@ -10,7 +10,11 @@ export const shorthands = undefined;
 export const up = (pgm) => {
   // USERS
   pgm.createTable('users', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     name: { type: 'varchar(255)', notNull: true },
     email: { type: 'varchar(255)', notNull: true, unique: true },
     google_id: { type: 'varchar(255)' },
@@ -22,7 +26,11 @@ export const up = (pgm) => {
 
   // SERVICES
   pgm.createTable('services', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     name: { type: 'varchar(255)', notNull: true },
     description: { type: 'text' },
     price: { type: 'decimal(10,2)', notNull: true },
@@ -34,7 +42,11 @@ export const up = (pgm) => {
 
   // SERVICE VARIANTS
   pgm.createTable('service_variants', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     service_id: { type: 'uuid', references: 'services' },
     name: { type: 'varchar(255)', notNull: true },
     price: { type: 'decimal(10,2)', notNull: true },
@@ -44,22 +56,34 @@ export const up = (pgm) => {
   });
 
   // AVAILABILITY
-  pgm.createTable('availability', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
-    service_id: { type: 'uuid', references: 'services' },
-    date: { type: 'date', notNull: true },
-    capacity: { type: 'int', notNull: true },
-    is_open: { type: 'boolean', default: true },
-    created_at: { type: 'timestamp', default: pgm.func('now()') },
-  }, {
-    constraints: {
-      unique: ['service_id', 'date'],
+  pgm.createTable(
+    'availability',
+    {
+      id: {
+        type: 'uuid',
+        primaryKey: true,
+        default: pgm.func('gen_random_uuid()'),
+      },
+      service_id: { type: 'uuid', references: 'services' },
+      date: { type: 'date', notNull: true },
+      capacity: { type: 'int', notNull: true },
+      is_open: { type: 'boolean', default: true },
+      created_at: { type: 'timestamp', default: pgm.func('now()') },
     },
-  });
+    {
+      constraints: {
+        unique: ['service_id', 'date'],
+      },
+    },
+  );
 
   // CLOSED DATES
   pgm.createTable('closed_dates', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     type: { type: 'varchar(50)', notNull: true },
     day_of_week: { type: 'int' },
     date: { type: 'date' },
@@ -75,7 +99,11 @@ export const up = (pgm) => {
 
   // BOOKINGS
   pgm.createTable('bookings', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     user_id: { type: 'uuid', references: 'users' },
     service_id: { type: 'uuid', references: 'services' },
     variant_id: { type: 'uuid', references: 'service_variants' },
@@ -103,7 +131,11 @@ export const up = (pgm) => {
 
   // PAYMENTS
   pgm.createTable('payments', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     booking_id: { type: 'uuid', references: 'bookings' },
     xendit_invoice_id: { type: 'varchar(255)' },
     amount: { type: 'decimal(10,2)', notNull: true },
@@ -119,7 +151,11 @@ export const up = (pgm) => {
 
   // NOTIFICATIONS
   pgm.createTable('notifications', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     booking_id: { type: 'uuid', references: 'bookings' },
     email: { type: 'varchar(255)', notNull: true },
     type: { type: 'varchar(100)', notNull: true },
@@ -128,7 +164,11 @@ export const up = (pgm) => {
 
   // AUDIT LOGS
   pgm.createTable('audit_logs', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     user_id: { type: 'uuid', references: 'users' },
     action: { type: 'varchar(255)', notNull: true },
     target_table: { type: 'varchar(100)' },
@@ -139,7 +179,11 @@ export const up = (pgm) => {
 
   // BOOKING STATUS LOGS
   pgm.createTable('booking_status_logs', {
-    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    id: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
     booking_id: { type: 'uuid', references: 'bookings' },
     status: { type: 'varchar(50)', notNull: true },
     changed_by: { type: 'uuid', references: 'users' },

@@ -25,7 +25,10 @@
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   outline: none;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-field::placeholder {
@@ -85,7 +88,9 @@
   height: 100%;
   width: 0%;
   border-radius: 2px;
-  transition: width 0.4s ease, background 0.4s ease;
+  transition:
+    width 0.4s ease,
+    background 0.4s ease;
 }
 
 .strength-fill.weak {
