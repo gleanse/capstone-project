@@ -26,7 +26,7 @@ const getServiceById = async (serviceId) => {
     WHERE s.is_active = true AND s.id = $1
     GROUP BY s.id
   `,
-    [serviceId]
+    [serviceId],
   );
   return result.rows[0] || null;
 };
@@ -62,7 +62,7 @@ const getAvailableDates = async (serviceId) => {
     ) > 0
     ORDER BY a.date ASC
   `,
-    [serviceId]
+    [serviceId],
   );
   return result.rows;
 };
@@ -93,7 +93,7 @@ const lockSlot = async ({
       variantId || null,
       userId || null,
       ipAddress || null,
-    ]
+    ],
   );
   return result.rows[0];
 };
@@ -107,7 +107,7 @@ const releaseSlot = async (bookingId) => {
     AND booking_status = 'locked'
     RETURNING id, ip_address, user_id
   `,
-    [bookingId]
+    [bookingId],
   );
   return result.rows[0] || null;
 };
@@ -122,7 +122,7 @@ const updateBookingDetails = async (
     motorcycleModel,
     motorcycleColor,
     motorcycleDescription,
-  }
+  },
 ) => {
   const result = await pool.query(
     `
@@ -149,7 +149,7 @@ const updateBookingDetails = async (
       motorcycleModel,
       motorcycleColor,
       motorcycleDescription || null,
-    ]
+    ],
   );
   return result.rows[0] || null;
 };
@@ -180,7 +180,7 @@ const createPayment = async ({
       amount - amountPaid,
       paymentType,
       paymentType === 'full',
-    ]
+    ],
   );
   return result.rows[0];
 };
@@ -204,7 +204,7 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
     WHERE id = $1
     RETURNING *
   `,
-    [bookingId]
+    [bookingId],
   );
 
   const booking = result.rows[0];
@@ -214,7 +214,7 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
       width: 300,
       margin: 2,
       color: { dark: '#000000', light: '#ffffff' },
-    }
+    },
   );
 
   let qrUrl;
@@ -238,7 +238,7 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
     const base64Data = qrDataUrl.replace('data:image/png;base64,', '');
     fs.writeFileSync(
       path.join(qrDir, qrFilename),
-      Buffer.from(base64Data, 'base64')
+      Buffer.from(base64Data, 'base64'),
     );
     qrUrl = `${process.env.APP_URL}/uploads/qr/${qrFilename}`;
   }
@@ -258,13 +258,13 @@ const confirmBooking = async ({ bookingId, xenditInvoiceId }) => {
       paid_at = NOW()
     WHERE booking_id = $1
   `,
-    [bookingId, xenditInvoiceId]
+    [bookingId, xenditInvoiceId],
   );
 
   await pool.query(
     `INSERT INTO booking_status_logs (booking_id, status, changed_by)
      VALUES ($1, 'confirmed', NULL)`,
-    [bookingId]
+    [bookingId],
   );
 
   return { ...booking, qr_code: qrUrl };
@@ -297,7 +297,7 @@ const getBookingByPaymentId = async (paymentId) => {
     JOIN services s ON s.id = b.service_id
     LEFT JOIN service_variants sv ON sv.id = b.variant_id
     WHERE p.id = $1`,
-    [paymentId]
+    [paymentId],
   );
   return result.rows[0] || null;
 };
@@ -336,7 +336,7 @@ const getBookingByReferenceCode = async (referenceCode) => {
     LEFT JOIN service_variants sv ON sv.id = b.variant_id
     LEFT JOIN payments p ON p.booking_id = b.id
     WHERE b.reference_code = $1`,
-    [referenceCode]
+    [referenceCode],
   );
 
   if (!bookingResult.rows.length) return null;
@@ -353,7 +353,7 @@ const getBookingByReferenceCode = async (referenceCode) => {
     LEFT JOIN users u ON u.id = bsl.changed_by
     WHERE bsl.booking_id = $1
     ORDER BY bsl.created_at ASC`,
-    [booking.id]
+    [booking.id],
   );
 
   return { ...booking, status_logs: logsResult.rows };

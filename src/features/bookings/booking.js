@@ -27,7 +27,7 @@ function saveSession() {
       selectedDate: state.selectedDate,
       availabilityId: state.availabilityId,
       serviceId,
-    })
+    }),
   );
 }
 
@@ -322,7 +322,7 @@ function handleTimerExpired() {
       state.expiresAt = null;
       showStep(2);
       loadDates();
-    }
+    },
   );
 }
 
@@ -368,7 +368,7 @@ document.addEventListener('visibilitychange', async () => {
             showStep(2);
             loadDates();
           },
-          'Okay'
+          'Okay',
         );
       }
     } catch {
@@ -476,7 +476,7 @@ function renderVariants(variants) {
         <span class="text-white font-medium">Standard</span>
       </div>
       <span class="text-white font-bold">${formatPrice(
-        state.service.price
+        state.service.price,
       )}</span>
     `;
     container.appendChild(card);
@@ -618,7 +618,7 @@ function renderCalendar() {
   headersEl.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     .map(
       (d) =>
-        `<div class="text-center text-xs text-white/30 uppercase tracking-widest py-3">${d}</div>`
+        `<div class="text-center text-xs text-white/30 uppercase tracking-widest py-3">${d}</div>`,
     )
     .join('');
 
@@ -634,7 +634,7 @@ function renderCalendar() {
   for (let d = 1; d <= daysInMonth; d++) {
     const dateObj = new Date(year, month, d);
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(
-      d
+      d,
     ).padStart(2, '0')}`;
     const slot = calendarData[dateStr];
     const isPast = dateObj <= today;
@@ -707,7 +707,7 @@ function confirmSelectDate(slot, dateStr) {
 
       renderCalendar();
     },
-    'Confirm'
+    'Confirm',
   );
 }
 
@@ -757,7 +757,7 @@ function populateSummary() {
   document.getElementById('summary-variant').textContent =
     state.selectedVariant?.name || 'Standard';
   document.getElementById('summary-date').textContent = formatDate(
-    state.selectedDate
+    state.selectedDate,
   );
   document.getElementById('summary-price').textContent = formatPrice(price);
   document.getElementById('full-amount').textContent = formatPrice(price);
@@ -808,7 +808,7 @@ document.querySelectorAll('nav a, #mobile-menu a').forEach((link) => {
           async () => {
             await releaseAndReset();
             window.location.href = href;
-          }
+          },
         );
       }
     });
@@ -823,7 +823,7 @@ document.getElementById('btn-back-services').addEventListener('click', () => {
       async () => {
         await releaseAndReset();
         window.location.href = '/services';
-      }
+      },
     );
   } else {
     window.location.href = '/services';
@@ -874,13 +874,13 @@ document.getElementById('btn-step3-back').addEventListener('click', () => {
             showStep(2);
             loadDates();
           },
-          'Understood'
+          'Understood',
         );
       } else {
         showStep(2);
         loadDates();
       }
-    }
+    },
   );
 });
 
@@ -892,7 +892,7 @@ document
     if (!isValid) {
       // scroll to first error
       const firstError = document.querySelector(
-        '#step-3 .field-error:not(.hidden)'
+        '#step-3 .field-error:not(.hidden)',
       );
       if (firstError)
         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -948,7 +948,7 @@ document
           if (el) setFieldError(el, message);
         });
         const firstError = document.querySelector(
-          '#step-3 .field-error:not(.hidden)'
+          '#step-3 .field-error:not(.hidden)',
         );
         if (firstError)
           firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -966,7 +966,7 @@ document.getElementById('btn-step4-back').addEventListener('click', () => {
 
 document.getElementById('btn-pay').addEventListener('click', async () => {
   const paymentType = document.querySelector(
-    'input[name="payment_type"]:checked'
+    'input[name="payment_type"]:checked',
   ).value;
   const btn = document.getElementById('btn-pay');
 

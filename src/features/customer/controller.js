@@ -76,7 +76,7 @@ const register = async (req, res) => {
       `INSERT INTO users (name, email, phone, password, role)
        VALUES ($1, $2, $3, $4, 'customer')
        RETURNING id, name, email, phone, role`,
-      [name.trim(), email.toLowerCase(), phone.trim(), hashedPassword]
+      [name.trim(), email.toLowerCase(), phone.trim(), hashedPassword],
     );
 
     const user = result.rows[0];
@@ -120,7 +120,7 @@ const login = async (req, res) => {
 
     const result = await pool.query(
       'SELECT id, name, email, phone, password, role FROM users WHERE email = $1',
-      [email.toLowerCase()]
+      [email.toLowerCase()],
     );
 
     if (result.rows.length === 0) {
@@ -241,7 +241,7 @@ const forgotPassword = async (req, res) => {
 
     const result = await pool.query(
       'SELECT id, name, email, role FROM users WHERE email = $1',
-      [email.toLowerCase()]
+      [email.toLowerCase()],
     );
 
     if (result.rows.length === 0 || result.rows[0].role !== 'customer') {
@@ -256,7 +256,7 @@ const forgotPassword = async (req, res) => {
     const otp = crypto.randomInt(100000, 999999).toString();
 
     // key: pw_reset:<email>, TTL: 10 minutes
-    await redis.set(`pw_reset:${user.email}`, otp, { ex: 600 });
+    await redis.set(`pw_reset:${user.email}`, otp, 'EX', 600);
 
     await sendPasswordResetEmail({ email: user.email, name: user.name, otp });
 
@@ -314,7 +314,7 @@ const resetPassword = async (req, res) => {
 
     const result = await pool.query(
       'SELECT id FROM users WHERE email = $1 AND role = $2',
-      [email.toLowerCase(), 'customer']
+      [email.toLowerCase(), 'customer'],
     );
 
     if (result.rows.length === 0) {

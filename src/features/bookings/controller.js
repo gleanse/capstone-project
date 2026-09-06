@@ -240,7 +240,7 @@ const createInvoice = async (req, res) => {
        LEFT JOIN service_variants sv ON sv.id = b.variant_id
        LEFT JOIN users u ON u.id = b.user_id
        WHERE b.id = $1 AND b.booking_status = 'locked'`,
-      [bookingId]
+      [bookingId],
     );
 
     if (!bookingResult.rows.length) {
@@ -252,7 +252,7 @@ const createInvoice = async (req, res) => {
 
     const booking = bookingResult.rows[0];
     const totalPrice = parseFloat(
-      booking.variant_price || booking.service_price
+      booking.variant_price || booking.service_price,
     );
     const amountPaid = paymentType === 'full' ? totalPrice : totalPrice * 0.5;
     const email = booking.guest_email || booking.user_email;
@@ -298,7 +298,7 @@ const handleWebhook = async (req, res) => {
     // external_id is the payment id
     const paymentResult = await pool.query(
       'SELECT * FROM payments WHERE id = $1',
-      [external_id]
+      [external_id],
     );
 
     if (!paymentResult.rows.length) {
@@ -365,7 +365,7 @@ const getBookingSession = async (req, res) => {
     const { bookingId } = req.params;
     const result = await pool.query(
       `SELECT booking_status, expires_at FROM bookings WHERE id = $1`,
-      [bookingId]
+      [bookingId],
     );
 
     if (!result.rows.length) {

@@ -87,7 +87,7 @@ const checkAvailability = async (serviceId, date) => {
   if (!serviceId || !date) return null;
   try {
     const res = await fetch(
-      `/staff/services/${serviceId}/availability?date=${date}`
+      `/staff/services/${serviceId}/availability?date=${date}`,
     );
     const data = await res.json();
     return data.success ? data : null;
@@ -130,10 +130,10 @@ const loadVariants = (serviceId) => {
       .map(
         (v) => `<option value="${v.id}">
       ${v.name} - PHP ${parseFloat(v.price).toLocaleString('en-PH', {
-          minimumFractionDigits: 2,
-        })}
+        minimumFractionDigits: 2,
+      })}
       ${v.duration_hours ? ' (' + v.duration_hours + 'h est.)' : ''}
-    </option>`
+    </option>`,
       )
       .join('');
   select.disabled = false;
@@ -162,7 +162,7 @@ const checkTodayCapacity = async () => {
     todayIsFull = true;
     showCapacityBadge(
       `Today is fully booked (${avail.confirmed}/${avail.capacity}). You can still book a future date below.`,
-      'full'
+      'full',
     );
     showFutureDatePicker();
   } else {
@@ -171,7 +171,7 @@ const checkTodayCapacity = async () => {
       `Today: ${avail.remaining} slot${
         avail.remaining !== 1 ? 's' : ''
       } remaining (${avail.confirmed}/${avail.capacity})`,
-      'ok'
+      'ok',
     );
     hideFutureDatePicker();
   }
@@ -289,11 +289,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // if future date is selected but still full, confirm with staff
     if (isFutureVisible && futureDate) {
       const futureText = document.getElementById(
-        'future-capacity-text'
+        'future-capacity-text',
       ).textContent;
       if (futureText.includes('fully booked')) {
         const proceed = confirm(
-          `${futureDate} is also at full capacity. Proceed anyway?`
+          `${futureDate} is also at full capacity. Proceed anyway?`,
         );
         if (!proceed) return;
       }
@@ -324,11 +324,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           todayIsFull = true;
           showCapacityBadge(
             `Today is fully booked. Please select a future date below.`,
-            'full'
+            'full',
           );
           showFutureDatePicker();
           showError(
-            'This date is at full capacity. Select a future date below.'
+            'This date is at full capacity. Select a future date below.',
           );
         } else {
           showError(data.message);
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
-        }
+        },
       );
 
       document.getElementById('s-ref').textContent = data.booking.referenceCode;
@@ -361,9 +361,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('s-plate').textContent =
         motorcyclePlate.toUpperCase();
       document.getElementById('s-date').textContent = bookedDate;
-      document.getElementById(
-        'btn-download-slip'
-      ).href = `/staff/slip/${lastCreatedId}`;
+      document.getElementById('btn-download-slip').href =
+        `/staff/slip/${lastCreatedId}`;
 
       document
         .getElementById('modal-success')

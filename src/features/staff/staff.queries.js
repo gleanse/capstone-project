@@ -24,7 +24,7 @@ const getUpcomingBookings = async ({
      WHERE a.date >= CURRENT_DATE
        AND b.booking_status = 'confirmed'
        ${dateFilter}`,
-    date ? [date] : []
+    date ? [date] : [],
   );
   const total = parseInt(countResult.rows[0].count);
 
@@ -71,7 +71,7 @@ const getUpcomingBookings = async ({
       ${dateFilter}
     ORDER BY a.date ASC, b.queue_number ASC NULLS LAST, b.created_at ASC
     LIMIT $${params.length - 1} OFFSET $${params.length}`,
-    params
+    params,
   );
 
   return {
@@ -90,7 +90,7 @@ const getBookingsForDate = async (date, { page = 1, limit = 5 } = {}) => {
     `SELECT COUNT(*) FROM bookings b
      LEFT JOIN availability a ON b.availability_id = a.id
      WHERE a.date = $1 AND b.booking_status = 'confirmed'`,
-    [date]
+    [date],
   );
   const total = parseInt(countResult.rows[0].count);
 
@@ -136,7 +136,7 @@ const getBookingsForDate = async (date, { page = 1, limit = 5 } = {}) => {
       AND b.booking_status = 'confirmed'
     ORDER BY b.queue_number ASC NULLS LAST, b.created_at ASC
     LIMIT $2 OFFSET $3`,
-    [date, limit, offset]
+    [date, limit, offset],
   );
 
   return {
@@ -191,7 +191,7 @@ const getBookingByReferenceCode = async (referenceCode) => {
     LEFT JOIN availability a ON b.availability_id = a.id
     WHERE b.reference_code = $1
       AND b.booking_status = 'confirmed'`,
-    [referenceCode.toUpperCase()]
+    [referenceCode.toUpperCase()],
   );
   return result.rows[0] || null;
 };
@@ -238,7 +238,7 @@ const getBookingById = async (id) => {
     LEFT JOIN payments p ON p.booking_id = b.id
     LEFT JOIN availability a ON b.availability_id = a.id
     WHERE b.id = $1`,
-    [id]
+    [id],
   );
   return result.rows[0] || null;
 };
@@ -252,7 +252,7 @@ const getInProgressStaff = async (bookingId) => {
      WHERE bsl.booking_id = $1 AND bsl.status = 'in_progress'
      ORDER BY bsl.created_at DESC
      LIMIT 1`,
-    [bookingId]
+    [bookingId],
   );
   return result.rows[0] || null;
 };
@@ -295,7 +295,7 @@ const getMyInProgressBookings = async (staffId) => {
     WHERE b.status = 'in_progress'
       AND b.booking_status = 'confirmed'
     ORDER BY bsl.created_at ASC`,
-    [staffId]
+    [staffId],
   );
   return result.rows;
 };
@@ -306,7 +306,7 @@ const updateBookingStatus = async (bookingId, status, staffId) => {
      SET status = $1, updated_by = $2, updated_at = NOW()
      WHERE id = $3
      RETURNING id, status, reference_code`,
-    [status, staffId, bookingId]
+    [status, staffId, bookingId],
   );
   return result.rows[0];
 };
@@ -315,14 +315,14 @@ const logBookingStatus = async (bookingId, status, staffId) => {
   await pool.query(
     `INSERT INTO booking_status_logs (booking_id, status, changed_by)
      VALUES ($1, $2, $3)`,
-    [bookingId, status, staffId]
+    [bookingId, status, staffId],
   );
 };
 
 const updateVariant = async (bookingId, variantId, staffId) => {
   const variantResult = await pool.query(
     `SELECT price FROM service_variants WHERE id = $1`,
-    [variantId]
+    [variantId],
   );
   if (variantResult.rows.length === 0) return null;
 
@@ -330,12 +330,12 @@ const updateVariant = async (bookingId, variantId, staffId) => {
 
   await pool.query(
     `UPDATE bookings SET variant_id = $1, updated_by = $2, updated_at = NOW() WHERE id = $3`,
-    [variantId, staffId, bookingId]
+    [variantId, staffId, bookingId],
   );
 
   const paymentResult = await pool.query(
     `SELECT id, amount_paid FROM payments WHERE booking_id = $1`,
-    [bookingId]
+    [bookingId],
   );
   if (paymentResult.rows.length === 0) return null;
 
@@ -347,7 +347,7 @@ const updateVariant = async (bookingId, variantId, staffId) => {
     `UPDATE payments
      SET amount = $1, remaining_balance = $2, is_fully_paid = $3
      WHERE booking_id = $4`,
-    [newPrice, remaining, isFullyPaid, bookingId]
+    [newPrice, remaining, isFullyPaid, bookingId],
   );
 
   return { newPrice, amountPaid, remaining, isFullyPaid };
@@ -358,11 +358,11 @@ const markFullyPaid = async (bookingId, staffId) => {
     `UPDATE payments
      SET remaining_balance = 0, is_fully_paid = true, paid_at = NOW()
      WHERE booking_id = $1`,
-    [bookingId]
+    [bookingId],
   );
   await pool.query(
     `UPDATE bookings SET updated_by = $1, updated_at = NOW() WHERE id = $2`,
-    [staffId, bookingId]
+    [staffId, bookingId],
   );
 };
 
@@ -374,7 +374,7 @@ const getAvailabilityForDate = async (serviceId, date) => {
      LEFT JOIN bookings b ON b.availability_id = a.id
      WHERE a.service_id = $1 AND a.date = $2
      GROUP BY a.id`,
-    [serviceId, date]
+    [serviceId, date],
   );
   return result.rows[0] || null;
 };
@@ -384,7 +384,7 @@ const getNextQueueNumber = async (availabilityId) => {
     `SELECT COALESCE(MAX(queue_number), 0) + 1 AS next_queue
      FROM bookings
      WHERE availability_id = $1 AND booking_status = 'confirmed'`,
-    [availabilityId]
+    [availabilityId],
   );
   return result.rows[0].next_queue;
 };
@@ -400,7 +400,7 @@ const getAllActiveServices = async () => {
      LEFT JOIN service_variants sv ON sv.service_id = s.id AND sv.is_active = true
      WHERE s.is_active = true
      GROUP BY s.id
-     ORDER BY s.name ASC`
+     ORDER BY s.name ASC`,
   );
   return result.rows;
 };
@@ -450,27 +450,27 @@ const createWalkInBooking = async ({
         referenceCode,
         qrCode,
         staffId,
-      ]
+      ],
     );
 
     const booking = bookingResult.rows[0];
 
     const variantResult = await client.query(
       `SELECT price FROM service_variants WHERE id = $1`,
-      [variantId]
+      [variantId],
     );
     const price = parseFloat(variantResult.rows[0].price);
 
     await client.query(
       `INSERT INTO payments (booking_id, amount, amount_paid, remaining_balance, payment_type, is_fully_paid, status, paid_at)
        VALUES ($1, $2, $2, 0, 'full', true, 'paid', NOW())`,
-      [booking.id, price]
+      [booking.id, price],
     );
 
     await client.query(
       `INSERT INTO booking_status_logs (booking_id, status, changed_by)
        VALUES ($1, 'confirmed', $2)`,
-      [booking.id, staffId]
+      [booking.id, staffId],
     );
 
     await client.query('COMMIT');
@@ -487,7 +487,7 @@ const logAudit = async ({ userId, action, targetTable, targetId, details }) => {
   await pool.query(
     `INSERT INTO audit_logs (user_id, action, target_table, target_id, details)
      VALUES ($1, $2, $3, $4, $5)`,
-    [userId, action, targetTable, targetId, details]
+    [userId, action, targetTable, targetId, details],
   );
 };
 
@@ -506,7 +506,7 @@ const getDoneNotPickedUp = async () => {
      LEFT JOIN availability a ON b.availability_id = a.id
      WHERE b.status = 'done'
        AND b.booking_status = 'confirmed'
-     ORDER BY b.updated_at ASC`
+     ORDER BY b.updated_at ASC`,
   );
   return result.rows;
 };
@@ -517,7 +517,7 @@ const getVariantsForService = async (serviceId) => {
      FROM service_variants
      WHERE service_id = $1 AND is_active = true
      ORDER BY price ASC`,
-    [serviceId]
+    [serviceId],
   );
   return result.rows;
 };

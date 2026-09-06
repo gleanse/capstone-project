@@ -25,7 +25,7 @@ const statusLabel = (s) =>
     in_progress: 'In Progress',
     done: 'Done',
     picked_up: 'Picked Up',
-  }[s] || s);
+  })[s] || s;
 
 const showModal = (id) =>
   document.getElementById(id).classList.replace('hidden', 'flex');
@@ -47,7 +47,7 @@ const renderBookingRow = (b) => {
   const dateLabel =
     viewMode === 'upcoming'
       ? `<span class="text-[10px] bg-white/6 text-white/40 px-1.5 py-0.5 rounded-md">${new Date(
-          b.booking_date + 'T00:00:00'
+          b.booking_date + 'T00:00:00',
         ).toLocaleDateString('en-PH', {
           month: 'short',
           day: 'numeric',
@@ -78,14 +78,14 @@ const renderBookingRow = (b) => {
               }
             </div>
             <p class="text-white/30 text-xs mt-0.5">${b.reference_code} · ${
-    b.service_name
-  }${b.variant_name ? ' - ' + b.variant_name : ''}</p>
+              b.service_name
+            }${b.variant_name ? ' - ' + b.variant_name : ''}</p>
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
           <span class="status-badge status-${b.status}">${statusLabel(
-    b.status
-  )}</span>
+            b.status,
+          )}</span>
           ${
             !b.is_fully_paid
               ? '<span class="text-[10px] bg-red-500/15 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded-full">Unpaid bal.</span>'
@@ -126,7 +126,7 @@ const renderPagination = () => {
         ? `<span class="pg-ellipsis">…</span>`
         : `<button class="pg-btn${
             p === currentPage ? ' active' : ''
-          }" data-page="${p}">${p}</button>`
+          }" data-page="${p}">${p}</button>`,
     )
     .join('');
 
@@ -145,13 +145,13 @@ const renderPagination = () => {
     </div>`;
 
   el.querySelector('#pg-prev')?.addEventListener('click', () =>
-    goToPage(currentPage - 1)
+    goToPage(currentPage - 1),
   );
   el.querySelector('#pg-next')?.addEventListener('click', () =>
-    goToPage(currentPage + 1)
+    goToPage(currentPage + 1),
   );
   el.querySelectorAll('.pg-btn[data-page]').forEach((btn) =>
-    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page)))
+    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page))),
   );
 };
 
@@ -185,19 +185,19 @@ const applyFilter = () => {
 const updateStats = () => {
   document.getElementById('stat-total').textContent = allBookings.length;
   document.getElementById('stat-pending').textContent = allBookings.filter(
-    (b) => b.status === 'pending'
+    (b) => b.status === 'pending',
   ).length;
   document.getElementById('stat-inprogress').textContent = allBookings.filter(
-    (b) => b.status === 'in_progress'
+    (b) => b.status === 'in_progress',
   ).length;
   document.getElementById('stat-done').textContent = allBookings.filter((b) =>
-    ['done', 'picked_up'].includes(b.status)
+    ['done', 'picked_up'].includes(b.status),
   ).length;
 };
 
 const skeleton = () =>
   `<div class="px-5 py-4"><div class="skeleton-line h-14 rounded-xl"></div></div>`.repeat(
-    3
+    3,
   );
 
 const loadBookings = async (date, page = 1) => {
@@ -214,7 +214,7 @@ const loadBookings = async (date, page = 1) => {
     applyFilter();
   } catch (err) {
     document.getElementById('bookings-list').innerHTML = renderEmpty(
-      'Failed to load bookings'
+      'Failed to load bookings',
     );
   }
 };
@@ -225,7 +225,7 @@ const loadUpcoming = async (page = 1) => {
   try {
     const dateParam = upcomingDateFilter ? `&date=${upcomingDateFilter}` : '';
     const res = await fetch(
-      `/staff/bookings/upcoming?page=${page}${dateParam}`
+      `/staff/bookings/upcoming?page=${page}${dateParam}`,
     );
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
@@ -236,7 +236,7 @@ const loadUpcoming = async (page = 1) => {
     applyFilter();
   } catch (err) {
     document.getElementById('bookings-list').innerHTML = renderEmpty(
-      'Failed to load upcoming bookings'
+      'Failed to load upcoming bookings',
     );
   }
 };
@@ -271,7 +271,7 @@ const loadDoneList = async () => {
           b.service_name
         }</p>
         <p class="text-white/20 text-[10px] mt-1">${b.reference_code}</p>
-      </div>`
+      </div>`,
       )
       .join('');
   } catch (err) {
@@ -313,7 +313,7 @@ const loadMyInProgress = async () => {
           b.service_name
         }${b.variant_name ? ' - ' + b.variant_name : ''}</p>
         <p class="text-white/20 text-[10px] mt-1">${b.reference_code}</p>
-      </div>`
+      </div>`,
       )
       .join('');
   } catch (err) {
@@ -366,7 +366,7 @@ const openModal = (b) => {
         ? `<div class="flex items-start gap-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2.5 mb-4">
       <i class="ph ph-warning text-yellow-400 text-base flex-shrink-0 mt-0.5"></i>
       <p class="text-yellow-300 text-xs">Booking date is <strong>${new Date(
-        b.booking_date
+        b.booking_date,
       ).toDateString()}</strong> but today is <strong>${new Date().toDateString()}</strong>. Confirm status changes carefully.</p>
     </div>`
         : ''
@@ -381,8 +381,8 @@ const openModal = (b) => {
       <div class="bg-white/3 rounded-xl px-3 py-2.5">
         <p class="text-white/30 text-[10px] uppercase tracking-widest mb-0.5">Status</p>
         <span class="status-badge status-${b.status}">${statusLabel(
-    b.status
-  )}</span>
+          b.status,
+        )}</span>
       </div>
     </div>
     <div class="flex flex-col gap-2 mb-4">
@@ -395,27 +395,27 @@ const openModal = (b) => {
       ${modalField(
         'ph-wrench',
         'Service',
-        `${b.service_name} - ${b.variant_name || '-'}`
+        `${b.service_name} - ${b.variant_name || '-'}`,
       )}
       ${modalField(
         'ph-calendar',
         'Booking Date',
-        b.booking_date ? new Date(b.booking_date).toDateString() : '-'
+        b.booking_date ? new Date(b.booking_date).toDateString() : '-',
       )}
     </div>
     <div class="bg-white/3 rounded-xl px-4 py-3 mb-4 text-xs space-y-1.5">
       <div class="flex justify-between text-white/50"><span>Total</span><span class="text-white">${fmt(
-        b.amount
+        b.amount,
       )}</span></div>
       <div class="flex justify-between text-white/50"><span>Paid</span><span class="text-white">${fmt(
-        b.amount_paid
+        b.amount_paid,
       )}</span></div>
       <div class="flex justify-between text-white/50 border-t border-white/8 pt-1.5"><span>Remaining</span>
         <span class="${
           b.is_fully_paid ? 'text-green-400' : 'text-red-400'
         } font-semibold">${
-    b.is_fully_paid ? 'Fully Paid' : fmt(b.remaining_balance)
-  }</span>
+          b.is_fully_paid ? 'Fully Paid' : fmt(b.remaining_balance)
+        }</span>
       </div>
       <div class="flex justify-between text-white/50"><span>Payment</span><span class="text-white uppercase">${
         b.payment_method
@@ -460,7 +460,7 @@ const closeModal = () => {
 const warnMsg = (b) =>
   isDateMismatch(b.booking_date)
     ? `⚠ Booking date is ${new Date(
-        b.booking_date
+        b.booking_date,
       ).toDateString()} but today is ${new Date().toDateString()}. Proceed carefully.`
     : null;
 
@@ -497,7 +497,7 @@ const triggerStatus = async (status) => {
     ownerWarn.classList.add('hidden');
     try {
       const res = await fetch(
-        `/staff/bookings/${currentBooking.id}/started-by`
+        `/staff/bookings/${currentBooking.id}/started-by`,
       );
       const data = await res.json();
       if (
@@ -556,7 +556,7 @@ const triggerVariantSwap = async () => {
   if (!currentBooking) return;
   try {
     const res = await fetch(
-      `/staff/services/${currentBooking.service_id}/variants`
+      `/staff/services/${currentBooking.service_id}/variants`,
     );
     const data = await res.json();
     if (!data.success) return;
@@ -566,7 +566,7 @@ const triggerVariantSwap = async () => {
         (v) =>
           `<option value="${v.id}" data-price="${v.price}"${
             v.id === currentBooking.variant_id ? ' selected' : ''
-          }>${v.name} - PHP ${parseFloat(v.price).toLocaleString()}</option>`
+          }>${v.name} - PHP ${parseFloat(v.price).toLocaleString()}</option>`,
       )
       .join('');
     updateVariantPreview();
@@ -614,7 +614,7 @@ const triggerMarkPaid = () => {
   document.getElementById('paid-ref').textContent =
     currentBooking.reference_code;
   document.getElementById('paid-amount').textContent = fmt(
-    currentBooking.remaining_balance
+    currentBooking.remaining_balance,
   );
   showModal('modal-paid');
 };
@@ -815,7 +815,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ variantId }),
-          }
+          },
         );
         const data = await res.json();
         if (!data.success) throw new Error(data.message);

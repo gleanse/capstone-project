@@ -197,9 +197,8 @@ document
         formMsg('email-step1-error', data.message);
       } else {
         pendingEmail = email;
-        document.getElementById(
-          'otp-sent-to'
-        ).textContent = `Code sent to ${email}. Expires in 10 minutes.`;
+        document.getElementById('otp-sent-to').textContent =
+          `Code sent to ${email}. Expires in 10 minutes.`;
         document.getElementById('email-step-1').classList.add('hidden');
         const step2 = document.getElementById('email-step-2');
         step2.classList.remove('hidden');

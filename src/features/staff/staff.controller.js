@@ -494,7 +494,9 @@ const downloadSlip = async (req, res) => {
     field('Variant', booking.variant_name);
     field(
       'Date',
-      booking.booking_date ? new Date(booking.booking_date).toDateString() : '-'
+      booking.booking_date
+        ? new Date(booking.booking_date).toDateString()
+        : '-',
     );
     field('Motorcycle Plate', booking.motorcycle_plate);
     field('Motorcycle Model', booking.motorcycle_model);
@@ -507,11 +509,11 @@ const downloadSlip = async (req, res) => {
     field('Amount', `PHP ${parseFloat(booking.amount || 0).toFixed(2)}`);
     field(
       'Amount Paid',
-      `PHP ${parseFloat(booking.amount_paid || 0).toFixed(2)}`
+      `PHP ${parseFloat(booking.amount_paid || 0).toFixed(2)}`,
     );
     field(
       'Remaining Balance',
-      `PHP ${parseFloat(booking.remaining_balance || 0).toFixed(2)}`
+      `PHP ${parseFloat(booking.remaining_balance || 0).toFixed(2)}`,
     );
     field('Payment Type', booking.payment_type?.toUpperCase());
     field('Payment Method', booking.payment_method?.toUpperCase());
@@ -522,7 +524,7 @@ const downloadSlip = async (req, res) => {
       .fillColor('#999')
       .text(
         'This slip serves as proof of booking. Present upon drop-off and pickup.',
-        { align: 'center' }
+        { align: 'center' },
       );
 
     doc.end();

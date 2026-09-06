@@ -73,7 +73,7 @@ const updateProfile = async (req, res) => {
     const result = await pool.query(
       `UPDATE users SET name = $1, phone = $2 WHERE id = $3
        RETURNING id, name, email, phone, role`,
-      [name.trim(), phone.trim(), userId]
+      [name.trim(), phone.trim(), userId],
     );
 
     const user = result.rows[0];
@@ -114,7 +114,7 @@ const requestEmailChange = async (req, res) => {
     // check if already taken by another user
     const existing = await pool.query(
       `SELECT id FROM users WHERE email = $1 AND id != $2`,
-      [normalized, userId]
+      [normalized, userId],
     );
     if (existing.rows.length) {
       return res
@@ -134,7 +134,12 @@ const requestEmailChange = async (req, res) => {
     const key = `email_otp:${userId}`;
 
     // store otp and pending email together, expire in 10 minutes
-    await redis.set(key, { otp, newEmail: normalized }, { ex: 600 });
+    await redis.set(
+      key,
+      JSON.stringify({ otp, newEmail: normalized }),
+      'EX',
+      600,
+    );
 
     await sendEmailVerificationEmail({
       email: normalized,
@@ -173,7 +178,7 @@ const verifyEmailChange = async (req, res) => {
       });
     }
 
-    const { otp: storedOtp, newEmail } = stored;
+    const { otp: storedOtp, newEmail } = JSON.parse(stored);
 
     if (otp.trim() !== storedOtp) {
       return res
@@ -228,7 +233,7 @@ const changePassword = async (req, res) => {
 
     const result = await pool.query(
       'SELECT password FROM users WHERE id = $1',
-      [userId]
+      [userId],
     );
 
     const user = result.rows[0];

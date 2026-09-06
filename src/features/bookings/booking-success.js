@@ -35,7 +35,7 @@ async function loadBookingDetails() {
     document.getElementById('bookingDate').textContent = new Date(
       year,
       month - 1,
-      day
+      day,
     ).toLocaleDateString('en-PH', {
       year: 'numeric',
       month: 'long',
@@ -45,14 +45,14 @@ async function loadBookingDetails() {
     document.getElementById('paymentType').textContent =
       b.payment_type === 'full' ? 'Full Payment' : '50% Down Payment';
     document.getElementById('amountPaid').textContent = `₱${parseFloat(
-      b.amount_paid
+      b.amount_paid,
     ).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
 
     // remaining balance
     if (!b.is_fully_paid && b.remaining_balance > 0) {
       const formatted = `₱${parseFloat(b.remaining_balance).toLocaleString(
         'en-PH',
-        { minimumFractionDigits: 2 }
+        { minimumFractionDigits: 2 },
       )}`;
       document
         .getElementById('amountRow')

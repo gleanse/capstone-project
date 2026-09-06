@@ -32,7 +32,7 @@ const getBookingsByUserId = async (userId) => {
     WHERE b.user_id = $1
     AND b.booking_status IN ('confirmed', 'expired')
     ORDER BY b.created_at DESC`,
-    [userId]
+    [userId],
   );
   return result.rows;
 };
@@ -70,7 +70,7 @@ const getBookingByReferenceCode = async (referenceCode, userId) => {
     LEFT JOIN service_variants sv ON sv.id = b.variant_id
     LEFT JOIN payments p ON p.booking_id = b.id
     WHERE b.reference_code = $1 AND b.user_id = $2`,
-    [referenceCode, userId]
+    [referenceCode, userId],
   );
 
   if (!bookingResult.rows.length) return null;
@@ -86,7 +86,7 @@ const getBookingByReferenceCode = async (referenceCode, userId) => {
     LEFT JOIN users u ON u.id = bsl.changed_by
     WHERE bsl.booking_id = $1
     ORDER BY bsl.created_at ASC`,
-    [booking.id]
+    [booking.id],
   );
 
   return { ...booking, status_logs: logsResult.rows };
@@ -95,7 +95,7 @@ const getBookingByReferenceCode = async (referenceCode, userId) => {
 const updateUserEmail = async (userId, newEmail) => {
   const result = await pool.query(
     `UPDATE users SET email = $1 WHERE id = $2 RETURNING id, name, email, phone, role`,
-    [newEmail, userId]
+    [newEmail, userId],
   );
   return result.rows[0];
 };
@@ -120,7 +120,7 @@ const getLastBookingByUserId = async (userId) => {
     AND b.booking_status = 'confirmed'
     ORDER BY b.created_at DESC
     LIMIT 1`,
-    [userId]
+    [userId],
   );
   return result.rows[0] || null;
 };

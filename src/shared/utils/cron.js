@@ -13,7 +13,7 @@ const incrementAbuseCounter = async (ip, userId) => {
       const ipCount = await redis.incr(ipKey);
       if (ipCount === 1) await redis.expire(ipKey, ABUSE_WINDOW_SECONDS);
       if (ipCount >= ABUSE_LIMIT) {
-        await redis.set(`block:ip:${ip}`, '1', { ex: ABUSE_BLOCK_SECONDS });
+        await redis.set(`block:ip:${ip}`, '1', 'EX', ABUSE_BLOCK_SECONDS);
       }
     }
 
@@ -22,9 +22,7 @@ const incrementAbuseCounter = async (ip, userId) => {
       const userCount = await redis.incr(userKey);
       if (userCount === 1) await redis.expire(userKey, ABUSE_WINDOW_SECONDS);
       if (userCount >= ABUSE_LIMIT) {
-        await redis.set(`block:user:${userId}`, '1', {
-          ex: ABUSE_BLOCK_SECONDS,
-        });
+        await redis.set(`block:user:${userId}`, '1', 'EX', ABUSE_BLOCK_SECONDS);
       }
     }
   } catch (error) {
@@ -41,7 +39,7 @@ const startCronJobs = () => {
          SET booking_status = 'expired'
          WHERE booking_status = 'locked'
          AND expires_at < NOW()
-         RETURNING id, ip_address, user_id`
+         RETURNING id, ip_address, user_id`,
       );
 
       if (result.rows.length > 0) {
@@ -63,7 +61,7 @@ const startCronJobs = () => {
         `DELETE FROM bookings
          WHERE booking_status = 'expired'
          AND expires_at < NOW() - INTERVAL '30 days'
-         RETURNING id`
+         RETURNING id`,
       );
 
       if (result.rows.length > 0) {
