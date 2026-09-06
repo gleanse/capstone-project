@@ -256,7 +256,7 @@ const forgotPassword = async (req, res) => {
     const otp = crypto.randomInt(100000, 999999).toString();
 
     // key: pw_reset:<email>, TTL: 10 minutes
-    await redis.set(`pw_reset:${user.email}`, otp, { ex: 600 });
+    await redis.set(`pw_reset:${user.email}`, otp, 'EX', 600);
 
     await sendPasswordResetEmail({ email: user.email, name: user.name, otp });
 
