@@ -13,8 +13,8 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.set('trust proxy', 1);
-// custom session store using @upstash/redis
-class UpstashSessionStore extends session.Store {
+// custom session store using ioredis
+class RedisSessionStore extends session.Store {
   async get(sid, cb) {
     try {
       const data = await redis.get(`sess:${sid}`);
@@ -30,7 +30,7 @@ class UpstashSessionStore extends session.Store {
       const ttl = sessionData.cookie?.maxAge
         ? Math.floor(sessionData.cookie.maxAge / 1000)
         : 60 * 60 * 8;
-      await redis.set(`sess:${sid}`, JSON.stringify(sessionData), { ex: ttl });
+      await redis.set(`sess:${sid}`, JSON.stringify(sessionData), 'EX', ttl);
       cb(null);
     } catch (err) {
       cb(err);
@@ -50,7 +50,7 @@ class UpstashSessionStore extends session.Store {
 // SESSION
 app.use(
   session({
-    store: new UpstashSessionStore(),
+    store: new RedisSessionStore(),
     secret: process.env.SESSION_SECRET || 'herco-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
