@@ -153,16 +153,13 @@
 
     if (!svcId || !fromDate) return;
 
-    const cancelSkeleton = AdminLayout.delayedSkeleton(() => {
-    if (list) list.innerHTML = AdminLayout.skeletonListItems(3);
-  });
+    if (list) list.innerHTML = `<div class="empty-state" style="padding:16px;"><i class="fas fa-spinner fa-spin"></i></div>`;
     if (wrap) wrap.style.display = 'block';
 
     try {
       const params = new URLSearchParams({ service_id: svcId, date: fromDate, status: 'confirmed' });
       const res  = await fetch('/api/admin/bookings/by-date?' + params.toString());
       const data = await res.json();
-      cancelSkeleton();
 
       if (!data.success || !data.data.length) {
         wrap.style.display  = 'none';
@@ -184,7 +181,6 @@
 
       onCbChange();
     } catch (_) {
-      cancelSkeleton();
       if (list) list.innerHTML = `<div class="empty-state" style="padding:16px;"><i class="fas fa-exclamation-triangle"></i><p>Failed to load bookings</p></div>`;
     }
   }

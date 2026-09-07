@@ -1,6 +1,6 @@
  AdminLayout.init({ activePage: 'services', breadcrumb: 'Services' });
 
-  const { formatCurrency, skeletonCards } = AdminLayout;
+  const { formatCurrency } = AdminLayout;
 
   //  State 
   let editingServiceId  = null;
@@ -92,14 +92,11 @@
   //  Load Services 
   async function loadServices() {
     const grid = document.getElementById('servicesGrid');
-     const cancelSkeleton = AdminLayout.delayedSkeleton(() => {
-    grid.innerHTML = skeletonCards(3);
-  });
+    grid.innerHTML = `<div class="empty-state full-width"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
 
     try {
       const res  = await fetch('/api/admin/services');
       const data = await res.json();
-      cancelSkeleton();
 
       if (!data.success || !data.data.length) {
         grid.innerHTML = `<div class="full-width"><div class="empty-state">
@@ -148,7 +145,6 @@
           </div>
         </div>`).join('');
     } catch (err) {
-      cancelSkeleton();
       console.error('Load services error:', err);
       grid.innerHTML = `<div class="full-width"><div class="empty-state">
         <i class="fas fa-exclamation-triangle"></i><p>Failed to load services</p>
