@@ -7,15 +7,15 @@ const PAGES_DIR = path.join(__dirname, 'pages');
 
 router.get('/admin.css',       (req, res) => res.sendFile(path.join(__dirname, 'admin.css')));
 router.get('/admin-layout.js', (req, res) => res.sendFile(path.join(__dirname, 'admin-layout.js')));
-router.get('/dashboard.js',    (req, res) => res.sendFile(path.join(__dirname, 'dashboard.js')));
-router.get('/audit.js',        (req, res) => res.sendFile(path.join(__dirname, 'audit.js')));
-router.get('/availability.js', (req, res) => res.sendFile(path.join(__dirname, 'availability.js')));
-router.get('/bookings.js',     (req, res) => res.sendFile(path.join(__dirname, 'bookings.js')));
-router.get('/walkins.js',      (req, res) => res.sendFile(path.join(__dirname, 'walkins.js')));
-router.get('/reschedule.js',   (req, res) => res.sendFile(path.join(__dirname, 'reschedule.js')));
-router.get('/services.js',     (req, res) => res.sendFile(path.join(__dirname, 'services.js')));
-router.get('/staff.js',        (req, res) => res.sendFile(path.join(__dirname, 'staff.js')));
-router.get('/payments.js',     (req, res) => res.sendFile(path.join(__dirname, 'payments.js')));
+router.get('/dashboard.js',    (req, res) => res.sendFile(path.join(PAGES_DIR, 'dashboard.js')));
+router.get('/audit.js',        (req, res) => res.sendFile(path.join(PAGES_DIR, 'audit.js')));
+router.get('/availability.js', (req, res) => res.sendFile(path.join(PAGES_DIR, 'availability.js')));
+router.get('/bookings.js',     (req, res) => res.sendFile(path.join(PAGES_DIR, 'bookings.js')));
+router.get('/walkins.js',      (req, res) => res.sendFile(path.join(PAGES_DIR, 'walkins.js')));
+router.get('/reschedule.js',   (req, res) => res.sendFile(path.join(PAGES_DIR, 'reschedule.js')));
+router.get('/service.js',      (req, res) => res.sendFile(path.join(PAGES_DIR, 'service.js')));
+router.get('/staff.js',        (req, res) => res.sendFile(path.join(PAGES_DIR, 'staff.js')));
+router.get('/payments.js',     (req, res) => res.sendFile(path.join(PAGES_DIR, 'payments.js')));
 
 router.get('/',             (req, res) => res.redirect('/admin/dashboard'));
 router.get('/dashboard',    (req, res) => res.sendFile(path.join(PAGES_DIR, 'dashboard.html')));
